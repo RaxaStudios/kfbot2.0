@@ -6,28 +6,24 @@
 package com.twitchbotx.gui;
 
 import com.twitchbotx.bot.*;
-import com.twitchbotx.bot.handlers.*;
 import com.twitchbotx.bot.ConfigParameters.Elements;
 import com.twitchbotx.bot.client.TwitchMessenger;
+import eu.mihosoft.scaledfx.ScalableContentPane;
 import java.io.BufferedReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.URI;
-import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import javax.xml.parsers.ParserConfigurationException;
-import org.xml.sax.SAXException;
+import javafx.concurrent.Task;
 
 /**
  *
@@ -36,13 +32,13 @@ import org.xml.sax.SAXException;
 public class guiHandler extends Application {
 
     //TODO
-    public static Datastore store;
+    public Datastore store;
     final ConfigParameters configuration = new ConfigParameters();
     public static TwitchMessenger messenger;
     public static PrintStream out;
-    public static BufferedReader in;
+    public BufferedReader in;
     public static TwitchBotX bot;
-    public static Socket socket;
+    public Socket socket;
 
     //refine event viewer mod actions, command updates, etc
     public static String dashboardID = "dashboard";
@@ -59,9 +55,13 @@ public class guiHandler extends Application {
     //moderation -> filters, phrases, toggles, spam
     public static String moderationID = "moderation";
     public static String moderationFile = "Moderation.fxml";
+    public static String regexID = "regex";
+    public static String regexFile = "Regex.fxml";
     //queue, lottery, raffle display users + order, scrollable
     public static String lotteryID = "lottery";
     public static String lotteryFile = "Lottery.fxml";
+    public static String songLottoID = "songLotto";
+    public static String songLottoFile = "SongLotto.fxml";
     //spoopathon system
     public static String spoopathonID = "spoopathon";
     public static String spoopathonFile = "Spoopathon.fxml";
@@ -85,32 +85,53 @@ public class guiHandler extends Application {
      */
     @Override
     public void start(Stage primaryStage) {
+        //begin bot setup
         try {
             Path xmlFile = Paths.get("");
             Path xmlResolved = xmlFile.resolve("kfbot.xml");
-            System.out.println("kfbot.xml file found at path: " + xmlResolved.toString());
             final Elements elements = configuration.parseConfiguration(xmlResolved.toString());
             store = new XmlDatastore(elements);
+            //store.setStore(store);
             socket = new Socket(store.getConfiguration().host, store.getConfiguration().port);
+            socket.setKeepAlive(true);
+            //store.setSocket(socket);
             out = new PrintStream(socket.getOutputStream());
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out.println("PASS " + store.getConfiguration().password);
-            out.println("NICK " + store.getConfiguration().account);
-            out.println("JOIN #" + store.getConfiguration().joinedChannel);
-            messenger = new TwitchMessenger(out, store.getConfiguration().joinedChannel);
-            bot = new TwitchBotX();
+            //store.setOut(out);
+            Charset charset = Charset.forName("UTF-8");
+            //outWriter = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), charset));
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream(), charset));
+            //store.setIn(in);
+
+            bot = new TwitchBotX(store, in, out, socket);
+            store.setBot(bot);
+            //out.println("PASS " + store.getConfiguration().password);
+            //out.println("NICK " + store.getConfiguration().account);
+            //out.println("JOIN #" + store.getConfiguration().joinedChannel);
+            messenger = new TwitchMessenger(store.getBot().getOut(), store.getConfiguration().joinedChannel);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        //create and show GUI
         ScreensController container = new ScreensController();
         container.loadScreen(dashboardID, dashboardFile);
         container.setScreen(dashboardID);
-
+        // TODO resizing scale options
         Group root = new Group();
         root.getChildren().addAll(container);
+        root.setStyle("-fx-font-family: \"Comfortaa\", cursive;");
+        ScalableContentPane scale = new ScalableContentPane();
         Scene scene = new Scene(root);
-        stage.setScene(scene);
+        scene.getStylesheets().add("https://fonts.googleapis.com/css?family=Comfortaa");
+        scale.setContent(root);
+        Scene testScale = new Scene(scale, 600, 400);
+        testScale.getStylesheets().add("https://fonts.googleapis.com/css?family=Comfortaa");
+        //stage.setScene(scene);
+        stage.setScene(testScale);
+        stage.setTitle("Kungfufruit Bot 2.0");
+        stage.getIcons().add(new Image("http://kf.bot.raxastudios.com/kffcLove.png"));
         stage.show();
         stage.setOnCloseRequest(e -> System.exit(0));
+        System.out.println("test print after open bot data: " + store.getBot().getSock().toString());
     }
 }

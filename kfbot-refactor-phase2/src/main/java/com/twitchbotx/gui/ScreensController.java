@@ -5,6 +5,7 @@
  */
 package com.twitchbotx.gui;
 
+import eu.mihosoft.scaledfx.ScalableContentPane;
 import java.util.HashMap;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -22,6 +23,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -48,9 +50,9 @@ public class ScreensController extends StackPane {
     public boolean loadScreen(String name, String resource) {
         AnchorPane r = null;
         try {
-           FXMLLoader loadFXML = new FXMLLoader();
-           loadFXML.setLocation(getClass().getClassLoader().getResource(resource));
-           Parent content = loadFXML.load();
+            FXMLLoader loadFXML = new FXMLLoader();
+            loadFXML.setLocation(getClass().getClassLoader().getResource(resource));
+            Parent content = loadFXML.load();
             r = (AnchorPane) content;
             addScreen(name, r);
             return true;
@@ -85,9 +87,20 @@ public class ScreensController extends StackPane {
 
     public void show(Node node) {
         Group group = new Group();
+        node.setStyle("-fx-font-family: \"Comfortaa\";");
         group.getChildren().addAll(node);
-        Scene visibleScreen = new Scene(group);
-        guiHandler.stage.setScene(visibleScreen);
+        /*Scene visibleScreen = new Scene(group);
+        visibleScreen.getStylesheets().add("https://fonts.googleapis.com/css?family=Comfortaa");
+        guiHandler.stage.setScene(visibleScreen);*/
+        
+        //scalable content update
+        //TODO set scale value based on last viewed page?
+        ScalableContentPane scale = new ScalableContentPane();
+        scale.setContent(group);
+        Scene testScale = new Scene(scale, 600, 400);
+        testScale.getStylesheets().add("https://fonts.googleapis.com/css?family=Comfortaa:700");
+        guiHandler.stage.setScene(testScale);
+
     }
 
     //This method will remove the screen with the given name from the collection of screens

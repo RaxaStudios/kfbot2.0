@@ -38,6 +38,14 @@ public final class ConfigParameters {
         public Element filters;
 
         public NodeList filterNodes;
+        
+        public Element phrases;
+        
+        public NodeList phraseNodes;
+        
+        public Element regex;
+        
+        public NodeList regexNodes;
     }
 
     /**
@@ -98,6 +106,8 @@ public final class ConfigParameters {
         public String lottoName;
 
         public String pyramidResponse;
+        
+        public String pings;
 
         @Override
         public String toString() {
@@ -127,6 +137,7 @@ public final class ConfigParameters {
                     + ", sStatus=" + sStatus
                     + ", lottoAuth=" + lottoAuth
                     + ", lottoName=" + lottoName
+                    + ", pings=" + pings
                     + ", pyramidResponse='" + pyramidResponse + '\''
                     + '}';
         }
@@ -209,22 +220,65 @@ public final class ConfigParameters {
      */
     public final static class Filter {
 
-        public boolean disabled;
+        public boolean enabled;
 
         public String name;
 
         public String reason;
+        
+        public String seconds;
 
         @Override
         public String toString() {
             return "Filter{"
-                    + "disabled='" + disabled + '\''
+                    + "enabled='" + enabled + '\''
                     + ", name='" + name + '\''
                     + ", reason='" + reason + '\''
+                    + ", seconds=" + seconds + '\''
+                    + '}';
+        }
+    }
+    
+    public final static class FilterPhrase {
+        public boolean enabled;
+        
+        public String phrase;
+        
+        public String reason;
+        
+        public String seconds;
+        
+        @Override 
+        public String toString(){
+            return "FilterPhrase{"
+                    + "enabled='" + enabled + '\''
+                    + ", phrase='" + phrase + '\''
+                    + ", reason='" + reason + '\''
+                    + ", seconds=" + seconds + '\''
                     + '}';
         }
     }
 
+        public final static class FilterRegex {
+        public boolean enabled;
+        
+        public String content;
+        
+        public String reason;
+        
+        public String seconds;
+        
+        @Override 
+        public String toString(){
+            return "FilterRegex{"
+                    + "enabled='" + enabled + '\''
+                    + ", content='" + content + '\''
+                    + ", reason='" + reason + '\''
+                    + ", seconds=" + seconds + '\''
+                    + '}';
+        }
+    }
+    
     /**
      * This method will parse the configuration and save off references to each
      * of the parsed XML file parts.
@@ -266,6 +320,10 @@ public final class ConfigParameters {
         elements.counterNodes = elements.counters.getElementsByTagName("counter");
         elements.filters = (Element) elements.doc.getElementsByTagName("filters").item(0);
         elements.filterNodes = elements.filters.getElementsByTagName("filter");
+        elements.phrases = (Element) elements.doc.getElementsByTagName("filterPhrases").item(0);
+        elements.phraseNodes = elements.doc.getElementsByTagName("filterPhrase");
+        elements.regex = (Element) elements.doc.getElementsByTagName("filterRegexes").item(0);
+        elements.regexNodes = elements.doc.getElementsByTagName("filterRegex");
         return elements;
     }
 }

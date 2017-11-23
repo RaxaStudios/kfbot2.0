@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.RegexController">
+   <children>
+      <Button layoutX="14.0" layoutY="361.0" mnemonicParsing="false" onAction="#moderation" text="Moderation Home" />
+      <ListView fx:id="filterList" layoutX="38.0" layoutY="110.0" prefHeight="233.0" prefWidth="200.0" />
+      <Label layoutX="95.0" layoutY="67.0" text="Current Filters">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="234.0" layoutY="14.0" text="Regex Manager">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="422.0" layoutY="67.0" text="Edit Regex">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Button layoutX="521.0" layoutY="135.0" mnemonicParsing="false" onAction="#addRegex" text="Add" />
+      <Button layoutX="502.0" layoutY="223.0" mnemonicParsing="false" onAction="#delRegex" text="Remove" />
+      <Button layoutX="506.0" layoutY="307.0" mnemonicParsing="false" onAction="#editRegex" text="Submit" />
+      <Label layoutX="301.0" layoutY="227.0" text="Index" />
+      <Label layoutX="301.0" layoutY="311.0" text="Index" />
+      <Label layoutX="271.0" layoutY="139.0" text="New Regex" />
+      <TextField fx:id="newRegex" layoutX="351.0" layoutY="135.0" />
+      <TextField fx:id="deleteIndex" layoutX="351.0" layoutY="223.0" prefHeight="25.0" prefWidth="65.0" />
+      <TextField fx:id="editIndex" layoutX="352.0" layoutY="310.0" prefHeight="25.0" prefWidth="65.0" />
+      <Label layoutX="405.0" layoutY="110.0" text="Create" />
+      <Label layoutX="404.0" layoutY="192.0" text="Remove" />
+      <Label layoutX="408.0" layoutY="272.0" text="Enable" />
+      <RadioButton layoutX="445.0" layoutY="302.0" mnemonicParsing="false" selected="true" text="On">
+         <toggleGroup>
+            <ToggleGroup fx:id="enabled" />
+         </toggleGroup>
+      </RadioButton>
+      <RadioButton layoutX="444.0" layoutY="327.0" mnemonicParsing="false" text="Off" />
+   </children>
+</AnchorPane>

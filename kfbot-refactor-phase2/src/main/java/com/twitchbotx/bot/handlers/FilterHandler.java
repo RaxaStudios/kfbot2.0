@@ -17,6 +17,9 @@ public final class FilterHandler {
         this.store = store;
     }
 
+    
+    //TODO create system to allow for indexing, timeout changes, phrase parsing, reason parsing
+    
     /**
      * This method returns a list of known filters back to the user.
      *
@@ -72,7 +75,8 @@ public final class FilterHandler {
             final ConfigParameters.Filter filter = new ConfigParameters.Filter();
             filter.name = filterName;
             filter.reason = reason;
-            filter.disabled = false;
+            filter.enabled = true;
+            filter.seconds = "600";
             boolean added = store.addFilter(filter);
             if(added) {
                 return ".w " + user + " Filter added.";

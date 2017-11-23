@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.SongLottoController">
+  
+
+    <children>
+      <Button layoutX="1.0" layoutY="353.0" mnemonicParsing="false" onAction="#goToDashboard" text="Dashboard" />
+      <ScrollPane fx:id="queueList" layoutX="358.0" layoutY="53.0" prefHeight="288.0" prefWidth="212.0" />
+      <Button layoutX="244.0" layoutY="300.0" mnemonicParsing="false" onAction="#drawWinner" text="Draw Winner" />
+      <Label alignment="CENTER" layoutX="139.0" layoutY="255.0" text="Winner" />
+      <Label alignment="CENTER" layoutX="5.0" layoutY="189.0" text="Username" />
+      <Label alignment="CENTER" layoutY="225.0" text="Song Name" />
+      <TextField fx:id="username" layoutX="83.0" layoutY="184.0" style="-fx-border-color: grey;" />
+      <TextField fx:id="songName" layoutX="83.0" layoutY="220.0" prefHeight="27.0" prefWidth="151.0" style="-fx-border-color: grey;" />
+      <Button layoutX="254.0" layoutY="208.0" mnemonicParsing="false" onAction="#addUser" text="Add User" />
+      <Button layoutX="420.0" layoutY="353.0" mnemonicParsing="false" onAction="#showQueue" text="Show/Update" />
+      <Label layoutX="68.0" layoutY="43.0" text="Song Lotto Status" underline="true">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label fx:id="statusWindow" alignment="CENTER" contentDisplay="CENTER" layoutX="28.0" layoutY="76.0" prefHeight="71.0" prefWidth="190.0" style="-fx-border-color: grey; -fx-background-color: white;" wrapText="true" />
+      <Label fx:id="winnerName" alignment="CENTER" contentDisplay="CENTER" layoutX="83.0" layoutY="272.0" prefHeight="27.0" prefWidth="151.0" style="-fx-background-color: white; -fx-border-color: grey;" />
+      <Button layoutX="243.0" layoutY="76.0" mnemonicParsing="false" onAction="#openLotto" text="Open Lottery" />
+      <Label layoutX="182.0" layoutY="15.0" text="Song Lottery Manager">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Button layoutX="245.0" layoutY="353.0" mnemonicParsing="false" onAction="#clearQueue" text="Clear Queue" />
+      <Label layoutX="416.0" layoutY="32.0" text="Current Queue">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Button layoutX="243.0" layoutY="122.0" mnemonicParsing="false" onAction="#closeLotto" text="Close Lottery" />
+      <Label layoutY="317.0" text="Song Name" />
+      <Label layoutX="5.0" layoutY="277.0" text="Username" />
+      <Label layoutX="134.0" layoutY="159.0" text="Add User" />
+      <Label fx:id="winnerSong" alignment="CENTER" contentDisplay="CENTER" layoutX="83.0" layoutY="312.0" prefHeight="27.0" prefWidth="151.0" style="-fx-background-color: white; -fx-border-color: grey;" textAlignment="CENTER" />
+   </children>
+</AnchorPane>

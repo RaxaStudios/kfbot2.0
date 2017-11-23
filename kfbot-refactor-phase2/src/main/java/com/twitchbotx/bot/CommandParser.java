@@ -2,12 +2,11 @@ package com.twitchbotx.bot;
 
 import com.twitchbotx.bot.client.TwitchMessenger;
 import com.twitchbotx.bot.handlers.*;
-import com.twitchbotx.gui.LotteryController;
-import static com.twitchbotx.gui.guiHandler.store;
 
 import java.io.PrintStream;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import javafx.application.Platform;
 
 /**
  * This class is used to parse all commands flowing through it.
@@ -38,13 +37,15 @@ public final class CommandParser {
     private final CountHandler countHandler;
 
     // For lottery system
-    private final LotteryHandler lotteryHandler;
-    private Datastore kStore;
-    final ConfigParameters configuration = new ConfigParameters();
-    public static boolean lottoOn = false;
+    public static LotteryHandler.Lotto lotto = new LotteryHandler.Lotto();
+    public static LotteryHandler.SongList songs = new LotteryHandler.SongList();
+    final ConfigParameters configuration = new ConfigParameters();;
 
     // For handling SQL transactions
     private final sqlHandler sql;
+
+    // For handling displayname capitalization 
+    public static String displayName = "";
 
     // For filter handling
     private final FilterHandler filterHandler;
@@ -70,11 +71,15 @@ public final class CommandParser {
         this.filterHandler = new FilterHandler(store);
         this.youtubeHandler = new YoutubeHandler(store, stream);
         this.moderationHandler = new ModerationHandler(store, stream);
-        this.messenger = new TwitchMessenger(stream, store.getConfiguration().joinedChannel);
-        this.lotteryHandler = new LotteryHandler(store, stream);
+        this.messenger = new TwitchMessenger(stream, store.getConfiguration().joinedChannel);;
         this.sql = new sqlHandler(store, stream);
         this.outstream = stream;
         this.store = store;
+    }
+
+    public void addPing() {
+        int newValue = Integer.parseInt(store.getConfiguration().pings) + 1;
+        store.modifyConfiguration("pings", String.valueOf(newValue));
     }
 
     /**
@@ -114,29 +119,25 @@ public final class CommandParser {
 //        }
         youtubeHandler.handleLinkRequest(trailing);
         moderationHandler.handleTool(username, trailing);
-
         //add check for lottery entrants
         //TODO create instance to check current keyword
         //issue: parsing value off startup name only
-        if (lottoOn) {
-            try {
-                final ConfigParameters.Elements elements = configuration.parseConfiguration("./kfbot.xml");
-                kStore = new XmlDatastore(elements);
-            } catch (Exception e) {
-                LOGGER.severe("keyword parse error:" + e.getMessage());
-            }
-            String keyword = kStore.getLottoName();
+        if (lotto.getLottoStatus()) {
+            String keyword = lotto.getLottoName();
             if (keyword == null) {
                 keyword = "";
             }
-            System.out.println("Keyword:" + keyword);
             if (trailing.startsWith(keyword) && !keyword.equals("")) {
-                lotteryHandler.enter(username, sub);
+                lotto.addUser(username, sub);
             }
         }
 
         if (!trailing.startsWith("!")) {
             return;
+        }
+
+        if (trailing.startsWith("!test1")) {
+            sendEvent("Test event command");
         }
 
         if (trailing.startsWith("!uptime")) {
@@ -158,22 +159,67 @@ public final class CommandParser {
         //begin raffle system commands
         if (trailing.startsWith("!lottery-open")) {
             if (commandOptionsHandler.checkAuthorization("!lottery-open", username, mod, sub)) {
-                lotteryHandler.startLotto(trailing);
+                lotto.lottoOpen(trailing);
             }
             return;
         }
 
         if (trailing.startsWith("!lottery-clear")) {
             if (commandOptionsHandler.checkAuthorization("!lottery-clear", username, mod, sub)) {
-                lotteryHandler.clearLotto();
+                lotto.lottoClear();
             }
+            return;
+        }
+
+        if (trailing.startsWith("!unlottery")) {
+            lotto.leaveLotto(username);
             return;
         }
 
         if (trailing.startsWith("!draw")) {
             if (commandOptionsHandler.checkAuthorization("!draw", username, mod, sub)) {
-                lotteryHandler.drawWinner(trailing);
+                lotto.drawLotto();
             }
+            return;
+        }
+
+        if (trailing.startsWith("!song-open")) {
+            if (commandOptionsHandler.checkAuthorization("!song-open", username, mod, sub)) {
+                songs.songOpen();
+            }
+            return;
+        }
+
+        if (trailing.startsWith("!song-close")) {
+            if (commandOptionsHandler.checkAuthorization("!song-close", username, mod, sub)) {
+                songs.songClose();
+            }
+            return;
+        }
+
+        if (trailing.startsWith("!song-clear")) {
+            if (commandOptionsHandler.checkAuthorization("!song-clear", username, mod, sub)) {
+                songs.songClear();
+            }
+            return;
+        }
+
+        if (trailing.startsWith("!song-draw")) {
+            if (commandOptionsHandler.checkAuthorization("!song-draw", username, mod, sub)) {
+                songs.drawSong();
+            }
+            return;
+        }
+
+        if (trailing.startsWith("!song")) {
+            if (songs.getSongStatus()) {
+                songs.addUser(username, trailing);
+            }
+            return;
+        }
+
+        if (trailing.startsWith("!unsong")) {
+            songs.leaveSong(username);
             return;
         }
 
@@ -365,9 +411,12 @@ public final class CommandParser {
             if (msg.startsWith("PING")) {
                 final int trailingStart = msg.indexOf(" :");
                 final String trailing = msg.substring(trailingStart + 2);
-                this.outstream.println("PONG :tmi.twitch.tv\\r\\r");
+                this.outstream.println("PONG :" + trailing);
                 p++;
                 return;
+            }
+            if (msg.startsWith("PONG")) {
+                addPing();
             }
 
             boolean isMod = false;
@@ -453,5 +502,18 @@ public final class CommandParser {
             e.printStackTrace();
             LOGGER.log(Level.WARNING, "Error detected in parsing a message: throwing away message ", e.toString());
         }
+    }
+
+    //Method to add events to the GUI event list
+    //Stored in the store, created in DashboardController
+    //to address thread safety and concurrency
+    private void sendEvent(final String msg) {
+        String event = msg;
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                store.getEventList().addList(event);
+            }
+        });
     }
 }

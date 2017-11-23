@@ -9,15 +9,20 @@ import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.TwitchBotX;
 import com.twitchbotx.bot.XmlDatastore;
-import java.awt.Label;
-import java.awt.TextField;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.JFXPanel;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -26,6 +31,14 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javax.annotation.concurrent.GuardedBy;
+import javax.annotation.concurrent.ThreadSafe;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 
 /**
  * FXML Controller class
@@ -36,21 +49,15 @@ public class DashboardController implements Initializable, ControlledScreen {
 
     ScreensController myController = new ScreensController();
 
-    TwitchBotX bot = guiHandler.bot;
-    Datastore store = guiHandler.store;
-    PrintStream out = guiHandler.out;
+    TwitchBotX bot;
+    Datastore store;
+
+    static int visitCount = 0;
+
+    public static XmlDatastore.eventObList eventObL = new XmlDatastore.eventObList();
 
     @FXML
-    private Label label;
-
-    @FXML
-    private Label invalid_label;
-
-    @FXML
-    private TextField username_box;
-
-    @FXML
-    private TextField password_box;
+    private ListView<String> eventList;
 
     @FXML
     private Button commands;
@@ -73,12 +80,11 @@ public class DashboardController implements Initializable, ControlledScreen {
     private static JFXPanel dashContainer;
     private static final int JFXPANEL_WIDTH_INT = 600;
     private static final int JFXPANEL_HEIGHT_INT = 400;
-    private Thread botT;
 
     @FXML
     private void close(ActionEvent event) throws IOException {
-        System.out.println("Closing bot");
-        bot.cancel(); //stop running bot
+        guiHandler.bot.cancel(); //stop running bot
+        eventObL.addList("Bot has left channel");
     }
 
     @FXML
@@ -115,6 +121,7 @@ public class DashboardController implements Initializable, ControlledScreen {
 
     @FXML
     private void spoopathon(ActionEvent event) {
+
         myController.loadScreen(guiHandler.spoopathonID, guiHandler.spoopathonFile);
         myController.setScreen(guiHandler.spoopathonID);
         myController.setId("spoopathon");
@@ -129,41 +136,59 @@ public class DashboardController implements Initializable, ControlledScreen {
         myController.show(myController);
     }
 
+    
     @FXML
     private void startBot(ActionEvent event) {
-        botT = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    bot.cancel();
-                } catch (NullPointerException e) {
-                    System.out.println("No instance to cancel");
-                }
-                bot.createBot();
-                bot.start();
-                botT.setName("bot");
+        Thread botT;
+        try {
+            eventObL.addList("Starting bot");
+            try {
+                store.getBot().cancel();
+            } catch (NullPointerException ne) {
+                //ignore
             }
-        };
-        botT.start();
+            store.getBot().createBot();
+
+            store.getBot().start(false);
+            botT = new Thread() {
+                @Override
+                public void run() {
+                    store.getBot().beginReadingMessages();
+                }
+            };
+            botT.start();
+            eventObL.addList("Bot connected to chat");
+        } catch (NullPointerException e) {
+            eventObL.addList("No instance to cancel, restart the application");
+        } catch (Exception e) {
+            e.printStackTrace();
+            eventObL.addList("General error occured creating the bot, restart the application");
+        }
     }
 
     @FXML
     private void restartBot(ActionEvent event) {
-
-        botT = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    bot.cancel();
-                } catch (NullPointerException e) {
-                    System.out.println("No instance to cancel");
+        Thread botT;
+        try {
+            eventObL.addList("Restarting bot");
+            store.getBot().cancel();
+            store.getBot().createBot();
+            store.getBot().start(true);
+            botT = new Thread() {
+                @Override
+                public void run() {
+                    store.getBot().beginReadingMessages();
                 }
-                bot.createBot();
-                bot.start();
-                botT.setName("bot");
-            }
-        };
-        botT.start();
+            };
+            botT.start();
+
+            eventObL.addList("Bot connected to chat");
+        } catch (NullPointerException e) {
+            eventObL.addList("No instance to cancel, restart the application");
+        } catch (Exception e) {
+            e.printStackTrace();
+            eventObL.addList("General error occured creating the bot, restart the application");
+        }
     }
 
     public Scene getScene() throws IOException {
@@ -174,6 +199,20 @@ public class DashboardController implements Initializable, ControlledScreen {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        store = guiHandler.bot.getStore();
+        store.setLV(eventList);
+        store.getLV().setItems(eventObL.getList());
+        store.setEvent(eventObL);
+        if (visitCount == 0) {
+            eventObL.addList("Bot ready to connect");
+        }
+        visitCount++;
+    }
+
+    public void eventObLAdd(String msg) {
+        eventObL.addList(msg);
+        eventList.setItems(eventObL.getList());
+        eventList.scrollTo(eventObL.getList().size() - 1);
     }
 
     public void setScreenParent(ScreensController screenParent) {

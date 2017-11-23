@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.client.TwitchMessenger;
+import com.twitchbotx.gui.DashboardController;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -20,21 +21,22 @@ import java.text.DecimalFormat;
  *
  * @author Raxa
  */
-public class DonationHandler implements Runnable{
+public class DonationHandler implements Runnable {
+
     private static String accessToken;
     private final Datastore store;
     private final PrintStream outstream;
     private final TwitchMessenger messenger;
     private String temp = "";
     private int tempCount = 0;
-    
-    public DonationHandler(final Datastore store, final PrintStream outstream){
+
+    public DonationHandler(final Datastore store, final PrintStream outstream) {
         this.store = store;
         this.outstream = outstream;
         this.messenger = new TwitchMessenger(outstream, store.getConfiguration().joinedChannel);
         this.accessToken = store.getConfiguration().streamlabsToken;
     }
-    
+
     public void run() {
         try {
             String limit = "1";
@@ -54,14 +56,14 @@ public class DonationHandler implements Runnable{
                 temp = low.get("donation_id").asText();
                 tempCount++;
             }
-            
+
             if (temp.equals("") || !temp.equals(low.get("donation_id").asText())) {
                 //convert dollar amount to point value
                 //1 cent = 1 point i.e. $9.50 donation = 950 points
                 temp = low.get("donation_id").asText();
                 double amount = low.get("amount").asDouble();
                 DecimalFormat f = new DecimalFormat("##.00");
-                
+
                 String outAmount = (String) f.format(amount);
                 int am = low.get("amount").asInt();
                 outAmount = outAmount.replaceAll("[^0-9]", "");
@@ -71,9 +73,10 @@ public class DonationHandler implements Runnable{
                 System.out.println("From: " + username);
                 String msg = low.get("message").asText();
                 System.out.println("Message: " + msg);
-                
+
                 CountHandler ch = new CountHandler(store, outstream);
                 //ch.addPoints("!addPoints " + outAmount);
+                sendEvent(username, msg, am);
                 if (!msg.contains("#")) {
                     messenger.sendMessage(".w Raxa " + username + " donated $" + am + " for spoopathon with no #, message: \"" + msg + "\"");
                 } else {
@@ -92,4 +95,9 @@ public class DonationHandler implements Runnable{
         sql.gameSearch(msg, points);
     }
 
+    private void sendEvent(String user, String msg, int amount) {
+        String eventMsg = "Donation Event: " + user + " donated $" + amount + " with message: " + msg;
+        DashboardController dc = new DashboardController();
+        dc.eventObLAdd(eventMsg);
+    }
 }

@@ -1,6 +1,10 @@
 package com.twitchbotx.bot;
 
+import java.io.BufferedReader;
+import java.io.PrintStream;
+import java.net.Socket;
 import java.util.List;
+import javafx.scene.control.ListView;
 
 /**
  * This class represents a datastore, for where we store the configuration.
@@ -27,7 +31,8 @@ public interface Datastore {
      * A list of filters
      */
     List<ConfigParameters.Filter> getFilters();
-
+    List<ConfigParameters.FilterPhrase> getFilterPhrases();
+    List<ConfigParameters.FilterRegex> getRegexes();
     /**
      * This method is used to get a list of counters.
      *
@@ -47,6 +52,19 @@ public interface Datastore {
      */
     void modifyConfiguration(final String node, final String value);
 
+    /*
+     * Methods to configure and utilize a global connection system
+     *
+     *
+     *
+    */
+    
+    TwitchBotX getBot();
+    void setBot(TwitchBotX bot);
+    ListView<String> getLV();
+    void setLV(ListView<String> lv);
+    XmlDatastore.eventObList getEventList();
+    void setEvent(XmlDatastore.eventObList e);
     /**
      * This method adds a new command to the list of existing commands. If the command already exist, do nothing.
      *
@@ -61,6 +79,10 @@ public interface Datastore {
      */
     boolean addCommand(final String command, final String text);
 
+    boolean addCommand(final String command, final String auth, 
+                       final String cooldown, final String repeating, 
+                       final String initDelay, final String interval, 
+                       final String sound, final String msg);
     /**
      * This method edits or adds an existing command. If the command does not exist, simply add a new one.
      * If it already exists, modify it.
@@ -132,6 +154,9 @@ public interface Datastore {
      */
     boolean addFilter(final ConfigParameters.Filter filter);
 
+    
+    boolean updateFilter(final ConfigParameters.Filter filter);
+    
     /**
      * This method deletes an existing filter. If a filter does not exist, simply fail and do nothing.
      *
@@ -144,25 +169,7 @@ public interface Datastore {
      */
     boolean deleteFilter(final String filterName);
 
-        /**
-     * These methods deal with the lottery system
-     *
-     * @param 
-     * user to add
-     *
-     * @return
-     * Current List<String> in 
-     */
-    List<String> lotteryList();
-    void openLottery(String auth, String keyword);
-    void setupLotto(String auth, String keyword);
-    boolean addLotteryList(String user);
-    String drawLotteryList();
-    void clearLotteryList();
-    boolean getQOpen();
-    void openQueue();
-    void closeQueue();
-    String getLottoName();
+
     /**
      * This method updates the cooldown timer.
      *

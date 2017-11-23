@@ -139,7 +139,7 @@ public class WhisperHandler {
                             }
                         }
                     }
-                } else if (root.get("type").asText().equalsIgnoreCase("PONG")) {
+                } else if (root.get("type").asText().contains("PONG")) {
                     pongCounter++;
                 }
             } catch (IOException e) {

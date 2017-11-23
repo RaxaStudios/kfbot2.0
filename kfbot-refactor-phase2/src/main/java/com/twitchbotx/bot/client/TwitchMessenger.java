@@ -1,5 +1,6 @@
 package com.twitchbotx.bot.client;
 
+import com.twitchbotx.gui.guiHandler;
 import java.io.PrintStream;
 
 /**
@@ -25,7 +26,7 @@ public final class TwitchMessenger {
     public void sendWhisper(final String msg) {
         if (!msg.isEmpty()) {
             final String message = msg;
-            this.outstream.println("PRIVMSG #"
+            guiHandler.bot.getOut().println("PRIVMSG #"
                     + channel
                     + " "
                     + ":"
@@ -44,7 +45,7 @@ public final class TwitchMessenger {
     public void sendMessage(final String msg) {
         if (!msg.isEmpty()) {
             final String message = "/me > " + msg;
-            this.outstream.println("PRIVMSG #"
+            guiHandler.bot.getOut().println("PRIVMSG #"
                     + channel
                     + " "
                     + ":"

@@ -8,6 +8,7 @@ package com.twitchbotx.bot.handlers;
 import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.client.TwitchMessenger;
+import com.twitchbotx.gui.DashboardController;
 import java.io.File;
 import java.io.PrintStream;
 import java.net.URL;
@@ -51,6 +52,10 @@ public class sqlHandler {
 
     private Datastore store;
 
+    private String gameName;
+    private String gameID;
+    private String gamePoints;
+
     public sqlHandler(final Datastore store,
             final PrintStream stream) {
         this.store = store;
@@ -58,6 +63,9 @@ public class sqlHandler {
         this.USER = store.getConfiguration().sqlUser;
         this.PASS = store.getConfiguration().sqlPass;
         this.messenger = new TwitchMessenger(stream, store.getConfiguration().joinedChannel);
+        this.gameID = "";
+        this.gameName = "";
+        this.gamePoints = "";
     }
 
     //open the connection
@@ -123,6 +131,69 @@ public class sqlHandler {
         closeConnection();
     }
 
+    /*
+    ** get methods for points, name, id
+     */
+    public String getData(int index) {
+        //index for sql query
+        try {
+            Statement getData = connect();
+            String findData = "SELECT * FROM bot WHERE gameID=\'" + index + "\'";
+            String name = "";
+            int points = 0;
+            int id = 0;
+            try {
+                ResultSet gd = getData.executeQuery(findData);
+                while (gd.next()) {
+                    name = gd.getString("Game");
+                    points = gd.getInt("Points");
+                    id = gd.getInt("gameID");
+                }
+                String returnData = "#" + id + " " + name + ": " + points;
+                return returnData;
+            } catch (SQLException sql) {
+                LOGGER.severe(sql.toString());
+            } finally {
+                try {
+                    getData.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(sqlHandler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        } finally {
+            closeConnection();
+        }
+
+        gamePoints = "1";
+        gameName = "Name";
+        gameID = "ID";
+        String returnData = "#" + gameID + " " + gameName + ": " + gamePoints;
+        return returnData;
+    }
+
+    public int getSize() {
+        Statement getSize = connect();
+        String findSize = "SELECT gameID FROM bot";
+        int size = 0;
+        try {
+            ResultSet gs = getSize.executeQuery(findSize);
+            while (gs.next()) {
+                size = gs.getInt("gameID");
+            }
+            return size;
+        } catch (SQLException sql) {
+            LOGGER.severe(sql.toString());
+        } finally {
+            closeConnection();
+            try {
+                getSize.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(sqlHandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return size;
+    }
+
     public void addPoints(String msg) {
         String enabled = this.store.getConfiguration().sStatus;
         System.out.println(enabled);
@@ -146,6 +217,7 @@ public class sqlHandler {
                 sqlStatement = "UPDATE bot SET Points=" + amount + " WHERE Game=\'" + game + "\'";
                 addPoints.execute(sqlStatement);
                 messenger.sendMessage(points + " added to " + game);
+                sendEvent(game, points);
                 closeConnection();
             } catch (IllegalArgumentException il) {
                 messenger.sendMessage("Syntax: !s-addPoints [gameID] [points]");
@@ -289,15 +361,18 @@ public class sqlHandler {
 
     }
 
-    
-    public void download(){
-        try{
-        FileUtils.copyURLToFile(new URL("url to jar here"), new File("KFbot-1.1.jar"));
-        }catch(Exception e){
+    private void sendEvent(String game, int points) {
+        String eventMsg = "Spoopathon Event: " + points + " added to  " + game;
+        DashboardController dc = new DashboardController();
+        dc.eventObLAdd(eventMsg);
+    }
+
+    public void download() {
+        try {
+            FileUtils.copyURLToFile(new URL("url to jar here"), new File("KFbot-1.1.jar"));
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
-    
-    
+
 }

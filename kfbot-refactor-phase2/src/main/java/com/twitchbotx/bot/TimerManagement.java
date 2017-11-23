@@ -1,9 +1,17 @@
 package com.twitchbotx.bot;
 
+import com.twitchbotx.gui.DashboardController;
+import com.twitchbotx.gui.guiHandler;
 import java.io.PrintStream;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import javafx.application.Platform;
+import javax.annotation.concurrent.GuardedBy;
+import javax.annotation.concurrent.ThreadSafe;
 import org.w3c.dom.Element;
 
 /*
@@ -18,8 +26,9 @@ import org.w3c.dom.Element;
  */
 public final class TimerManagement {
 
-    private final PrintStream outstream;
-    private final ConfigParameters.Elements elements;
+    public static ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
+    // private final PrintStream outstream;
+    private final Datastore store;
     private static final Logger LOGGER = Logger.getLogger(TwitchBotX.class.getSimpleName());
 
     /*
@@ -28,89 +37,75 @@ public final class TimerManagement {
 ** "repeating" = True commands need to start when the bot starts
 ** all commands set to repeat need to start (including created/edited commands)
      */
-    public TimerManagement(final ConfigParameters.Elements elements,
-            final PrintStream stream) {
-        this.elements = elements;
-        this.outstream = stream;
+    public TimerManagement() {
+        this.store = guiHandler.bot.getStore();
+        //this.outstream = stream;
     }
 
-    public void setupPeriodicBroadcast(final ConfigParameters.Elements repeating) {
-        for (int i = 0; i < elements.commandNodes.getLength(); i++) {
-            Element ca = (Element) repeating.commandNodes.item(i);
+    public void setupPeriodicBroadcast(final Datastore repeating) {
+        for (int i = 0; i < store.getCommands().size(); i++) {
 
-            if (Boolean.parseBoolean(ca.getAttribute("repeating"))) {
-                long d = Long.parseLong(ca.getAttribute("initialDelay")) * 1000L;
-                Long l = Long.parseLong(ca.getAttribute("interval")) * 1000L;
-                if (l < 60000L) {
-                    System.out.println("Repeating interval too short for command " + ca.getAttribute("name"));
+            final ConfigParameters.Command command = store.getCommands().get(i);
+
+            if (Boolean.parseBoolean(command.repeating)) {
+                int iDelay = Integer.parseInt(command.initialDelay);
+                int interval = Integer.parseInt(command.interval);
+                if (interval < 600) {
+                    String event = "Repeating interval too short for command " + command.name;
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            store.getEventList().addList(event);
+                        }
+                    });
                 } else {
-                    new Timer().schedule(new rTimer(ca.getTextContent(), l), d);
+                    ses.scheduleWithFixedDelay(new Runnable() {
+                        @Override
+                        public void run() {
+                            sendMessage(command.text);
+                        }
+                        // }, 0, 10, TimeUnit.SECONDS);
+                    }, iDelay, interval, TimeUnit.SECONDS);
+                    String event = "Starting repeating command: " + command.name;
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            store.getEventList().addList(event);
+                        }
+                    });
 
                 }
             }
         }
     }
 
-    static class rTimer
-            extends TimerTask implements Runnable {
-
-        String message;
-        long repeatingTimer;
-
-        public rTimer(String msg, long timer) {
-            this.message = msg;
-            this.repeatingTimer = timer;
-        }
-
-        @Override
-        public void run() {
-            new Timer().schedule(new rTimer(this.message, this.repeatingTimer), this.repeatingTimer);
-            /*sendTimer sendMessage = new sendTimer(this.message);*/
-            //sendMessage.run();
-            /*sendMessage(this.message);*/
-
-            System.out.println("Starting repeating commands" + this.message);
-        }
-    }
-
-    /**
-     * This command will send a message out to a specific Twitch channel.
-     *
-     * It will also wrap the message in pretty text (> /me) before sending it
-     * out.
-     */
-    static class sendTimer implements Runnable {
-
-        private final PrintStream outstream;
-        private final ConfigParameters.Elements elements;
-        String msg1;
-
-        public sendTimer(String message1) {
-            this.msg1 = message1;
-            this.outstream = null;
-            this.elements = null;
-        }
-
-        private void sendMessage(final String msg) {
-            final String message = "/me > " + msg;
-            this.outstream.println("PRIVMSG #"
-                    + this.elements.configNode.getElementsByTagName("myChannel").item(0).getTextContent()
-                    + " "
-                    + ":"
-                    + message);
-        }
-
-        public void run() {
-
-        }
-    }
-
     private void sendMessage(final String msg) {
-        final String message = "/me > " + msg;
-        this.outstream.println("PRIVMSG #"
-                + this.elements.configNode.getElementsByTagName("myChannel").item(0).getTextContent()
+        final String sendMessage = "/me > " + msg;
+        guiHandler.bot.getOut().println("PRIVMSG #"
+                + store.getConfiguration().joinedChannel
                 + " "
                 + ":"
-                + message);
+                + sendMessage);
     }
+
+    @ThreadSafe
+    public static class pongHandler {
+
+        @GuardedBy("this")
+        private int pongCounter = 1;
+
+        public synchronized int getPong() {
+            return pongCounter;
+        }
+
+        public synchronized void addPong() {
+            pongCounter++;
+        }
+
+        public synchronized void resetPong() {
+            pongCounter = 0;
+        }
+
+    }
+
 }

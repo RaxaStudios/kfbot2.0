@@ -16,6 +16,7 @@ import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.client.TwitchMessenger;
+import com.twitchbotx.gui.DashboardController;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
@@ -43,7 +44,7 @@ public class PubSubBitsHandler {
         this.CHANNEL_ID = store.getConfiguration().channelID;
         this.CHANNEL_AUTH_TOKEN = store.getConfiguration().pubSubAuthToken;
     }
-    
+
     public static void connect(final Datastore store,
             final PrintStream outstream) {
         try {
@@ -52,7 +53,7 @@ public class PubSubBitsHandler {
         } catch (IOException | WebSocketException e) {
             e.printStackTrace();
         }
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> connection.sendText("{ \"type\": \"PING\" }"), 7, 5, TimeUnit.MINUTES);
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> connection.sendText("{ \"type\": \"PING\" }"), 3, 5, TimeUnit.MINUTES);
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> checkPongs(store, outstream), 22, 20, TimeUnit.MINUTES);
     }
 
@@ -76,7 +77,7 @@ public class PubSubBitsHandler {
         public PubSubListener(final Datastore store, final PrintStream outstream) {
             this.store = store;
             this.outstream = outstream;
-             this.messenger = new TwitchMessenger(outstream, store.getConfiguration().joinedChannel);
+            this.messenger = new TwitchMessenger(outstream, store.getConfiguration().joinedChannel);
         }
 
         @Override
@@ -110,9 +111,9 @@ public class PubSubBitsHandler {
                             String msg = messageNode.get("data").get("chat_message").asText();
                             //send information to CountHandler.java
                             //bits are added 1 point per cent
-
-                                //bits1 = bits1 / 100;
-                                int b = (int) ((bits1)/100);
+                            sendEvent(userName, msg, bits);
+                            //bits1 = bits1 / 100;
+                            int b = (int) ((bits1) / 100);
                             //addPoints(bits);
                             if (!msg.contains("#") && bits > 99) {
                                 messenger.sendMessage("@" + userName + ", let a mod know what game you'd like to choose for !spoopathon");
@@ -120,7 +121,7 @@ public class PubSubBitsHandler {
                                 addSubSQLPoints(msg, b);
                             }
                         }
-                    } else if (root.get("type").asText().equalsIgnoreCase("PONG")) {
+                    } else if (root.get("type").asText().contains("PONG")) {
                         pongCounter++;
                     }
                 } catch (IOException e) {
@@ -168,6 +169,11 @@ public class PubSubBitsHandler {
             sqlHandler sql = new sqlHandler(store, outstream);
             sql.gameSearch(msg, points);
         }
+
+        private void sendEvent(String user, String msg, int bits) {
+            String eventMsg = "Bit Event: " + user + " cheered " + bits + " bits. Message: " + msg;
+            DashboardController dc = new DashboardController();
+            dc.eventObLAdd(eventMsg);
+        }
     }
 }
-

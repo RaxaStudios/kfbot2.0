@@ -1,11 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.ModerationController">
-    
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.ModerationController">
+   <children>
+      <Button layoutX="27.0" layoutY="355.0" mnemonicParsing="false" onAction="#dash" text="Dashboard" />
+      <Label layoutX="88.0" layoutY="64.0" text="Current Filters">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label layoutX="213.0" layoutY="14.0" text="Moderation Settings">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Button layoutX="387.0" layoutY="343.0" mnemonicParsing="false" onAction="#deleteFilter" text="Delete" />
+      <Button layoutX="263.0" layoutY="188.0" mnemonicParsing="false" onAction="#selectFilter" text="Edit" />
+      <Label layoutX="444.0" layoutY="64.0" text="Filter Editor">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label layoutX="338.0" layoutY="106.0" text="Text:" />
+      <Label layoutX="328.0" layoutY="153.0" text="Enabled:" />
+      <Label layoutX="327.0" layoutY="192.0" text="Timeout:" />
+      <Label layoutX="329.0" layoutY="252.0" text="Reason:" />
+      <TextField fx:id="filterText" alignment="CENTER" layoutX="393.0" layoutY="102.0" prefHeight="25.0" prefWidth="174.0" promptText="banned word or phrase" />
+      <TextField fx:id="timeoutValue" alignment="CENTER" layoutX="392.0" layoutY="188.0" prefHeight="25.0" prefWidth="74.0" text="10" />
+      <Label layoutX="480.0" layoutY="192.0" text="seconds" />
+      <RadioButton fx:id="enabledT" layoutX="398.0" layoutY="153.0" mnemonicParsing="false" selected="true" text="True">
+         <toggleGroup>
+            <ToggleGroup fx:id="enabled" />
+         </toggleGroup>
+      </RadioButton>
+      <RadioButton fx:id="enabledF" layoutX="477.0" layoutY="153.0" mnemonicParsing="false" text="False" toggleGroup="$enabled" />
+      <Button layoutX="498.0" layoutY="343.0" mnemonicParsing="false" onAction="#submitFilter" text="Submit" />
+      <ListView fx:id="filterList" layoutX="29.0" layoutY="100.0" prefHeight="220.0" prefWidth="200.0" />
+      <TextArea fx:id="reasonMsg" layoutX="392.0" layoutY="232.0" prefHeight="92.0" prefWidth="174.0" promptText="Reason sent to user" style="-fx-wrap-text: true;" />
+      <Label fx:id="filterStatus" layoutX="434.0" layoutY="372.0" text="Filter added" />
+      <Button layoutX="129.0" layoutY="355.0" mnemonicParsing="false" onAction="#regex" text="Regex Manager" />
+   </children>
 </AnchorPane>

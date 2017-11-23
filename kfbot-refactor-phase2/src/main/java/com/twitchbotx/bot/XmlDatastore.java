@@ -1,5 +1,8 @@
 package com.twitchbotx.bot;
 
+import com.twitchbotx.gui.DashboardController;
+import com.twitchbotx.gui.guiHandler;
+import java.io.BufferedReader;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -9,9 +12,16 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.PrintStream;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.ListView;
+import javax.annotation.concurrent.GuardedBy;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * This class deals with all the interactions with the database.
@@ -92,6 +102,8 @@ public final class XmlDatastore implements Datastore {
 
         configuration.streamlabsToken = this.elements.configNode.getElementsByTagName("streamlabsToken").item(0).getTextContent();
 
+        configuration.pings = this.elements.configNode.getElementsByTagName("pings").item(0).getTextContent();
+
         return configuration;
     }
 
@@ -109,6 +121,9 @@ public final class XmlDatastore implements Datastore {
             command.disabled = Boolean.parseBoolean(e.getAttribute("disabled"));
             command.text = e.getTextContent();
             command.cdUntil = e.getAttribute("cdUntil");
+            command.initialDelay = e.getAttribute("initialDelay");
+            command.interval = e.getAttribute("interval");
+            command.repeating = e.getAttribute("repeating");
             command.cooldownInSec = e.getAttribute("cooldownInSec");
             command.sound = e.getAttribute("sound");
             commands.add(command);
@@ -126,7 +141,43 @@ public final class XmlDatastore implements Datastore {
             final ConfigParameters.Filter filter = new ConfigParameters.Filter();
             filter.name = e.getAttribute("name");
             filter.reason = e.getAttribute("reason");
-            filter.disabled = Boolean.parseBoolean(e.getAttribute("disabled"));
+            filter.enabled = Boolean.parseBoolean(e.getAttribute("enabled"));
+            filter.seconds = e.getAttribute("seconds");
+            filters.add(filter);
+        }
+
+        return filters;
+    }
+
+    @Override
+    public List<ConfigParameters.FilterRegex> getRegexes() {
+        final List<ConfigParameters.FilterRegex> filters = new ArrayList<>();
+        for (int i = 0; i < this.elements.regexNodes.getLength(); i++) {
+            Node n = this.elements.regexNodes.item(i);
+            Element e = (Element) n;
+
+            final ConfigParameters.FilterRegex filter = new ConfigParameters.FilterRegex();
+            filter.content = e.getAttribute("content");
+            filter.reason = e.getAttribute("reason");
+            filter.enabled = Boolean.parseBoolean(e.getAttribute("enabled"));
+            filter.seconds = e.getAttribute("seconds");
+            filters.add(filter);
+        }
+        return filters;
+    }
+
+    @Override
+    public List<ConfigParameters.FilterPhrase> getFilterPhrases() {
+        final List<ConfigParameters.FilterPhrase> filters = new ArrayList<>();
+        for (int i = 0; i < this.elements.phraseNodes.getLength(); i++) {
+            Node n = this.elements.phraseNodes.item(i);
+            Element e = (Element) n;
+
+            final ConfigParameters.FilterPhrase filter = new ConfigParameters.FilterPhrase();
+            filter.phrase = e.getAttribute("phrase");
+            filter.reason = e.getAttribute("reason");
+            filter.enabled = Boolean.parseBoolean(e.getAttribute("enabled"));
+            filter.seconds = e.getAttribute("seconds");
             filters.add(filter);
         }
 
@@ -149,96 +200,73 @@ public final class XmlDatastore implements Datastore {
         return counters;
     }
 
-    private final static List<String> lotto = new ArrayList();
-    public static boolean qOpen = false;
+    //Keep the bot instance here, get/set methods through TwitchBotX 
+    private TwitchBotX bot;
 
     @Override
-    public void openLottery(String auth, String keyword) {
-        qOpen = true;
-        modifyConfiguration("lottoAuth", auth);
-        modifyConfiguration("lottoName", keyword);
-        try {
-            lotto.clear();
-        } catch (NullPointerException n) {
-            System.out.println(n.getMessage());
-        }
+    public TwitchBotX getBot() {
+        return bot;
     }
 
     @Override
-    public boolean getQOpen() {
-        return qOpen;
+    public void setBot(TwitchBotX sentBot) {
+        bot = sentBot;
+    }
+
+    //UI elements for synch
+    private ListView<String> events;
+
+    @Override
+    public ListView<String> getLV() {
+        return events;
     }
 
     @Override
-    public void openQueue() {
-        qOpen = true;
+    public void setLV(ListView<String> lv) {
+        events = lv;
+    }
+
+    private eventObList eventList;
+
+    @Override
+    public eventObList getEventList() {
+        return eventList;
     }
 
     @Override
-    public void closeQueue() {
-        qOpen = false;
-                com.twitchbotx.bot.CommandParser.lottoOn = false;
+    public void setEvent(eventObList e) {
+        eventList = e;
     }
 
-    @Override
-    public String getLottoName() {
-        Node n = this.elements.configNode.getElementsByTagName("lottoName").item(0);
-        Element el = (Element) n;
-        return el.getTextContent();
-    }
+    @ThreadSafe
+    public static class eventObList {
 
-    @Override
-    public void setupLotto(String auth, String keyword) {
-        qOpen = true;
-        com.twitchbotx.bot.CommandParser.lottoOn = true;
-        try {
-            lotto.clear();
-        } catch (NullPointerException n) {
-            System.out.println(n.getMessage());
-        }
-        final Node authN = this.elements.configNode.getElementsByTagName("lottoAuth").item(0);
-        final Element authE = (Element) authN;
-        authE.setTextContent(auth);
-        final Node key = this.elements.configNode.getElementsByTagName("lottoName").item(0);
-        final Element keyE = (Element) key;
-        keyE.setTextContent(keyword);
-        commit();
-    }
+        @GuardedBy("this")
+        private final ListView<String> eventList = new ListView<>();
 
-    @Override
-    public List<String> lotteryList() {
-        //get method for list
-        return lotto;
-    }
+        @GuardedBy("this")
+        private final ObservableList<String> eventObL = FXCollections.observableArrayList();
 
-    @Override
-    public boolean addLotteryList(String user) {
-        //add user to list
-
-        if (!lotto.contains(user)) {
-            lotto.add(user);
-            return true;
-        } else {
-            System.out.println("duplicate entry");
-            return false;
+        public synchronized ObservableList<String> getList() {
+            return this.eventObL;
         }
 
-    }
+        public synchronized void setEventList() {
+            this.eventList.setItems(this.eventObL);
+            this.eventList.scrollTo(this.eventObL.size() - 1);
+        }
 
-    @Override
-    public String drawLotteryList() {
-        //remove name from list
+        public synchronized ListView<String> getEventList() {
+            return this.eventList;
+        }
 
-        Collections.shuffle(lotto);
-        String winner = lotto.get(0);
-        lotto.remove(0);
-        return winner;
-    }
+        public synchronized void addList(String toAdd) {
+            this.eventObL.add(toAdd);
+        }
 
-    @Override
-    public void clearLotteryList() {
-        //clear list
-        lotto.clear();
+        public synchronized void resetList() {
+            this.eventObL.clear();
+        }
     }
 
     @Override
@@ -250,6 +278,34 @@ public final class XmlDatastore implements Datastore {
     }
 
     @Override
+    public boolean addCommand(final String command, final String auth,
+            final String cooldown, final String repeating,
+            final String initDelay, final String interval,
+            final String sound, final String msg) {
+        for (int i = 0; i < this.elements.commandNodes.getLength(); i++) {
+            final Node n = this.elements.commandNodes.item(i);
+            final Element e = (Element) n;
+            if (command.equals(e.getAttribute("name"))) {
+                return false;
+            }
+        }
+        Element newNode = this.elements.doc.createElement("command");
+        newNode.appendChild(this.elements.doc.createTextNode(msg));
+        newNode.setAttribute("name", command.toLowerCase());
+        newNode.setAttribute("auth", auth);
+        newNode.setAttribute("repeating", repeating);
+        newNode.setAttribute("initialDelay", initDelay);
+        newNode.setAttribute("interval", interval);
+        newNode.setAttribute("cooldownInSec", cooldown);
+        newNode.setAttribute("cdUntil", "");
+        newNode.setAttribute("sound", sound);
+        newNode.setAttribute("disabled", "false");
+        this.elements.commands.appendChild(newNode);
+        commit();
+        return true;
+    }
+
+    @Override
     public boolean addCommand(final String command, final String text) {
         for (int i = 0; i < this.elements.commandNodes.getLength(); i++) {
             final Node n = this.elements.commandNodes.item(i);
@@ -258,7 +314,6 @@ public final class XmlDatastore implements Datastore {
                 return false;
             }
         }
-
         Element newNode = this.elements.doc.createElement("command");
         newNode.appendChild(this.elements.doc.createTextNode(text));
         newNode.setAttribute("name", command.toLowerCase());
@@ -266,13 +321,12 @@ public final class XmlDatastore implements Datastore {
         newNode.setAttribute("repeating", "false");
         newNode.setAttribute("initialDelay", "0");
         newNode.setAttribute("interval", "0");
-        newNode.setAttribute("cooldown", "0");
+        newNode.setAttribute("cooldownInSec", "0");
         newNode.setAttribute("cdUntil", "");
         newNode.setAttribute("sound", "");
         newNode.setAttribute("disabled", "false");
         this.elements.commands.appendChild(newNode);
         commit();
-
         return true;
     }
 
@@ -398,16 +452,31 @@ public final class XmlDatastore implements Datastore {
         Element newNode = this.elements.doc.createElement("filter");
         newNode.setAttribute("name", filter.name);
         newNode.setAttribute("reason", filter.reason);
-        if (filter.disabled) {
-            newNode.setAttribute("disable", "true");
+        if (filter.enabled) {
+            newNode.setAttribute("enabled", "true");
         } else {
-            newNode.setAttribute("disable", "false");
+            newNode.setAttribute("enabled", "false");
         }
-
+        newNode.setAttribute("seconds", filter.seconds);
         this.elements.filters.appendChild(newNode);
         commit();
-
         return true;
+    }
+
+    @Override
+    public boolean updateFilter(final ConfigParameters.Filter filter) {
+        for (int i = 0; i < this.elements.filterNodes.getLength(); i++) {
+            final Node n = this.elements.filterNodes.item(i);
+            final Element e = (Element) n;
+            if (filter.name.contentEquals(e.getAttribute("name"))) {
+                e.setAttribute("enabled", String.valueOf(filter.enabled));
+                e.setAttribute("reason", filter.reason);
+                e.setAttribute("seconds", filter.seconds);
+                commit();
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -421,7 +490,6 @@ public final class XmlDatastore implements Datastore {
                 return true;
             }
         }
-
         return false;
     }
 

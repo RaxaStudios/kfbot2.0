@@ -17,22 +17,31 @@ public final class Commands {
     }
 
     private String[] reservedCommands = {
+        
+        //UPDATE COMMAND LIST FOR NON EDITABLE COMMANDS
             "!uptime",
             "!followage",
+            "!highlight",
+            "!commands",
             "!command-add",
             "!command-delete",
-            "!command-edit",
-            "!command-auth",
-            // "!command-repeat", // TODO later.
-            // "!command-delay",
-            // "!command-interval",
-            // "!command-cooldown",
-            "!command-sound",
-            "!set-msgCache",
-            "!set-pyramidResponse",
             "!command-enable",
             "!command-disable",
-            "!commands",
+            "!command-edit",
+            "!command-auth",
+            "!command-repeat", // TODO later.
+            "!command-delay",
+            "!command-interval",
+            "!command-cooldown",
+            "!command-sound",
+            "!command-add-sub",
+            "!command-edit-sub",
+            "!command-delete-sub",
+            "!command-auth-sub",
+            "!command-cooldown-sub",
+            "!command-sound-sub",
+            "!set-msgCache",
+            "!set-pyramidResponse",
             "!cnt-add",
             "!cnt-delete",
             "!cnt-set",
@@ -40,7 +49,35 @@ public final class Commands {
             "!count",
             "!filter-all",
             "!filter-add",
-            "!filter-delete"
+            "!filter-delete",
+            "!phrase-add",
+            "!phrase-delete",
+            "!phrase-timeout",
+            "!countadd",
+            "!totals",
+            "!countadd",
+            "!addPoints",
+            "!setTime",
+            "!start",
+            "!totalTime",
+            "!setDonationPoints",
+            "!addDonationPoints",
+            "!donation-add",
+            "!donation-delete",
+            "!dqpoints",
+            "!jboxcode",
+            "!jboxcodeset",
+            "!lottery-open",
+            "!lottery-clear",
+            "!draw",
+            "!s-game-add",
+            "!s-game-delete",
+            "!s-set-name",
+            "!s-set-points",
+            "!s-addPoints",
+            "!points",
+            "!s-status"
+            
     };
 
     /**

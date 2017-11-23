@@ -26,6 +26,13 @@
             <version>2.6</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/eu.mihosoft.jfx.scaledfx/scaledfx -->
+        <dependency>
+            <groupId>eu.mihosoft.jfx.scaledfx</groupId>
+            <artifactId>scaledfx</artifactId>
+            <version>0.3</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/com.neovisionaries/nv-websocket-client -->
         <dependency>
             <groupId>com.neovisionaries</groupId>
@@ -106,13 +113,6 @@
                 <directory>src/main/java/com/twitchbotx/gui</directory>
                 <includes>
                     <include>**/*.fxml</include>
-                </includes>             
-            </resource>
-            <resource>
-                <filtering>false</filtering>
-                <directory>.</directory>
-                <includes>
-                    <include>**/*.xml</include>
                 </includes>             
             </resource>
         </resources>

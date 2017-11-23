@@ -1,11 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.MarathonController">
-    
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.MarathonController">
+   <children>
+      <Button layoutX="26.0" layoutY="349.0" mnemonicParsing="false" onAction="#dash" text="Dashboard" />
+      <Label layoutX="218.0" layoutY="21.0" text="Marathon Manager">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="79.0" layoutY="48.0" text="Timer ">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="26.0" layoutY="106.0" text="Time" />
+      <Label layoutX="10.0" layoutY="162.0" text="Add Points" />
+      <Button layoutX="85.0" layoutY="102.0" mnemonicParsing="false" text="Start/Reset" />
+      <Button layoutX="255.0" layoutY="158.0" mnemonicParsing="false" text="Add" />
+      <TextField alignment="CENTER" layoutX="90.0" layoutY="158.0" prefHeight="25.0" prefWidth="114.0" />
+      <Label layoutX="88.0" layoutY="183.0" text="500 points = 1 minute" />
+      <Button layoutX="235.0" layoutY="102.0" mnemonicParsing="false" text="Refresh" />
+      <Button layoutX="236.0" layoutY="218.0" mnemonicParsing="false" text="Submit" />
+      <Label layoutX="16.0" layoutY="222.0" text="Set Time" />
+      <TextField alignment="CENTER" layoutX="79.0" layoutY="218.0" prefHeight="25.0" prefWidth="43.0" promptText="12" />
+      <TextField alignment="CENTER" layoutX="132.0" layoutY="218.0" prefHeight="25.0" prefWidth="43.0" promptText="00" />
+      <TextField alignment="CENTER" layoutX="183.0" layoutY="218.0" prefHeight="25.0" prefWidth="43.0" promptText="00" />
+      <Label layoutX="430.0" layoutY="48.0" text="Current Settings">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="506.0" layoutY="106.0" text="Base Time" />
+      <Label layoutX="506.0" layoutY="162.0" text="Total Points" />
+      <Label layoutX="497.0" layoutY="222.0" text="Added Minutes" />
+      <VBox fx:id="currentBaseTime" layoutX="370.0" layoutY="101.0" prefHeight="27.0" prefWidth="100.0" style="-fx-border-color: grey;" />
+      <VBox layoutX="370.0" layoutY="157.0" prefHeight="27.0" prefWidth="100.0" style="-fx-border-color: grey;" />
+      <VBox layoutX="370.0" layoutY="217.0" prefHeight="27.0" prefWidth="100.0" style="-fx-border-color: grey;" />
+   </children>
 </AnchorPane>

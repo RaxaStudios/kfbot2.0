@@ -1,11 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.SpoopathonController">
-    
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.SpoopathonController">
+   <children>
+      <Button layoutX="30.0" layoutY="347.0" mnemonicParsing="false" onAction="#dash" text="Dashboard" />
+      <Label layoutX="208.0" layoutY="22.0" text="Spoopathon Manager">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <ListView fx:id="gameListView" layoutX="32.0" layoutY="103.0" prefHeight="91.0" prefWidth="200.0" />
+      <Label layoutX="86.0" layoutY="57.0" text="Current Games">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="422.0" layoutY="57.0" text="Point Editor">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Button layoutX="276.0" layoutY="140.0" mnemonicParsing="false" text="Select" />
+      <Button layoutX="529.0" layoutY="299.0" mnemonicParsing="false" text="Submit" />
+      <Button layoutX="531.0" layoutY="261.0" mnemonicParsing="false" text="Delete" />
+      <Button layoutX="537.0" layoutY="167.0" mnemonicParsing="false" text="Add" />
+      <Label layoutX="432.0" layoutY="100.0" text="Add Points" />
+      <Label layoutX="439.0" layoutY="235.0" text="Edit Info" />
+      <TextField fx:id="editGameID" alignment="CENTER" layoutX="425.0" layoutY="261.0" prefHeight="25.0" prefWidth="74.0" />
+      <TextField fx:id="editPoints" alignment="CENTER" layoutX="425.0" layoutY="299.0" prefHeight="25.0" prefWidth="74.0" />
+      <TextField fx:id="addPointsGameID" alignment="CENTER" layoutX="424.0" layoutY="131.0" prefHeight="25.0" prefWidth="74.0" />
+      <Label layoutX="360.0" layoutY="265.0" text="Game ID" />
+      <Label layoutX="367.0" layoutY="303.0" text="Points" />
+      <Label layoutX="360.0" layoutY="135.0" text="Game ID" />
+      <Label layoutX="365.0" layoutY="171.0" text="Points " />
+      <TextField fx:id="addPointsPoints" alignment="CENTER" layoutX="425.0" layoutY="167.0" prefHeight="25.0" prefWidth="74.0" />
+      <TextField fx:id="newGameID" alignment="CENTER" layoutX="117.0" layoutY="261.0" prefHeight="25.0" prefWidth="73.0" />
+      <TextField fx:id="newPoints" alignment="CENTER" layoutX="116.0" layoutY="299.0" prefHeight="25.0" prefWidth="74.0" text="0" />
+      <Button layoutX="206.0" layoutY="299.0" mnemonicParsing="false" text="Create" />
+      <Label layoutX="83.0" layoutY="215.0" text="Add New Game">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="43.0" layoutY="265.0" text="Game ID" />
+      <Label layoutX="50.0" layoutY="303.0" text="Points" />
+      <Label fx:id="loadLabel" layoutX="91.0" layoutY="144.0" text="Loading Data..." />
+   </children>
 </AnchorPane>

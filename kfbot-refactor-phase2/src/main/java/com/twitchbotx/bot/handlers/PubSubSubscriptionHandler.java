@@ -16,6 +16,7 @@ import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.client.TwitchMessenger;
+import com.twitchbotx.gui.DashboardController;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
@@ -69,7 +70,7 @@ public class PubSubSubscriptionHandler {
         } catch (IOException | WebSocketException e) {
             e.printStackTrace();
         }
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> connection.sendText("{ \"type\": \"PING\" }"), 6, 5, TimeUnit.MINUTES);
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> connection.sendText("{ \"type\": \"PING\" }"), 4, 5, TimeUnit.MINUTES);
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> checkPongs(store, outstream), 21, 20, TimeUnit.MINUTES);
     }
 
@@ -131,21 +132,29 @@ public class PubSubSubscriptionHandler {
                             String subPlan = messageNode.get("sub_plan").asText();
                             int points = 0;
                             int spoopPoints = 0;
+                            String subTier = "";
                             if (subPlan.equals("Prime")) {
                                 spoopPoints = 5;
                                 points = 500;
+                                subTier = "Prime";
                             } else if (subPlan.equals("1000")) {
                                 spoopPoints = 5;
                                 points = 500;
+                                subTier = "Tier 1";
                             } else if (subPlan.equals("2000")) {
                                 spoopPoints = 10;
                                 points = 1000;
+                                subTier = "Tier 2";
                             } else if (subPlan.equals("3000")) {
                                 spoopPoints = 25;
                                 points = 2500;
+                                subTier = "Tier 3";
                             }
                             String msg = messageNode.get("sub_message").get("message").asText();
-
+                            if (months < 2) {
+                                months = 0;
+                            }
+                            sendEvent(displayName, msg, subTier, months);
                             if (!msg.contains("#")) {
                                 System.out.println("MSG !CONTAIN #: " + msg);
                                 messenger.sendMessage("@" + displayName + ", let a mod know what game you'd like to choose for !spoopathon");
@@ -165,7 +174,7 @@ public class PubSubSubscriptionHandler {
                             //keep track of sub points, first 180 new sub points are double points
                             CountHandler getPoints = new CountHandler(store, outstream);
                             int subNum = 0;
-                                    //getPoints.getSubPoints();
+                            //getPoints.getSubPoints();
                             if ((months == 1 || months == 0) && subNum < 201) {
                                 points *= 2;
                                 //getPoints.addSubPoint();
@@ -175,7 +184,7 @@ public class PubSubSubscriptionHandler {
                             //addPoints(points);
 
                         }
-                    } else if (root.get("type").asText().equalsIgnoreCase("PONG")) {
+                    } else if (root.get("type").asText().contains("PONG")) {
                         pongCounter++;
                     }
                 } catch (IOException e) {
@@ -226,6 +235,25 @@ public class PubSubSubscriptionHandler {
             //parse for #game, send with points to sqlHandler.java
             sqlHandler sql = new sqlHandler(store, outstream);
             sql.gameSearch(msg, points);
+        }
+
+        private void sendEvent(String user, String msg, String subTier, int months) {
+            String eventMsg;
+            String monthFormat;
+            String subFormat;
+            if (months == 0) {
+                monthFormat = "as a new sub!";
+            } else {
+                monthFormat = "for " + months + " in a row!";
+            }
+            if (subTier.equals("Prime")) {
+                subFormat = " using Twitch Prime";
+            } else {
+                subFormat = " at " + subTier;
+            }
+            eventMsg = "Subscriber Event: " + user + " subscribed " + subFormat + " " + monthFormat + " Message: " + msg;
+            DashboardController dc = new DashboardController();
+            dc.eventObLAdd(eventMsg);
         }
     }
 }

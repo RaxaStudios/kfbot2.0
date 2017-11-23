@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.ConfigurationController">
-    
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.ConfigurationController">
+   <children>
+      <Button layoutX="31.0" layoutY="351.0" mnemonicParsing="false" onAction="#dash" text="Dashboard" />
+      <Label layoutX="225.0" layoutY="14.0" text="Settings Manager">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Button layoutX="221.0" layoutY="200.0" mnemonicParsing="false" onAction="#playTestSound" text="Play" />
+      <TextField fx:id="soundTestText" layoutX="31.0" layoutY="200.0" promptText="filename (test.mp3)" />
+      <Label layoutX="39.0" layoutY="172.0" text="Test Sound (mp3 or wav)" />
+      <Label layoutX="35.0" layoutY="97.0" text="Send test message to chat" />
+      <Button layoutX="218.0" layoutY="127.0" mnemonicParsing="false" onAction="#sendTestMessage" text="Send" />
+      <TextField fx:id="testMessageText" layoutX="31.0" layoutY="127.0" text="Testing 123 ABC" />
+   </children>
 </AnchorPane>

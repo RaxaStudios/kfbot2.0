@@ -11,13 +11,17 @@ import com.twitchbotx.bot.Commands;
 import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.TwitchBotX;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import org.w3c.dom.DOMException;
 
-import sun.audio.AudioPlayer;
-import sun.audio.AudioStream;
+//import sun.audio.AudioPlayer;
+//import sun.audio.AudioStream;
 
 
 /**
@@ -323,15 +327,13 @@ public final class CommandOptionHandler {
      */
     private void playSound(String file) {
         try {
-            //InputStream is = new FileInputStream(file);
-            AudioInputStream audioStream = AudioSystem.getAudioInputStream(new FileInputStream(file));
-            //AudioStream audioStream = new AudioStream(is);
-            //AudioPlayer.player.start(audioStream);
-            Clip clip = AudioSystem.getClip();
-            clip.open(audioStream);
-            clip.start();
+            Path xmlFile = Paths.get("");
+            Path xmlResolved = xmlFile.resolve(file);
+            Media hit = new Media(xmlResolved.toUri().toString());
+            MediaPlayer mediaPlayer = new MediaPlayer(hit);
+            mediaPlayer.play();
         } catch (Exception e) {
-            LOGGER.severe(e.toString());
+            e.printStackTrace();
         }
     }
 }
