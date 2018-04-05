@@ -7,25 +7,14 @@ package com.twitchbotx.gui;
 
 import eu.mihosoft.scaledfx.ScalableContentPane;
 import java.util.HashMap;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
-import javafx.beans.property.DoubleProperty;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.stage.Stage;
-import javafx.util.Duration;
+
 
 /**
  *
@@ -33,7 +22,8 @@ import javafx.util.Duration;
  */
 public class ScreensController extends StackPane {
 
-    private HashMap<String, Node> screens = new HashMap<>();
+    private final HashMap<String, Node> screens = new HashMap<>();
+    public static final guiHandler.dimensions dm = new guiHandler.dimensions();
 
     public ScreensController() {
         super();
@@ -80,7 +70,7 @@ public class ScreensController extends StackPane {
             }
             return true;
         } else {
-            System.out.println("screen hasn't been loaded!!! \n");
+            System.out.println("screen hasn't been loaded");
             return false;
         }
     }
@@ -95,12 +85,15 @@ public class ScreensController extends StackPane {
         
         //scalable content update
         //TODO set scale value based on last viewed page?
+        //issue: does not set consistent values Platform.runlater()?
         ScalableContentPane scale = new ScalableContentPane();
         scale.setContent(group);
+        int w = dm.getWidth();
+        int h = dm.getHeight();
         Scene testScale = new Scene(scale, 600, 400);
         testScale.getStylesheets().add("https://fonts.googleapis.com/css?family=Comfortaa:700");
         guiHandler.stage.setScene(testScale);
-
+        guiHandler.stage.show();
     }
 
     //This method will remove the screen with the given name from the collection of screens

@@ -2,7 +2,7 @@ package com.twitchbotx.bot.handlers;
 
 import com.twitchbotx.bot.Datastore;
 
-import java.io.PrintStream;
+//import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;

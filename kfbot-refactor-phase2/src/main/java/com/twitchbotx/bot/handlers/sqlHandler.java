@@ -9,6 +9,7 @@ import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.client.TwitchMessenger;
 import com.twitchbotx.gui.DashboardController;
+import com.twitchbotx.gui.guiHandler;
 import java.io.File;
 import java.io.PrintStream;
 import java.net.URL;
@@ -16,22 +17,23 @@ import java.sql.*;
 import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+import javafx.application.Platform;
+//import javax.xml.transform.OutputKeys;
+//import javax.xml.transform.Transformer;
+//import javax.xml.transform.TransformerException;
+//import javax.xml.transform.TransformerFactory;
+//import javax.xml.transform.dom.DOMSource;
+//import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.DOMException;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+//import org.w3c.dom.Element;
+//import org.w3c.dom.Node;
 import org.apache.commons.io.FileUtils;
 
 /**
  *
  * @author Raxa
  *
- * TODO
+ * 
  *
  * use this over FTP handler with php on website see SpotifyReader ->
  * ServerHandler.java for current version
@@ -91,19 +93,52 @@ public class sqlHandler {
         }
     }
 
-    public void addGame(String msg) {
+    public boolean addGame(String msg) {
         Statement add = connect();
-        sqlStatement = "";
+        System.out.println("addGame msg= " + msg);
+        String gameToAdd = msg.substring(msg.indexOf(" ") + 1);
+        String sqlStatementAI;
+        int value = 0;
+        try {
+            //reset auto_increment value using maxid + 1
+            ResultSet rs = add.executeQuery("SELECT * FROM bot ORDER BY gameID DESC");
+            while(rs.next()){
+            value = rs.getInt("gameID");
+            }
+            System.out.println("value sql autoadd:" + value);
+            sqlStatementAI = "ALTER TABLE bot AUTO_INCREMENT=" + value;
+            add.executeUpdate(sqlStatementAI);
+            //execute insertion of value
+            sqlStatement = "INSERT INTO bot (Game, Points) VALUES (\'" + gameToAdd + "\', \'0\')";
+            add.executeUpdate(sqlStatement);
+        } catch (SQLException e) {
+            LOGGER.severe(e.toString());
+            e.printStackTrace();
+        }
+        messenger.sendMessage(gameToAdd + " added to options");
         closeConnection();
+        sendEvent("Spoopathon Event: " + gameToAdd + " added to options");
+        return true;
     }
 
-    public void deleteGame(String msg) {
+    public boolean deleteGame(String msg) {
         Statement delete = connect();
-        sqlStatement = " ";
+        System.out.println("deleteGame msg= " + msg);
+        String gameToDelete = msg.substring(msg.indexOf(" ") + 1);
+        sqlStatement = "DELETE FROM bot WHERE Game=\'" + gameToDelete + "\'";
+        //sqlStatement = "DELETE FROM bot where gameID=\'0\'";
+        try {
+            delete.executeUpdate(sqlStatement);
+        } catch (SQLException e) {
+            LOGGER.severe(e.toString());
+        }
+        messenger.sendMessage(gameToDelete + " deleted from options");
         closeConnection();
+        sendEvent("Spoopathon Event: " + gameToDelete + " deleted from options");
+        return true;
     }
 
-    public void setName(String msg) {
+    public boolean setName(String msg) {
         Statement setName = connect();
         String oldName = msg.substring(msg.indexOf(" ") + 1, msg.indexOf(" ", msg.indexOf(" ") + 2));
         String newName = msg.substring(msg.indexOf(" ", msg.indexOf(oldName)) + 1, msg.length());
@@ -115,9 +150,10 @@ public class sqlHandler {
         }
         messenger.sendMessage("Renamed " + oldName + " to " + newName);
         closeConnection();
+        return true;
     }
 
-    public void setPoints(String msg) {
+    public boolean setPoints(String msg) {
         Statement setPoints = connect();
         String game = msg.substring(msg.indexOf(" ") + 1, msg.indexOf(" ", msg.indexOf(" ") + 2));
         String newPoints = msg.substring(msg.indexOf(" ", msg.indexOf(game)) + 1, msg.length());
@@ -129,6 +165,8 @@ public class sqlHandler {
         }
         messenger.sendMessage("Set " + game + " to " + newPoints);
         closeConnection();
+        sendEvent("Spoopathon Event: " + game + " set to " + newPoints);
+        return true;
     }
 
     /*
@@ -194,16 +232,18 @@ public class sqlHandler {
         return size;
     }
 
-    public void addPoints(String msg) {
-        String enabled = this.store.getConfiguration().sStatus;
+    public boolean addPoints(String msg) {
+        String enabled = this.store.getConfiguration().spoopathonStatus;
         System.out.println(enabled);
         if (enabled.equals("on")) {
             Statement addPoints = connect();
             String game = msg.substring(msg.indexOf(" ") + 1, msg.indexOf(" ", msg.indexOf(" ") + 2));
+            int pPosition = msg.indexOf(" ", msg.indexOf(game));
             int points = new Integer(msg.substring(msg.indexOf(" ", msg.indexOf(game)) + 1, msg.length()));
             String findPoints = "SELECT Points FROM bot WHERE Game=\'" + game + "\'";
             System.out.println("Points:" + points + " game:" + game);
-            if (points == -1) {
+            if (pPosition == -1) {
+                //parameter argument
                 throw new IllegalArgumentException();
             }
 
@@ -217,15 +257,19 @@ public class sqlHandler {
                 sqlStatement = "UPDATE bot SET Points=" + amount + " WHERE Game=\'" + game + "\'";
                 addPoints.execute(sqlStatement);
                 messenger.sendMessage(points + " added to " + game);
-                sendEvent(game, points);
+                sendEvent("Spoopathon Event: " + points + " added to  " + game);
                 closeConnection();
+                return true;
             } catch (IllegalArgumentException il) {
                 messenger.sendMessage("Syntax: !s-addPoints [gameID] [points]");
+                return false;
             } catch (SQLException sql) {
                 messenger.sendMessage("Syntax: !s-addPoints [gameID] [points]");
                 LOGGER.severe(sql.toString());
+                return false;
             }
         }
+        return false;
     }
 
     public void getPoints(String msg, String username) {
@@ -365,6 +409,16 @@ public class sqlHandler {
         String eventMsg = "Spoopathon Event: " + points + " added to  " + game;
         DashboardController dc = new DashboardController();
         dc.eventObLAdd(eventMsg);
+    }
+
+    private void sendEvent(final String msg) {
+        String event = msg;
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                guiHandler.bot.getStore().getEventList().addList(event);
+            }
+        });
     }
 
     public void download() {

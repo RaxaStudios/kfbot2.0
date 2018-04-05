@@ -1,19 +1,19 @@
 package com.twitchbotx.bot;
 
-import com.twitchbotx.bot.ConfigParameters.Elements;
+//import com.twitchbotx.bot.ConfigParameters.Elements;
 import com.twitchbotx.bot.handlers.DonationHandler;
 import com.twitchbotx.bot.handlers.PubSubBitsHandler;
 import com.twitchbotx.bot.handlers.PubSubSubscriptionHandler;
 import com.twitchbotx.bot.handlers.WhisperHandler;
 import com.twitchbotx.gui.DashboardController;
-import com.twitchbotx.gui.SpoopathonController;
-import com.twitchbotx.gui.guiHandler;
+//import com.twitchbotx.gui.SpoopathonController;
+//import com.twitchbotx.gui.guiHandler;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
+//import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -38,6 +38,7 @@ public final class TwitchBotX {
     private ScheduledExecutorService sPP;
     private ScheduledExecutorService timedManagement;
     public TimerManagement timers;
+    public static TimerManagement.pongHandler pH = new TimerManagement.pongHandler();
     private final ConfigParameters configuration = new ConfigParameters();
 
     public TwitchBotX(Datastore getStore, BufferedReader getIn, PrintStream getOut, Socket getSocket) {
@@ -126,6 +127,9 @@ public final class TwitchBotX {
                 in = null;
                 sPP.shutdownNow();
                 TimerManagement.ses.shutdownNow();
+                // start all periodic timers for broadcasting events
+                startTimers(store, out);
+                
                 socket = new Socket(store.getConfiguration().host, store.getConfiguration().port);
                 socket.setKeepAlive(true);
                 //socket.setSoTimeout(5 * 60 * 1000);
@@ -174,6 +178,8 @@ public final class TwitchBotX {
             out.println("PASS " + store.getConfiguration().password);
             out.println("NICK " + store.getConfiguration().account);
             out.println("JOIN #" + store.getConfiguration().joinedChannel);
+            //TODO alternate method of adding filters in bot's channel
+            out.println("JOIN #" + store.getConfiguration().account);
             out.println("CAP REQ :twitch.tv/tags");
             out.println("CAP REQ :twitch.tv/commands");
             //out.println("CAP REQ :twitch.tv/membership");
@@ -188,15 +194,11 @@ public final class TwitchBotX {
     public void start(boolean reconnect) {
         try {
 
-            
             //TODO make sure pubsub and sl auth lines up in final sent xml
-
             // Begin connecting to and listening to Twitch PubSub 
             //startPubSub(store, out);
-            
             //Start StreamLabs listener
             //startSL(store, out);
-            
             // start all periodic timers for broadcasting events
             startTimers(store, out);
 
@@ -229,12 +231,11 @@ public final class TwitchBotX {
         LOGGER.info("Starting to track pings");
         sPP = Executors.newSingleThreadScheduledExecutor();
         sPP.scheduleWithFixedDelay(new Runnable() {
-            TimerManagement.pongHandler pH;
             @Override
             public void run() {
-                pH = new TimerManagement.pongHandler();
                 System.out.println("DO SOME PING PONGS");
                 int pCheck = pH.getPong();
+                System.out.println("Pong count: " + pCheck);
                 if (pCheck == 0) {
                     LOGGER.severe("LOST CONNECTION ATTEMPTING TO RECONNECT");
                     store.getBot().reconnect();
@@ -245,7 +246,6 @@ public final class TwitchBotX {
                 }
             }
         }, 1, 4, TimeUnit.MINUTES);
-
     }
 
 
@@ -276,7 +276,7 @@ public final class TwitchBotX {
      */
     public void startTimers(final Datastore store, final PrintStream out) {
         timers = new TimerManagement();
-        timers.setupPeriodicBroadcast(store);
+        timers.setupPeriodicBroadcast();
     }
 
 }

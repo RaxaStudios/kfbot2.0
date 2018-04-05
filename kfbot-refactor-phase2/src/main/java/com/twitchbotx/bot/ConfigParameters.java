@@ -27,6 +27,10 @@ public final class ConfigParameters {
 
         public Element configNode;
 
+        public Element editors;
+
+        public NodeList editorNodes;
+
         public Element commands;
 
         public Element counters;
@@ -38,13 +42,13 @@ public final class ConfigParameters {
         public Element filters;
 
         public NodeList filterNodes;
-        
+
         public Element phrases;
-        
+
         public NodeList phraseNodes;
-        
+
         public Element regex;
-        
+
         public NodeList regexNodes;
     }
 
@@ -78,6 +82,8 @@ public final class ConfigParameters {
         public String youtubeTitle;
 
         public String sqlURL;
+        
+        public String sqlMURL;
 
         public String sqlUser;
 
@@ -99,14 +105,20 @@ public final class ConfigParameters {
 
         public int numCounters;
 
-        public String sStatus;
+        public String spoopathonStatus;
+        
+        public String marathonStatus;
 
+        public String lottoStatus;
+        
+        public String songLottoStatus;
+        
         public String lottoAuth;
 
         public String lottoName;
 
         public String pyramidResponse;
-        
+
         public String pings;
 
         @Override
@@ -127,6 +139,7 @@ public final class ConfigParameters {
                     + ", recentMessageCacheSize=" + recentMessageCacheSize
                     + ", numCounters=" + numCounters
                     + ", sqlURL=" + sqlURL
+                    + ", sqlMURL=" + sqlMURL
                     + ", sqlUser=" + sqlUser
                     + ", sqlPass=" + sqlPass
                     + ", channelID=" + channelID
@@ -134,11 +147,31 @@ public final class ConfigParameters {
                     + ", pubSubAuthToken=" + pubSubAuthToken
                     + ", botWhisperToken=" + botWhisperToken
                     + ", streamlabsToken=" + streamlabsToken
-                    + ", sStatus=" + sStatus
-                    + ", lottoAuth=" + lottoAuth
-                    + ", lottoName=" + lottoName
-                    + ", pings=" + pings
+                    + ", sStatus=" + spoopathonStatus
+                    + ", mStatus=" + marathonStatus
+                    + ", lottoStatus=" + lottoStatus
+                    + ", spoopStatus=" + songLottoStatus
                     + ", pyramidResponse='" + pyramidResponse + '\''
+                    + '}';
+        }
+    }
+
+    /*
+     * Represent editor levels
+     * per user basis
+     */
+    public final static class Editor {
+
+        //twitch username check 
+        //level internal usage for authorization beyond moderator status
+        public String username;
+        public int level;
+
+        @Override
+        public String toString() {
+            return "Editor{"
+                    + "username='" + username + '\''
+                    + ", level=" + level
                     + '}';
         }
     }
@@ -225,7 +258,7 @@ public final class ConfigParameters {
         public String name;
 
         public String reason;
-        
+
         public String seconds;
 
         @Override
@@ -238,18 +271,19 @@ public final class ConfigParameters {
                     + '}';
         }
     }
-    
+
     public final static class FilterPhrase {
+
         public boolean enabled;
-        
+
         public String phrase;
-        
+
         public String reason;
-        
+
         public String seconds;
-        
-        @Override 
-        public String toString(){
+
+        @Override
+        public String toString() {
             return "FilterPhrase{"
                     + "enabled='" + enabled + '\''
                     + ", phrase='" + phrase + '\''
@@ -259,17 +293,18 @@ public final class ConfigParameters {
         }
     }
 
-        public final static class FilterRegex {
+    public final static class FilterRegex {
+
         public boolean enabled;
-        
+
         public String content;
-        
+
         public String reason;
-        
+
         public String seconds;
-        
-        @Override 
-        public String toString(){
+
+        @Override
+        public String toString() {
             return "FilterRegex{"
                     + "enabled='" + enabled + '\''
                     + ", content='" + content + '\''
@@ -278,7 +313,7 @@ public final class ConfigParameters {
                     + '}';
         }
     }
-    
+
     /**
      * This method will parse the configuration and save off references to each
      * of the parsed XML file parts.
@@ -314,6 +349,8 @@ public final class ConfigParameters {
         LOGGER.info("Completed reading the XML file");
 
         elements.configNode = (Element) elements.doc.getElementsByTagName("config").item(0);
+        elements.editors = (Element) elements.doc.getElementsByTagName("editors").item(0);
+        elements.editorNodes = elements.editors.getElementsByTagName("editor");
         elements.commands = (Element) elements.doc.getElementsByTagName("commands").item(0);
         elements.commandNodes = elements.commands.getElementsByTagName("command");
         elements.counters = (Element) elements.doc.getElementsByTagName("counters").item(0);

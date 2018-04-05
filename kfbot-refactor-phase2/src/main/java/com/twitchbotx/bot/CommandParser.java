@@ -36,10 +36,13 @@ public final class CommandParser {
     // For counter handling
     private final CountHandler countHandler;
 
+    // For marathon system
+    private final MarathonHandler mHandler;
+
     // For lottery system
     public static LotteryHandler.Lotto lotto = new LotteryHandler.Lotto();
     public static LotteryHandler.SongList songs = new LotteryHandler.SongList();
-    final ConfigParameters configuration = new ConfigParameters();;
+    final ConfigParameters configuration = new ConfigParameters();
 
     // For handling SQL transactions
     private final sqlHandler sql;
@@ -63,6 +66,8 @@ public final class CommandParser {
     // for quick modification
     public CommandParser(final Datastore store, final PrintStream stream) {
 
+        //TODO match xml file with all commands to ensure proper authorization and directions
+        
         // all the handlers for different messages
         this.commandOptionsHandler = new CommandOptionHandler(store);
         this.pyramidDetector = new PyramidDetector(store);
@@ -71,15 +76,17 @@ public final class CommandParser {
         this.filterHandler = new FilterHandler(store);
         this.youtubeHandler = new YoutubeHandler(store, stream);
         this.moderationHandler = new ModerationHandler(store, stream);
-        this.messenger = new TwitchMessenger(stream, store.getConfiguration().joinedChannel);;
+        this.messenger = new TwitchMessenger(stream, store.getConfiguration().joinedChannel);
         this.sql = new sqlHandler(store, stream);
         this.outstream = stream;
         this.store = store;
+        this.mHandler = new MarathonHandler(store, stream);
     }
 
     public void addPing() {
-        int newValue = Integer.parseInt(store.getConfiguration().pings) + 1;
-        store.modifyConfiguration("pings", String.valueOf(newValue));
+        TimerManagement.pongHandler pong = TwitchBotX.pH;
+        pong.addPong();
+        System.out.println("Adding a ping from CommandParser");
     }
 
     /**
@@ -120,8 +127,6 @@ public final class CommandParser {
         youtubeHandler.handleLinkRequest(trailing);
         moderationHandler.handleTool(username, trailing);
         //add check for lottery entrants
-        //TODO create instance to check current keyword
-        //issue: parsing value off startup name only
         if (lotto.getLottoStatus()) {
             String keyword = lotto.getLottoName();
             if (keyword == null) {
@@ -155,6 +160,85 @@ public final class CommandParser {
             }
             return;
         }
+
+        //being marathon system
+        if (trailing.startsWith("!addPoints")) {
+            if (commandOptionsHandler.checkAuthorization("!addPoints", username, mod, sub)) {
+                mHandler.addPoints(trailing);
+
+            }
+        }
+        if (trailing.startsWith("!setTime")) {
+            if (commandOptionsHandler.checkAuthorization("!setTime", username, mod, sub)) {
+                mHandler.setTime(trailing);
+            }
+        }
+
+        if (trailing.startsWith("!setBaseTime")) {
+            if (commandOptionsHandler.checkAuthorization("!setBaseTime", username, mod, sub)) {
+                mHandler.setBaseTime(trailing);
+            }
+        }
+
+        if (trailing.startsWith("!setMinValue")) {
+            if (commandOptionsHandler.checkAuthorization("!setMinValue", username, mod, sub)) {
+                mHandler.setMinValue(trailing);
+            }
+        }
+
+        if (trailing.startsWith("!start")) {
+            if (commandOptionsHandler.checkAuthorization("!start", username, mod, sub)) {
+                mHandler.startTimer();
+            }
+        }
+        //TODO add in donation war system
+        /* if (trailing.startsWith("!addSubPoints")) {
+            if (commandHandler.checkAuthorization("!setTime", username, mod, sub)) {
+                countHandler.addSubPointTracker(trailing);
+            }
+        }
+        if (trailing.startsWith("!dwpoints")) {
+            if (commandHandler.checkAuthorization("!dwpoints", username, mod, sub)) {
+                countHandler.getDonationPoints();
+            }
+        }
+
+        if (trailing.startsWith("!addDonationPoints")) {
+            if (commandHandler.checkAuthorization("!addDonationPoints", username, mod, sub)) {
+                countHandler.addDonation(trailing);
+            }
+        }
+
+        if (trailing.startsWith("!setDonationPoints")) {
+            if (commandHandler.checkAuthorization("!setDonationPoints", username, mod, sub)) {
+                countHandler.setDonationPoints(trailing);
+            }
+        }
+        if (trailing.startsWith("!donation-add")) {
+            if (commandHandler.checkAuthorization("!donation-add", username, mod, sub)) {
+                countHandler.donateAdd(trailing);
+            }
+        }
+
+        if (trailing.startsWith("!donation-delete")) {
+            if (commandHandler.checkAuthorization("!donation-delete", username, mod, sub)) {
+                countHandler.donateDel(trailing);
+            }
+        }
+
+        if (trailing.startsWith("!totalTime")) {
+            if (commandHandler.checkAuthorization("!totalTime", username, mod, sub)) {
+                countHandler.totalTime();
+            }
+        }
+
+        if (trailing.startsWith("!highlight")) {
+            if (commandHandler.checkAuthorization("!highlight", username, mod, sub)) {
+                commandHandler.highlight();
+            }
+            return;
+        }
+         */
 
         //begin raffle system commands
         if (trailing.startsWith("!lottery-open")) {
@@ -197,9 +281,9 @@ public final class CommandParser {
             return;
         }
 
-        if (trailing.startsWith("!song-clear")) {
-            if (commandOptionsHandler.checkAuthorization("!song-clear", username, mod, sub)) {
-                songs.songClear();
+        if (trailing.startsWith("!song-reset")) {
+            if (commandOptionsHandler.checkAuthorization("!song-reset", username, mod, sub)) {
+                songs.songReset();
             }
             return;
         }
@@ -395,6 +479,30 @@ public final class CommandParser {
     }
 
     /**
+     * This method parses all incoming messages from Twitch IRC in the bots
+     * channel.
+     *
+     * @param user Username of person using the command.
+     * @param msg A string that represents the message type.
+     * @param channel Channel that the message is coming from.
+     */
+    public void handleEditorCommand(String user, String msg, String channel) {
+        // Check for editor level of user
+        int level = 0;
+        if (store.getConfiguration().joinedChannel.equalsIgnoreCase(user)) {
+            level = 600;
+        } else {
+            for (int i = 0; i < store.getEditors().size(); i++) {
+                final ConfigParameters.Editor editor = store.getEditors().get(i);
+                if (editor.username.equalsIgnoreCase(user)) {
+                    level = editor.level;
+                }
+            }
+        }
+        messenger.sendEditorMessage(editorCommandHandler.parseForCommand(user, level, msg, channel));
+    }
+
+    /**
      * This method parses all incoming messages from Twitch IRC.
      *
      * @param msg A string that represents the message type.
@@ -412,7 +520,6 @@ public final class CommandParser {
                 final int trailingStart = msg.indexOf(" :");
                 final String trailing = msg.substring(trailingStart + 2);
                 this.outstream.println("PONG :" + trailing);
-                p++;
                 return;
             }
             if (msg.startsWith("PONG")) {
@@ -422,6 +529,7 @@ public final class CommandParser {
             boolean isMod = false;
             boolean isSub = false;
             String username = "";
+            String chanFind = msg;
 
             // This is a message from a user.
             // If it's the broadcaster, he/she is a mod.
@@ -495,8 +603,20 @@ public final class CommandParser {
 
             msg = msg.substring(msgIndex + 1);
 
-            // Handle the message
-            handleCommand(username, isMod, isSub, msg);
+            // Determine where message is from
+            // filter system access via bot channel's chat
+            final int channelName = chanFind.indexOf("#", chanFind.indexOf("PRIVMSG"));
+            final int chanIndex = chanFind.indexOf(" ", channelName);
+            String channel = chanFind.substring(channelName + 1, chanIndex);
+            String botName = store.getConfiguration().account;
+            System.out.println(channel + " " + botName);
+            if (channel.equalsIgnoreCase(botName)) {
+                handleEditorCommand(username, msg, channel);
+            } else {
+
+                // Handle the message
+                handleCommand(username, isMod, isSub, msg);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

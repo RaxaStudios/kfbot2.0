@@ -5,24 +5,12 @@
  */
 package com.twitchbotx.gui;
 
-import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.TwitchBotX;
 import com.twitchbotx.bot.XmlDatastore;
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ResourceBundle;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.embed.swing.JFXPanel;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -32,13 +20,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
-import javax.annotation.concurrent.GuardedBy;
-import javax.annotation.concurrent.ThreadSafe;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
+
 
 /**
  * FXML Controller class
@@ -48,7 +30,7 @@ import javafx.scene.media.MediaPlayer;
 public class DashboardController implements Initializable, ControlledScreen {
 
     ScreensController myController = new ScreensController();
-
+    guiHandler.dimensions dm = ScreensController.dm;
     TwitchBotX bot;
     Datastore store;
 
@@ -89,6 +71,7 @@ public class DashboardController implements Initializable, ControlledScreen {
 
     @FXML
     private void commands(ActionEvent event) {
+        setDimensions();
         myController.loadScreen(guiHandler.commandsID, guiHandler.commandsFile);
         myController.setScreen(guiHandler.commandsID);
         myController.setId("commands");
@@ -97,6 +80,7 @@ public class DashboardController implements Initializable, ControlledScreen {
 
     @FXML
     private void configuration(ActionEvent event) {
+        setDimensions();
         myController.loadScreen(guiHandler.configurationID, guiHandler.configurationFile);
         myController.setScreen(guiHandler.configurationID);
         myController.setId("configuration");
@@ -105,6 +89,7 @@ public class DashboardController implements Initializable, ControlledScreen {
 
     @FXML
     private void moderation(ActionEvent event) {
+        setDimensions();
         myController.loadScreen(guiHandler.moderationID, guiHandler.moderationFile);
         myController.setScreen(guiHandler.moderationID);
         myController.setId("moderation");
@@ -113,6 +98,7 @@ public class DashboardController implements Initializable, ControlledScreen {
 
     @FXML
     private void lottery(ActionEvent event) {
+        setDimensions();
         myController.loadScreen(guiHandler.lotteryID, guiHandler.lotteryFile);
         myController.setScreen(guiHandler.lotteryID);
         myController.setId("lottery");
@@ -121,7 +107,7 @@ public class DashboardController implements Initializable, ControlledScreen {
 
     @FXML
     private void spoopathon(ActionEvent event) {
-
+        setDimensions();
         myController.loadScreen(guiHandler.spoopathonID, guiHandler.spoopathonFile);
         myController.setScreen(guiHandler.spoopathonID);
         myController.setId("spoopathon");
@@ -130,13 +116,13 @@ public class DashboardController implements Initializable, ControlledScreen {
 
     @FXML
     private void marathon(ActionEvent event) {
+        setDimensions();
         myController.loadScreen(guiHandler.marathonID, guiHandler.marathonFile);
         myController.setScreen(guiHandler.marathonID);
         myController.setId("marathon");
         myController.show(myController);
     }
 
-    
     @FXML
     private void startBot(ActionEvent event) {
         Thread botT;
@@ -218,4 +204,12 @@ public class DashboardController implements Initializable, ControlledScreen {
     public void setScreenParent(ScreensController screenParent) {
         myController = screenParent;
     }
+
+    private void setDimensions() {
+       int h = (int) guiHandler.stage.getHeight();
+       int w = (int) guiHandler.stage.getWidth();
+       dm.setHeight(h);
+       dm.setWidth(w);
+    }
+
 }

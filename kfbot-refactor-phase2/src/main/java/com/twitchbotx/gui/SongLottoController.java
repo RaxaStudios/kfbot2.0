@@ -11,10 +11,10 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
-import java.util.List;
+//import java.util.List;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
+//import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -54,15 +54,15 @@ public class SongLottoController implements Initializable {
 
     @FXML
     public void clearQueue() {
-        entries.getMap().clear();
-        statusWindow.setText("Lottery has been emptied");
+        entries.songReset();
+        statusWindow.setText("Lottery has been emptied and reset");
         showQueue();
     }
 
     @FXML
     public void openLotto() {
         entries.songOpen();
-        statusWindow.setText("Lottery has been opened !song [song name] to enter");
+        statusWindow.setText("Lottery has been opened !song [song number] to enter");
     }
 
     @FXML
@@ -76,29 +76,44 @@ public class SongLottoController implements Initializable {
         username.selectAll();
         username.copy();
         String user = username.getText();
+
         songName.selectAll();
         songName.copy();
         String content = songName.getText();
-        entries.addUser(user, "!song " + content);
-        statusWindow.setText(user + " has been added with song: " + content);
-        username.setText("");
-        songName.setText("");
-        showQueue();
+        if (user.equals("") || content.equals("")) {
+            statusWindow.setText("Username and song name required");
+        } else {
+            if (entries.addUser(user, "!song " + content)) {
+                statusWindow.setText(user + " has been added with song: " + content);
+            } else {
+                statusWindow.setText("Song:" + content +" or user: " + user + " already in queue or already played today");
+            }
+            username.setText("");
+            songName.setText("");
+            showQueue();
+        }
     }
 
     @FXML
     public void drawWinner() {
         String winner = entries.drawSong();
-        int begIndex = winner.indexOf("song:") + 7;
+        ///System.out.println(winner);
+        int begIndex = winner.indexOf("song:") + 6;
         int endIndex = winner.length();
-        String song = winner.substring(begIndex, endIndex);
-        winner = winner.substring(0, winner.indexOf("song:")-1);
-        winnerName.setText(winner);
-        winnerSong.setText(song);
-        Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-        sendEvent(sdf.format(cal.getTime()) + " song lottery winner: " + winner + " with song: " + song);
-        showQueue();
+        try {
+            //TODO song conversion from number to song title
+            String song = winner.substring(begIndex, endIndex);
+            winner = winner.substring(0, winner.indexOf("song:") - 1);
+            //System.out.println("JD draw print: " + winner + " " + song);
+            winnerName.setText(winner);
+            winnerSong.setText(song);
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+            sendEvent(sdf.format(cal.getTime()) + " song lottery winner: " + winner + " with song: " + song);
+            showQueue();
+        } catch (StringIndexOutOfBoundsException se) {
+            statusWindow.setText("Lotto is empty");
+        }
     }
 
     private void sendEvent(final String msg) {
@@ -132,6 +147,7 @@ public class SongLottoController implements Initializable {
     }
 
     public void goToDashboard() {
+        setDimensions();
         myController.loadScreen(guiHandler.dashboardID, guiHandler.dashboardFile);
         myController.setScreen(guiHandler.dashboardID);
         myController.setId("dashboard");
@@ -143,21 +159,18 @@ public class SongLottoController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
         MAP = entries.getMap();
-        entries.addUser("Test user 1", "!song song choice 1");
-        entries.addUser("Test user 3", "!song song choice 1");
-        entries.addUser("Test user 2", "!song song choice 1");
-        entries.addUser("Test user 4", "!song song choice 1");
-        entries.addUser("Test user 5", "!song snog choice 1");
-        entries.addUser("Test user 6", "!song song choice 1");
-        entries.addUser("Test user 7", "!song song choice 1");
-        entries.addUser("Test user 38", "!song song choice 1");
-        MAP.entrySet().forEach((m) -> {
-            System.out.println("Current map item: " + m.getKey() + "  current tickets: " + m.getValue().getTicket());
-        });
+
         showQueue();
         statusWindow.setText("Song lottery ready to be opened");
     }
 
+    guiHandler.dimensions dm = ScreensController.dm;
+
+    private void setDimensions() {
+        int h = (int) guiHandler.stage.getHeight();
+        int w = (int) guiHandler.stage.getWidth();
+        dm.setHeight(h);
+        dm.setWidth(w);
+    }
 }

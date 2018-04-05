@@ -1,8 +1,8 @@
 package com.twitchbotx.bot;
 
-import com.twitchbotx.gui.DashboardController;
-import com.twitchbotx.gui.guiHandler;
-import java.io.BufferedReader;
+//import com.twitchbotx.gui.DashboardController;
+//import com.twitchbotx.gui.guiHandler;
+//import java.io.BufferedReader;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -12,11 +12,12 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
-import java.io.PrintStream;
-import java.net.Socket;
+//import java.io.PrintStream;
+//import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collections;
+//import java.util.Collections;
 import java.util.List;
+//import java.util.Map;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
@@ -83,6 +84,8 @@ public final class XmlDatastore implements Datastore {
         configuration.pyramidResponse = this.elements.configNode.getElementsByTagName("pyramidResponse").item(0).getTextContent();
 
         configuration.sqlURL = this.elements.configNode.getElementsByTagName("sqlURL").item(0).getTextContent();
+        
+        configuration.sqlMURL = this.elements.configNode.getElementsByTagName("sqlMURL").item(0).getTextContent();
 
         configuration.sqlUser = this.elements.configNode.getElementsByTagName("sqlUser").item(0).getTextContent();
 
@@ -92,19 +95,35 @@ public final class XmlDatastore implements Datastore {
 
         configuration.botID = this.elements.configNode.getElementsByTagName("botID").item(0).getTextContent();
 
-        configuration.lottoAuth = this.elements.configNode.getElementsByTagName("lottoAuth").item(0).getTextContent();
-
-        configuration.lottoName = this.elements.configNode.getElementsByTagName("lottoName").item(0).getTextContent();
-
         configuration.pubSubAuthToken = this.elements.configNode.getElementsByTagName("pubSubAuthToken").item(0).getTextContent();
 
         configuration.botWhisperToken = this.elements.configNode.getElementsByTagName("botWhisperToken").item(0).getTextContent();
 
         configuration.streamlabsToken = this.elements.configNode.getElementsByTagName("streamlabsToken").item(0).getTextContent();
+        
+        configuration.spoopathonStatus = this.elements.configNode.getElementsByTagName("sStatus").item(0).getTextContent();
+        
+        configuration.marathonStatus = this.elements.configNode.getElementsByTagName("mStatus").item(0).getTextContent();
 
-        configuration.pings = this.elements.configNode.getElementsByTagName("pings").item(0).getTextContent();
-
+        configuration.lottoStatus = this.elements.configNode.getElementsByTagName("lottoStatus").item(0).getTextContent();
+        
+        configuration.songLottoStatus = this.elements.configNode.getElementsByTagName("songLottoStatus").item(0).getTextContent();
+        
         return configuration;
+    }
+
+    @Override
+    public List<ConfigParameters.Editor> getEditors() {
+        final List<ConfigParameters.Editor> editors = new ArrayList<>();
+        for (int i = 0; i < this.elements.editorNodes.getLength(); i++) {
+            Node n = this.elements.editorNodes.item(i);
+            Element e = (Element) n;
+            final ConfigParameters.Editor editor = new ConfigParameters.Editor();
+            editor.level = Integer.parseInt(e.getAttribute("level"));
+            editor.username = e.getAttribute("name");
+            editors.add(editor);
+        }
+        return editors;
     }
 
     @Override
@@ -502,7 +521,7 @@ public final class XmlDatastore implements Datastore {
             if (command.equals(el.getAttribute("name"))) {
                 el.setAttribute("cdUntil", Long.toString(cooldownUntil));
                 //TODO need commit()?                
-                //commit();
+                commit();
             }
         }
     }

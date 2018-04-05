@@ -6,18 +6,12 @@
 package com.twitchbotx.gui;
 
 import com.twitchbotx.bot.*;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -26,10 +20,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
-import javax.xml.parsers.ParserConfigurationException;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 /**
  * FXML Controller class
@@ -61,7 +51,6 @@ public class CommandsController implements ControlledScreen {
      * Initializes the controller class.
      */
     public void initialize() {
-        // TODO
         try {
             try {
                 final ConfigParameters.Elements elements = configuration.parseConfiguration("./kfbot.xml");
@@ -103,6 +92,7 @@ public class CommandsController implements ControlledScreen {
 
     @FXML
     private void dash(ActionEvent event) {
+        setDimensions();
         myController.loadScreen(guiHandler.dashboardID, guiHandler.dashboardFile);
         myController.setScreen(guiHandler.dashboardID);
         myController.setId("dashboard");
@@ -111,6 +101,7 @@ public class CommandsController implements ControlledScreen {
 
     @FXML
     private void editCommands(ActionEvent event) {
+        setDimensions();
         myController.loadScreen(guiHandler.commandEditorID, guiHandler.commandEditorFile);
         myController.setScreen(guiHandler.commandEditorID);
         myController.setId("commandEditor");
@@ -165,5 +156,14 @@ public class CommandsController implements ControlledScreen {
         commandInfo.getChildren().clear();
         commandInfo.getChildren().add(vB);
         // myController.setScreen(guiHandler.dashboardID);
+    }
+    
+    guiHandler.dimensions dm = ScreensController.dm;
+
+    private void setDimensions() {
+        int h = (int) guiHandler.stage.getHeight();
+        int w = (int) guiHandler.stage.getWidth();
+        dm.setHeight(h);
+        dm.setWidth(w);
     }
 }

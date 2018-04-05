@@ -4,7 +4,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.MarathonController">
@@ -22,26 +21,38 @@
       </Label>
       <Label layoutX="26.0" layoutY="106.0" text="Time" />
       <Label layoutX="10.0" layoutY="162.0" text="Add Points" />
-      <Button layoutX="85.0" layoutY="102.0" mnemonicParsing="false" text="Start/Reset" />
-      <Button layoutX="255.0" layoutY="158.0" mnemonicParsing="false" text="Add" />
-      <TextField alignment="CENTER" layoutX="90.0" layoutY="158.0" prefHeight="25.0" prefWidth="114.0" />
-      <Label layoutX="88.0" layoutY="183.0" text="500 points = 1 minute" />
-      <Button layoutX="235.0" layoutY="102.0" mnemonicParsing="false" text="Refresh" />
-      <Button layoutX="236.0" layoutY="218.0" mnemonicParsing="false" text="Submit" />
-      <Label layoutX="16.0" layoutY="222.0" text="Set Time" />
-      <TextField alignment="CENTER" layoutX="79.0" layoutY="218.0" prefHeight="25.0" prefWidth="43.0" promptText="12" />
-      <TextField alignment="CENTER" layoutX="132.0" layoutY="218.0" prefHeight="25.0" prefWidth="43.0" promptText="00" />
-      <TextField alignment="CENTER" layoutX="183.0" layoutY="218.0" prefHeight="25.0" prefWidth="43.0" promptText="00" />
-      <Label layoutX="430.0" layoutY="48.0" text="Current Settings">
+      <Button layoutX="100.0" layoutY="102.0" mnemonicParsing="false" onAction="#startTime" text="Start/Reset" />
+      <Button layoutX="269.0" layoutY="158.0" mnemonicParsing="false" onAction="#addPoints" prefHeight="25.0" prefWidth="63.0" text="Add" />
+      <TextField fx:id="addPointsText" alignment="CENTER" layoutX="101.0" layoutY="158.0" prefHeight="25.0" prefWidth="114.0" />
+      <Button layoutX="269.0" layoutY="102.0" mnemonicParsing="false" onAction="#refresh" prefHeight="25.0" prefWidth="63.0" text="Refresh" />
+      <Button layoutX="269.0" layoutY="258.0" mnemonicParsing="false" onAction="#submitSetTime" prefHeight="25.0" prefWidth="63.0" text="Submit" />
+      <Label layoutX="15.0" layoutY="251.0" prefHeight="40.0" prefWidth="75.0" text="Set Current Time" textAlignment="CENTER" wrapText="true" />
+      <TextField fx:id="setHour" alignment="CENTER" layoutX="101.0" layoutY="258.0" prefHeight="25.0" prefWidth="43.0" promptText="12" />
+      <TextField fx:id="setMin" alignment="CENTER" layoutX="150.0" layoutY="258.0" prefHeight="25.0" prefWidth="43.0" promptText="00" />
+      <TextField fx:id="setSec" alignment="CENTER" layoutX="204.0" layoutY="258.0" prefHeight="25.0" prefWidth="43.0" promptText="00" />
+      <Label layoutX="416.0" layoutY="48.0" text="Current Settings">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
       <Label layoutX="506.0" layoutY="106.0" text="Base Time" />
       <Label layoutX="506.0" layoutY="162.0" text="Total Points" />
-      <Label layoutX="497.0" layoutY="222.0" text="Added Minutes" />
-      <VBox fx:id="currentBaseTime" layoutX="370.0" layoutY="101.0" prefHeight="27.0" prefWidth="100.0" style="-fx-border-color: grey;" />
-      <VBox layoutX="370.0" layoutY="157.0" prefHeight="27.0" prefWidth="100.0" style="-fx-border-color: grey;" />
-      <VBox layoutX="370.0" layoutY="217.0" prefHeight="27.0" prefWidth="100.0" style="-fx-border-color: grey;" />
+      <Label layoutX="501.0" layoutY="262.0" text="Added Time" />
+      <Label fx:id="currentBaseTime" alignment="CENTER" contentDisplay="CENTER" layoutX="352.0" layoutY="101.0" prefHeight="27.0" prefWidth="118.0" style="-fx-border-color: grey;" />
+      <Label fx:id="currentTotalPoints" alignment="CENTER" contentDisplay="CENTER" layoutX="352.0" layoutY="157.0" prefHeight="27.0" prefWidth="118.0" style="-fx-border-color: grey;" />
+      <Label fx:id="currentAddedTime" alignment="CENTER" contentDisplay="CENTER" layoutX="352.0" layoutY="257.0" prefHeight="27.0" prefWidth="118.0" style="-fx-border-color: grey;" />
+      <Label layoutX="20.0" layoutY="295.0" prefHeight="40.0" prefWidth="65.0" text="Set Base Time" textAlignment="CENTER" wrapText="true" />
+      <TextField fx:id="setBaseHour" alignment="CENTER" layoutX="101.0" layoutY="302.0" prefHeight="25.0" prefWidth="43.0" promptText="12" />
+      <TextField fx:id="setBaseMin" alignment="CENTER" layoutX="150.0" layoutY="302.0" prefHeight="25.0" prefWidth="43.0" promptText="00" />
+      <TextField fx:id="setBaseSec" alignment="CENTER" layoutX="204.0" layoutY="302.0" prefHeight="25.0" prefWidth="43.0" promptText="00" />
+      <Button layoutX="269.0" layoutY="302.0" mnemonicParsing="false" onAction="#submitSetBaseTime" prefHeight="25.0" prefWidth="63.0" text="Submit" />
+      <Label layoutX="7.0" layoutY="200.0" prefHeight="40.0" prefWidth="89.0" text="Set Minute Value" textAlignment="CENTER" wrapText="true" />
+      <TextField fx:id="setMinuteValue" alignment="CENTER" layoutX="101.0" layoutY="207.0" prefHeight="25.0" prefWidth="43.0" text="500" />
+      <Label layoutX="146.0" layoutY="211.0" text="points = 1 minute" />
+      <Button layoutX="269.0" layoutY="208.0" mnemonicParsing="false" onAction="#submitSetMinuteValue" prefHeight="25.0" prefWidth="63.0" text="Submit" />
+      <Label fx:id="currentMinValue" alignment="CENTER" contentDisplay="CENTER" layoutX="352.0" layoutY="204.0" prefHeight="27.0" prefWidth="118.0" style="-fx-border-color: grey;" />
+      <Label layoutX="488.0" layoutY="198.0" prefHeight="40.0" prefWidth="91.0" text="Points/Minute Value" textAlignment="CENTER" wrapText="true" />
+      <Label layoutX="488.0" layoutY="294.0" prefHeight="40.0" prefWidth="89.0" text="Total Current Time" textAlignment="CENTER" wrapText="true" />
+      <Label fx:id="currentTotalTime" alignment="CENTER" contentDisplay="CENTER" layoutX="352.0" layoutY="301.0" prefHeight="27.0" prefWidth="118.0" style="-fx-border-color: grey;" />
    </children>
 </AnchorPane>

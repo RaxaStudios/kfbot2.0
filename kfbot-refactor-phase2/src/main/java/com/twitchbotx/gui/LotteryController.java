@@ -8,11 +8,7 @@ package com.twitchbotx.gui;
 import com.twitchbotx.bot.*;
 import com.twitchbotx.bot.client.TwitchMessenger;
 import com.twitchbotx.bot.handlers.*;
-import java.awt.Font;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintStream;
-import java.net.Socket;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,18 +23,13 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.text.FontWeight;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javax.xml.parsers.ParserConfigurationException;
-import org.xml.sax.SAXException;
+//import javax.annotation.concurrent.GuardedBy;
 
 /**
  * FXML Controller class
@@ -47,7 +38,6 @@ import org.xml.sax.SAXException;
  */
 public class LotteryController implements Initializable {
 
-    //TODO change this version to LotteryHandler display
     ScreensController myController = new ScreensController();
 
     private Datastore store;
@@ -71,7 +61,7 @@ public class LotteryController implements Initializable {
     @FXML
     private RadioButton subRadioButton;
 
-    @FXML
+    @FXML 
     ScrollPane queueList;
 
     @FXML
@@ -82,9 +72,19 @@ public class LotteryController implements Initializable {
 
     @FXML
     Label qStatus;
+    
+    private synchronized ScrollPane getPane(){
+        return queueList;
+    }
 
-    public void showQueue() {
-
+    private synchronized void setPane(VBox vB){
+        this.queueList.setContent(vB);
+    }
+    
+    @FXML
+    public synchronized void showQueue() {
+        boolean isEmpty = lotto.getCurr().isEmpty();
+        if(!isEmpty){
         MAP = lotto.getMap();
         if(!lotto.getCurr().isEmpty()){
         MAP.entrySet().forEach((m) -> {
@@ -99,18 +99,26 @@ public class LotteryController implements Initializable {
             c++;
         });
         c = 0;
+        //setPane(vB);
         queueList.setContent(vB);
         } else{
             qStatus.setText("Lottery is empty");
         }
+        } else {
+            VBox vB = new VBox();
+            //setPane(vB);
+            queueList.setContent(vB);
+        }
     }
 
+    @FXML
     public void clearQueue() {
         lotto.lottoClear();
         showQueue();
         qStatus.setText("Lottery queue cleared");
     }
 
+    @FXML
     public void openQueue() {
         //Handle text from keyword box
         //Check sub only button
@@ -136,6 +144,7 @@ public class LotteryController implements Initializable {
 
     }
 
+    @FXML
     public void closeQueue() {
         lotto.lottoClose();
         addUserTextField.setText("Lottery closed");
@@ -143,6 +152,7 @@ public class LotteryController implements Initializable {
         qStatus.setText("Lottery currently closed");
     }
 
+    @FXML
     public void addUser() {
         if (lotto.getLottoStatus()) {
             addUserTextField.selectAll();
@@ -167,6 +177,7 @@ public class LotteryController implements Initializable {
         }
     }
 
+    @FXML
     public void popUser() {
         try {
             boolean isEmpty = lotto.getCurr().isEmpty();
@@ -183,6 +194,7 @@ public class LotteryController implements Initializable {
                 winnerText.setAlignment(Pos.CENTER);
                 sendMessage("Lottery is empty");
                 winnerText.setText("Lottery is empty");
+                showQueue();
             }
         } catch (NullPointerException n) {
             sendMessage("Lottery is closed");
@@ -200,7 +212,9 @@ public class LotteryController implements Initializable {
         });
     }
 
+    @FXML
     public void goToDashboard() {
+        setDimensions();
         myController.loadScreen(guiHandler.dashboardID, guiHandler.dashboardFile);
         myController.setScreen(guiHandler.dashboardID);
         myController.setId("dashboard");
@@ -208,6 +222,7 @@ public class LotteryController implements Initializable {
     }
 
     public void songLotto() {
+        setDimensions();
         myController.loadScreen(guiHandler.songLottoID, guiHandler.songLottoFile);
         myController.setScreen(guiHandler.songLottoID);
         myController.setId("songLotto");
@@ -247,4 +262,14 @@ public class LotteryController implements Initializable {
         }
     }
 
+        guiHandler.dimensions dm = ScreensController.dm;
+
+    private void setDimensions() {
+        int h = (int) guiHandler.stage.getHeight();
+        int w = (int) guiHandler.stage.getWidth();
+        dm.setHeight(h);
+        dm.setWidth(w);
+    }
+    
+    
 }

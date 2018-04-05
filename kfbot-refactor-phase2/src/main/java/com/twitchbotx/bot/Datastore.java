@@ -1,8 +1,5 @@
 package com.twitchbotx.bot;
 
-import java.io.BufferedReader;
-import java.io.PrintStream;
-import java.net.Socket;
 import java.util.List;
 import javafx.scene.control.ListView;
 
@@ -13,6 +10,8 @@ public interface Datastore {
 
     /**
      * This method is used to read from the configurations that shouldn't ever change.
+     * @return 
+     * Configuration elements
      */
     ConfigParameters.Configuration getConfiguration();
 
@@ -24,6 +23,14 @@ public interface Datastore {
      */
     List<ConfigParameters.Command> getCommands();
 
+    /**
+     * This method is used to get a list of editors.
+     *
+     * @return
+     * A list of editors
+     */
+    List<ConfigParameters.Editor> getEditors();
+    
     /**
      * This method is used to get a list of filters.
      *

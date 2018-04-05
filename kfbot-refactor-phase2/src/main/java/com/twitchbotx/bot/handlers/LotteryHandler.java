@@ -7,15 +7,20 @@ package com.twitchbotx.bot.handlers;
 
 import com.twitchbotx.bot.CommandParser;
 import com.twitchbotx.bot.Datastore;
-import com.twitchbotx.bot.client.TwitchMessenger;
+//import com.twitchbotx.gui.LotteryController;
 import com.twitchbotx.gui.guiHandler;
-import java.io.PrintStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+//import java.util.Map;
 import java.util.Random;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -63,7 +68,7 @@ public class LotteryHandler {
         private boolean subOnly = false;
 
         public synchronized LinkedHashMap<String, Entrant<Integer, String>> getMap() {
-            return MAP;
+            return this.MAP;
         }
 
         public synchronized List<String> getCurr() {
@@ -112,9 +117,6 @@ public class LotteryHandler {
                 }
                 MAP.put(user, new Entrant());
                 MAP.get(user).addTicket(ticketValue);
-                MAP.entrySet().forEach((m) -> {
-                    System.out.println("Current map item: " + m.getKey() + "  current tickets: " + m.getValue().getTicket());
-                });
             }
         }
 
@@ -154,7 +156,7 @@ public class LotteryHandler {
                         }
                     }
                     m.getValue().addTicket(ticketValue);
-                    System.out.println(m.getKey() + " tickets: " + m.getValue().getTicket());
+                    //System.out.println(m.getKey() + " tickets: " + m.getValue().getTicket());
                 });
             } catch (NullPointerException | IllegalArgumentException ne) {
                 sendMessage("Lottery is empty!");
@@ -166,6 +168,7 @@ public class LotteryHandler {
         //value meant to prevent additional entries
         public synchronized void lottoOpen(String trailing) {
             lottoOn = true;
+            guiHandler.bot.getStore().modifyConfiguration("lottoStatus", "on");
             subOnly = false;
             String auth;
             try {
@@ -198,6 +201,7 @@ public class LotteryHandler {
 
         public synchronized void lottoClose() {
             lottoOn = false;
+            guiHandler.bot.getStore().modifyConfiguration("lottoStatus", "off");
             sendMessage("Lottery has been closed");
         }
 
@@ -230,7 +234,7 @@ public class LotteryHandler {
         @GuardedBy("this")
         private final Random RNG = new Random();
         @GuardedBy("this")
-        private final LinkedHashMap<String, Entrant<Integer, String>> MAP = new LinkedHashMap<>();
+        private LinkedHashMap<String, Entrant<Integer, String>> MAP = new LinkedHashMap<>();
         @GuardedBy("this")
         private int size = MAP.size();
         @GuardedBy("this")
@@ -238,12 +242,67 @@ public class LotteryHandler {
         @GuardedBy("this")
         private final List<String> currPool = new java.util.ArrayList<>();
         @GuardedBy("this")
+        private final List<String> songList = guiHandler.songList;
+        @GuardedBy("this")
+        private List<String> currAdded = new java.util.ArrayList<>();
+        @GuardedBy("this")
+        private List<String> prevAdded = new java.util.ArrayList<>();
+        @GuardedBy("this")
         private boolean songsOn = true;
         @GuardedBy("this")
         private String winner;
 
         public synchronized LinkedHashMap<String, Entrant<Integer, String>> getMap() {
-            return MAP;
+            return this.MAP;
+        }
+
+        public synchronized void setMap(LinkedHashMap<String, Entrant<Integer, String>> map) {
+            this.MAP = map;
+            writeMap(MAP);
+        }
+
+        public synchronized void printMap() {
+            MAP.entrySet().forEach((m) -> {
+                System.out.println("Current map item: " + m.getKey() + "  current tickets: " + m.getValue().getContent());
+            });
+        }
+
+        public synchronized void writeMap(LinkedHashMap<String, Entrant<Integer, String>> map) {
+            try {
+                FileOutputStream fout = new FileOutputStream("songLottery.map");
+                ObjectOutputStream oos = new ObjectOutputStream(fout);
+                oos.writeObject(map);
+            } catch (IOException ie) {
+                sendEvent("Error occurred trying to write lottery to file");
+            }
+        }
+
+        public synchronized LinkedHashMap<String, Entrant<Integer, String>> getMapFromFile() {
+            try {
+                Path location = Paths.get("");
+                Path lResolved = location.resolve("songLottery.map");
+                //System.out.println(lResolved.toAbsolutePath());
+                FileInputStream fin = new FileInputStream(lResolved.toString());
+                ObjectInputStream ois = new ObjectInputStream(fin);
+                LinkedHashMap<String, Entrant<Integer, String>> m1 = (LinkedHashMap<String, Entrant<Integer, String>>) ois.readObject();
+                m1.entrySet().forEach((m) -> {
+                    //System.out.println("Current map item: " + m.getKey() + "  current tickets: " + m.getValue().getContent());
+                    currAdded.add(m.getValue().getContent());
+                    prevAdded.add(m.getValue().getContent());
+                    currPool.add(m.getKey());
+                });
+                setMap(m1);
+                System.out.println("Successfully set song lottery from file");
+                sendEvent("Successfully set song lottery from file");
+                //printMap();
+                return m1;
+            } catch (IOException ie) {
+                sendEvent("Map lottery file not found");
+                ie.printStackTrace();
+            } catch (Exception e) {
+                sendEvent("Error occurred trying to get existing song lottery");
+            }
+            return null;
         }
 
         public synchronized List<String> getCurr() {
@@ -254,54 +313,86 @@ public class LotteryHandler {
             return prevWinner;
         }
 
-        public synchronized void addUser(String user, String content) {
+        public synchronized List<String> getSongList() {
+            return songList;
+        }
+
+        public synchronized boolean addUser(String user, String content) {
             String displayName = CommandParser.displayName;
             boolean nameCheck = user.equalsIgnoreCase(displayName);
             if (!nameCheck) {
                 displayName = user;
             }
             int contentIndex = content.indexOf(" ");
-            content = content.substring(contentIndex, content.length());
-            int tempCountFix = 0;
-            for (String check : currPool) {
-                if (check.equals(user)) {
-                    if (tempCountFix < 1) {
-                        tempCountFix++;
-                        sendMessage("User " + displayName + " already entered with song: " + MAP.get(user).getContent());
-                        return;
-                    } else {
-                        return;
-                    }
+            content = content.substring(contentIndex + 1, content.length());
+            String songListName;
+            int songListSize = songList.size();
+            //check that content is a number between 1 and max song #
+            try {
+                int intContent = Integer.parseInt(content);
+                if (intContent < 1 || intContent > songListSize) {
+                    sendMessage("@" + displayName + ", song choice must be a number between 1 and " + songListSize);
+                    System.out.println("@" + displayName + ", song choice must be a number between 1 and " + songListSize);
+                    return false;
+                } else {
+                    //parse song list for corresponding number, send to songList check
+                    songListName = songList.get(intContent);
+                    int nameBeginIndex = songListName.indexOf(".") + 2;
+                    songListName = songListName.substring(nameBeginIndex);
                 }
+            } catch (NumberFormatException e) {
+                sendMessage("@" + displayName + ", song choice must be a number between 1 and " + songListSize);
+                return false;
             }
-            currPool.add(user);
+
+            //add song to currAdded
+            //possibly check against prevAdded so songs can't be requested twitch without reset
+            if (currPool.contains(user)) {
+                sendMessage(displayName + " already entered with song: " + MAP.get(user).getContent());
+                return false;
+            } else {
+                currPool.add(user);
+            }
+            if (currAdded.contains(songListName)) {
+                sendMessage("@" + displayName + ", that song is already in the lottery, please choose a new song!");
+                return false;
+            } else {
+                currAdded.add(songListName);
+            }
+
+            if (prevAdded.contains(songListName)) {
+                sendMessage("@" + displayName + ", that song has already been played today, please choose a new song!");
+                return false;
+            } else {
+                //only add if winner else ignore
+                //prevAdded.add(songListName);
+            }
             int ticketValue = 2;
-            tempCountFix = 0;
-            boolean p = true;
-            for (String u : prevWinner) {
-                if (u.equals(user)) {
-                    if (tempCountFix < 1) {
-                        p = false;
-                        sendMessage("User " + displayName + " re-added with song: " + content);
-                        ticketValue = 1;
-                        tempCountFix++;
-                    }
-                }
+
+            if (prevWinner.contains(user)) {
+                sendMessage(displayName + " re-added with song: " + songListName);
+                ticketValue = 1;
+            } else {
+                sendMessage(displayName + " added with song: " + songListName);
             }
-            if (p && tempCountFix == 0) {
-                sendMessage(displayName + " added with song: " + content);
-            }
-            MAP.put(user, new Entrant(content));
+
+            MAP.put(user, new Entrant(songListName));
             MAP.get(user).addTicket(ticketValue);
             MAP.entrySet().forEach((m) -> {
                 // System.out.println("Current map item: " + m.getKey() + "  current tickets: " + m.getValue().getTicket());
             });
+            writeMap(MAP);
+            return true;
         }
 
         public synchronized void leaveSong(String user) {
+            //System.out.println("MAP stuff: " + MAP.get(user).content);
+            currAdded.remove(MAP.get(user).content);
             MAP.remove(user);
             prevWinner.add(user);
             currPool.remove(user);
+            
+            writeMap(MAP);
             sendMessage(user + " removed the song lottery");
         }
 
@@ -326,6 +417,8 @@ public class LotteryHandler {
                 winnerSong = MAP.get(winner).getContent();
                 sendMessage("Winner: " + winner + " kffcCheer Song choice: " + MAP.get(winner).getContent());
                 prevWinner.add(winner);
+                prevAdded.add(MAP.get(winner).getContent());
+                currAdded.remove(MAP.get(winner).content);
                 MAP.remove(winner);
                 currPool.remove(winner);
                 MAP.entrySet().forEach((m) -> {
@@ -338,6 +431,7 @@ public class LotteryHandler {
                     m.getValue().addTicket(ticketValue);
                     //System.out.println(m.getKey() + " index: " + m.getValue().getIndex() + " content: " + m.getValue().getContent() + " ticket: " + m.getValue().getTicket());
                 });
+                writeMap(MAP);
             } catch (NullPointerException | IllegalArgumentException ne) {
                 sendMessage("Song lottery is empty!");
             }
@@ -348,16 +442,23 @@ public class LotteryHandler {
         //value meant to prevent additional entries
         public synchronized void songOpen() {
             songsOn = true;
-            sendMessage("A lottery for !jd has opened, type '!song [song name]' to enter!");
+            guiHandler.bot.getStore().modifyConfiguration("songLottoStatus", "on");
+            sendMessage("A lottery for !jd has opened, type '!song [song number]' to enter!");
         }
 
-        public synchronized void songClear() {
+        public synchronized void songReset() {
             MAP.clear();
+            writeMap(MAP);
             currPool.clear();
+            currAdded.clear();
+            prevAdded.clear();
+            songsOn = true;
+            sendMessage("Song lottery has been reset");
         }
 
         public synchronized void songClose() {
             songsOn = false;
+            guiHandler.bot.getStore().modifyConfiguration("songLottoStatus", "off");
             sendMessage("Song lottery has been closed");
         }
 
@@ -376,9 +477,19 @@ public class LotteryHandler {
             }
         }
 
+        private void sendEvent(final String msg) {
+            String event = msg;
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    guiHandler.bot.getStore().getEventList().addList(event);
+                }
+            });
+        }
+
     }
 
-    public static class Entrant<Integer, String> {
+    public static class Entrant<Integer, String> implements Serializable {
 
         private String content;
         public int ticket;

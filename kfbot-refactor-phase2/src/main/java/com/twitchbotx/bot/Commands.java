@@ -64,9 +64,7 @@ public final class Commands {
             "!addDonationPoints",
             "!donation-add",
             "!donation-delete",
-            "!dqpoints",
-            "!jboxcode",
-            "!jboxcodeset",
+            "!dwpoints",
             "!lottery-open",
             "!lottery-clear",
             "!draw",
@@ -76,7 +74,11 @@ public final class Commands {
             "!s-set-points",
             "!s-addPoints",
             "!points",
-            "!s-status"
+            "!s-status",
+            "!song-open",
+            "!song-close",
+            "!song-draw",
+            "!song"
             
     };
 

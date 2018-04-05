@@ -72,7 +72,7 @@ public class ModerationHandler {
             //Timestamped chat log for testing purposes
             Calendar cal = Calendar.getInstance();
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-            sendEvent(sdf.format(cal.getTime()) + " " + username + ": " + msg);
+            //sendEvent(sdf.format(cal.getTime()) + " " + username + ": " + msg);
             if (!filterCheck(msg).equals("no filter")) {
                 System.out.println(reason);
                 sendMessage(".timeout " + username + " " + timeout + " " + reason);
@@ -110,10 +110,9 @@ public class ModerationHandler {
                 timeout = filter.seconds;
                 pattern = Pattern.compile(content);
                 matcher = pattern.matcher(msg);
-                if (matcher.matches()) {
+                if (matcher.find()) {
                     sendMessage(".timeout " + user + " " + timeout + " " + reason);
-                    return;
-                } else {
+                    sendEvent(".timeout " + user + " " + timeout + " " + reason);
                     return;
                 }
             }

@@ -52,4 +52,22 @@ public final class TwitchMessenger {
                     + message);
         }
     }
+    
+     /**
+     * This command will send a message out to the bot Twitch channel.
+     *
+     *
+     * @param msg The message to be sent out to the channel
+     */
+    public void sendEditorMessage(final String msg) {
+        String botChannel = guiHandler.bot.getStore().getConfiguration().account;
+        if (!msg.isEmpty()) {
+            final String message = "/me > " + msg;
+            guiHandler.bot.getOut().println("PRIVMSG #"
+                    + botChannel
+                    + " "
+                    + ":"
+                    + message);
+        }
+    }
 }

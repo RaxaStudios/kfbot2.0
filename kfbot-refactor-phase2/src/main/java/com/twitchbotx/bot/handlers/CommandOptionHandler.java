@@ -1,8 +1,8 @@
 package com.twitchbotx.bot.handlers;
 
 
-import java.io.FileInputStream;
-import java.io.InputStream;
+//import java.io.FileInputStream;
+//import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Logger;
@@ -15,9 +15,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
+//import javax.sound.sampled.AudioInputStream;
+//import javax.sound.sampled.AudioSystem;
+//import javax.sound.sampled.Clip;
 import org.w3c.dom.DOMException;
 
 //import sun.audio.AudioPlayer;
@@ -80,8 +80,10 @@ public final class CommandOptionHandler {
                     if (!username.contentEquals(store.getConfiguration().joinedChannel)) {
                         Calendar calendar = Calendar.getInstance();
                         Date now = calendar.getTime();
+                        System.out.println("cooldown test set cdUntil:" + command.cdUntil);
+                        //check for blank cdUntil
                         Date cdTime = new Date(Long.parseLong(command.cdUntil));
-
+                        
                         if (now.before(cdTime)) {
                             return "";
                         }
@@ -100,6 +102,7 @@ public final class CommandOptionHandler {
                 }
             } catch (DOMException | NumberFormatException e) {
                 LOGGER.severe(e.toString());
+                e.printStackTrace();
             }
         }
 
@@ -287,32 +290,41 @@ public final class CommandOptionHandler {
             }
         }
         if (auth.isEmpty()) {
+            System.out.println("false auth");
             return false;
         }
-        if (auth.toLowerCase().contains("-" + username + " ")) {
+        if (auth.toLowerCase().contains("-" + username)) {
+            System.out.println("false auth");
             return false;
         }
-        if (auth.toLowerCase().contains("+" + username + " ")) {
+        if (auth.toLowerCase().contains("+" + username)) {
+            System.out.println("true auth");
             return true;
         }
-        if ((auth.contains("-m ")) && mod) {
+        if ((auth.contains("-m")) && mod) {
             LOGGER.info("MOD FALSE: ");
+            System.out.println("false auth");
             return false;
         }
-        if ((auth.contains("+m ")) && mod) {
+        if ((auth.contains("+m")) && mod) {
             LOGGER.info("MOD TRUE: ");
+            System.out.println("true auth");
             return true;
         }
-        if ((auth.contains("-s ")) && sub) {
+        if ((auth.contains("-s")) && sub) {
+            System.out.println("false auth");
             return false;
         }
-        if ((auth.contains("+s ")) && sub) {
+        if ((auth.contains("+s")) && sub) {
+            System.out.println("true auth");
             return true;
         }
-        if (auth.contains("-a ")) {
+        if (auth.contains("-a")) {
+            System.out.println("false auth");
             return false;
         }
-        if (auth.contains("+a ")) {
+        if (auth.contains("+a")) {
+            System.out.println("true auth");
             return true;
         }
         return false;

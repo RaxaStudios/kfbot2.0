@@ -30,6 +30,9 @@ import javafx.scene.control.ToggleGroup;
  *
  * @author Raxa
  */
+
+//TODO sub tier 3 command system
+
 public class CommandEditorController implements Initializable {
 
     Datastore store = guiHandler.bot.getStore();
@@ -100,6 +103,7 @@ public class CommandEditorController implements Initializable {
 
     @FXML
     private void dash(ActionEvent event) {
+        setDimensions();
         myController.loadScreen(guiHandler.dashboardID, guiHandler.dashboardFile);
         myController.setScreen(guiHandler.dashboardID);
         myController.setId("dashboard");
@@ -162,6 +166,9 @@ public class CommandEditorController implements Initializable {
             }
             store.setUserCommandAttribute(cmd, attribute, change, true);
             if (attribute.equals("repeating")) {
+                if(change.equals("true")){
+                    //start up the command repeat schedule
+                }
                 submitStatus.setText("Changes applied, restart bot for changes to take effect.");
             } else {
                 submitStatus.setText("Changes saved!");
@@ -368,4 +375,14 @@ public class CommandEditorController implements Initializable {
         }
         commandList.setItems(commands);
     }
+
+    guiHandler.dimensions dm = ScreensController.dm;
+
+    private void setDimensions() {
+        int h = (int) guiHandler.stage.getHeight();
+        int w = (int) guiHandler.stage.getWidth();
+        dm.setHeight(h);
+        dm.setWidth(w);
+    }
+
 }

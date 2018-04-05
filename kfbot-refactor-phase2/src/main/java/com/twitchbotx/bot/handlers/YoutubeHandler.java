@@ -1,6 +1,6 @@
 package com.twitchbotx.bot.handlers;
 
-import com.twitchbotx.bot.ConfigParameters;
+//import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
 
 import java.io.BufferedReader;
@@ -38,10 +38,11 @@ public final class YoutubeHandler {
      */
     private void getYoutubeTitle(final String request) {
         try {
-            String ytAPI = store.getConfiguration().youtubeApi;
+            String ytAPI = store.getConfiguration().youtubeTitle;
             ytAPI = ytAPI.replaceAll("#id", "&id=" + request);
-            ytAPI = ytAPI.replaceAll("#key", "&key=" + store.getConfiguration().youtubeTitle);
+            ytAPI = ytAPI.replaceAll("#key", "&key=" + store.getConfiguration().youtubeApi);
             URL url = new URL(ytAPI);
+            System.out.println("Link: " + ytAPI);
             URLConnection con = (URLConnection) url.openConnection();
             BufferedReader bufReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
             String line;
@@ -54,7 +55,7 @@ public final class YoutubeHandler {
                 sendMessage("Video not found.");
             } else {
                 int bi = response.toString().indexOf("\"title\":") + 10;
-                int ei = response.toString().indexOf(",", bi) - 1;
+                int ei = response.toString().indexOf("\",   ", bi) - 1;
                 String s = response.toString().substring(bi, ei);
                 if (s.length() > 0) {
                     sendMessage(s);
@@ -62,6 +63,7 @@ public final class YoutubeHandler {
             }
         } catch (IOException e) {
             LOGGER.info("GetTitle.GetTitle - error opening or reading URL: " + e.toString());
+            e.printStackTrace();
         }
     }
 

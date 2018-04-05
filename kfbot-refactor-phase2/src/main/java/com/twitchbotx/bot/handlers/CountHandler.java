@@ -4,6 +4,8 @@ import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.client.TwitchMessenger;
 import java.io.PrintStream;
+import java.sql.Connection;
+import java.sql.Statement;
 
 import java.util.logging.Logger;
 
@@ -16,6 +18,12 @@ public final class CountHandler {
     String SQLURL;
     String USER;
     String PASS;
+    static Connection con = null;
+    static Statement stmt = null;
+    static String sqlStatement = "";
+    static boolean first = true;
+    int minutes = 0;
+    int hours = 12;
 
     private final TwitchMessenger messenger;
 
@@ -48,8 +56,7 @@ public final class CountHandler {
     public String addCounter(final String msg) {
         try {
             final String name = CommonUtility.getInputParameter("!cnt-add", msg, true);
-            boolean added = store.addCounter(name);
-            if (added) {
+            if (store.addCounter(name)) {
                 return "Added counter [" + name + "]";
             }
         } catch (IllegalArgumentException e) {

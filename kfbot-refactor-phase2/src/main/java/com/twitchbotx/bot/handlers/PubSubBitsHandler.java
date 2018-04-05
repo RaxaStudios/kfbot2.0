@@ -95,7 +95,9 @@ public class PubSubBitsHandler {
 
         @Override
         public void onTextMessage(WebSocket websocket, String text) {
-            String enabled = this.store.getConfiguration().sStatus;
+            //TODO change to synchronized get method in store            
+            String enabled = this.store.getConfiguration().spoopathonStatus;
+            String marathonEnabled = this.store.getConfiguration().marathonStatus;
             if (enabled.equals("on")) {
                 String incoming = text;
                 try {

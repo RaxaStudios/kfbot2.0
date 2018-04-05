@@ -8,22 +8,28 @@ package com.twitchbotx.gui;
 import com.twitchbotx.bot.*;
 import com.twitchbotx.bot.ConfigParameters.Elements;
 import com.twitchbotx.bot.client.TwitchMessenger;
+//import com.twitchbotx.bot.handlers.LotteryHandler;
 import eu.mihosoft.scaledfx.ScalableContentPane;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+//import java.io.OutputStreamWriter;
 import java.io.PrintStream;
-import java.io.PrintWriter;
+//import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+//import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Scanner;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import javafx.concurrent.Task;
+//import javafx.concurrent.Task;
+import javax.annotation.concurrent.GuardedBy;
 
 /**
  *
@@ -31,7 +37,6 @@ import javafx.concurrent.Task;
  */
 public class guiHandler extends Application {
 
-    //TODO
     public Datastore store;
     final ConfigParameters configuration = new ConfigParameters();
     public static TwitchMessenger messenger;
@@ -39,6 +44,8 @@ public class guiHandler extends Application {
     public BufferedReader in;
     public static TwitchBotX bot;
     public Socket socket;
+    public final static List<String> songList = new java.util.ArrayList<>();
+    private Scanner scan;
 
     //refine event viewer mod actions, command updates, etc
     public static String dashboardID = "dashboard";
@@ -112,6 +119,42 @@ public class guiHandler extends Application {
             e.printStackTrace();
         }
 
+        //create songlist based on text content
+        try {
+            Path location = Paths.get("");
+            Path lResolved = location.resolve("jdSongs.txt");
+            scan = new Scanner(lResolved);
+            String temp = "";
+            String numSong = "";
+            while (scan.hasNext()) {
+                temp = scan.nextLine();
+                if (temp.contains(".")) {
+                    //System.out.println(temp);
+                    int numEndIndex = temp.indexOf(".");
+                    numSong = temp.substring(0, numEndIndex);
+                    songList.add(temp);
+                }
+            }
+            //first line is added to list to take spot 0 in list 
+            //System.out.println(songList);
+            Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                guiHandler.bot.getStore().getEventList().addList("Successfully parsed song list from jdSongs.txt");
+            }
+        });
+            System.out.println("Successfully parsed song list from jdSongs.txt");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error occured trying to create song list");
+        }
+
+        //recover and/or create songLottery.map file to hold LinkedHashMap<String, Entrant<Integer, String>>
+        //uncomment next 2 lines to create new songLottery.map file
+        //LinkedHashMap<String, LotteryHandler.Entrant<Integer, String>> MAP = new LinkedHashMap<>();
+        //CommandParser.songs.writeMap(MAP);
+        CommandParser.songs.getMapFromFile();
+
         //create and show GUI
         ScreensController container = new ScreensController();
         container.loadScreen(dashboardID, dashboardFile);
@@ -132,6 +175,31 @@ public class guiHandler extends Application {
         stage.getIcons().add(new Image("http://kf.bot.raxastudios.com/kffcLove.png"));
         stage.show();
         stage.setOnCloseRequest(e -> System.exit(0));
-        System.out.println("test print after open bot data: " + store.getBot().getSock().toString());
+        //System.out.println("test print after open bot data: " + store.getBot().getSock().toString());
+    }
+
+    //storage for width/height variables to allow scalable content
+    public static class dimensions {
+
+        @GuardedBy("this")
+        private int width = 600;
+        @GuardedBy("this")
+        private int height = 400;
+
+        public synchronized int getWidth() {
+            return this.width;
+        }
+
+        public synchronized void setWidth(int w) {
+            this.width = w;
+        }
+
+        public synchronized int getHeight() {
+            return this.height;
+        }
+
+        public synchronized void setHeight(int h) {
+            this.height = h;
+        }
     }
 }

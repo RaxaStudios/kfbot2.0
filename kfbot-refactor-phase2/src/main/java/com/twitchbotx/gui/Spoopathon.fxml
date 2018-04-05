@@ -26,10 +26,10 @@
             <Font size="14.0" />
          </font>
       </Label>
-      <Button layoutX="276.0" layoutY="140.0" mnemonicParsing="false" text="Select" />
-      <Button layoutX="529.0" layoutY="299.0" mnemonicParsing="false" text="Submit" />
-      <Button layoutX="531.0" layoutY="261.0" mnemonicParsing="false" text="Delete" />
-      <Button layoutX="537.0" layoutY="167.0" mnemonicParsing="false" text="Add" />
+      <Button layoutX="276.0" layoutY="140.0" mnemonicParsing="false" onAction="#selectGame" text="Select" />
+      <Button layoutX="529.0" layoutY="299.0" mnemonicParsing="false" onAction="#submitGameInfo" text="Submit" />
+      <Button layoutX="531.0" layoutY="261.0" mnemonicParsing="false" onAction="#deleteGame" text="Delete" />
+      <Button layoutX="537.0" layoutY="167.0" mnemonicParsing="false" onAction="#addPoints" text="Add" />
       <Label layoutX="432.0" layoutY="100.0" text="Add Points" />
       <Label layoutX="439.0" layoutY="235.0" text="Edit Info" />
       <TextField fx:id="editGameID" alignment="CENTER" layoutX="425.0" layoutY="261.0" prefHeight="25.0" prefWidth="74.0" />
@@ -40,16 +40,17 @@
       <Label layoutX="360.0" layoutY="135.0" text="Game ID" />
       <Label layoutX="365.0" layoutY="171.0" text="Points " />
       <TextField fx:id="addPointsPoints" alignment="CENTER" layoutX="425.0" layoutY="167.0" prefHeight="25.0" prefWidth="74.0" />
-      <TextField fx:id="newGameID" alignment="CENTER" layoutX="117.0" layoutY="261.0" prefHeight="25.0" prefWidth="73.0" />
-      <TextField fx:id="newPoints" alignment="CENTER" layoutX="116.0" layoutY="299.0" prefHeight="25.0" prefWidth="74.0" text="0" />
-      <Button layoutX="206.0" layoutY="299.0" mnemonicParsing="false" text="Create" />
+      <TextField fx:id="newGameID" alignment="CENTER" layoutX="104.0" layoutY="261.0" prefHeight="25.0" prefWidth="73.0" />
+      <Button layoutX="207.0" layoutY="261.0" mnemonicParsing="false" onAction="#addNewGame" text="Create" />
       <Label layoutX="83.0" layoutY="215.0" text="Add New Game">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
       <Label layoutX="43.0" layoutY="265.0" text="Game ID" />
-      <Label layoutX="50.0" layoutY="303.0" text="Points" />
       <Label fx:id="loadLabel" layoutX="91.0" layoutY="144.0" text="Loading Data..." />
+      <Label fx:id="addPointsStatus" contentDisplay="CENTER" layoutX="395.0" layoutY="196.0" prefHeight="38.0" prefWidth="127.0" wrapText="true" />
+      <Label fx:id="editGameStatus" contentDisplay="CENTER" layoutX="399.0" layoutY="341.0" prefHeight="38.0" prefWidth="127.0" wrapText="true" />
+      <Label fx:id="addGameStatus" contentDisplay="CENTER" layoutX="67.0" layoutY="293.0" prefHeight="38.0" prefWidth="127.0" wrapText="true" />
    </children>
 </AnchorPane>

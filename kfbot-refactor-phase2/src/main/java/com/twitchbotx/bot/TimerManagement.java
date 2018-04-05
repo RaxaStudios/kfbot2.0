@@ -1,10 +1,12 @@
 package com.twitchbotx.bot;
 
-import com.twitchbotx.gui.DashboardController;
+//import com.twitchbotx.gui.DashboardController;
 import com.twitchbotx.gui.guiHandler;
-import java.io.PrintStream;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.ArrayList;
+import java.util.List;
+//import java.io.PrintStream;
+//import java.util.Timer;
+//import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -12,7 +14,7 @@ import java.util.logging.Logger;
 import javafx.application.Platform;
 import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
-import org.w3c.dom.Element;
+//import org.w3c.dom.Element;
 
 /*
 ** Roughly 15 minute intervals between command sendMessage, 
@@ -42,23 +44,55 @@ public final class TimerManagement {
         //this.outstream = stream;
     }
 
-    public void setupPeriodicBroadcast(final Datastore repeating) {
+    public volatile boolean repeat;
+
+    public void setupPeriodicBroadcast() {
         for (int i = 0; i < store.getCommands().size(); i++) {
 
-            final ConfigParameters.Command command = store.getCommands().get(i);
-
+            final ConfigParameters.Command command = guiHandler.bot.getStore().getCommands().get(i);
+            //store.getCommands().get(i);
+            final int index = i;
             if (Boolean.parseBoolean(command.repeating)) {
                 int iDelay = Integer.parseInt(command.initialDelay);
                 int interval = Integer.parseInt(command.interval);
                 if (interval < 600) {
                     String event = "Repeating interval too short for command " + command.name;
-                    Platform.runLater(new Runnable() {
+                    Platform.runLater(() -> {
+                        store.getEventList().addList(event);
+                    });
+/*
+                    ses.schedule(new Runnable() {
+                        Datastore store;
+
                         @Override
                         public void run() {
-                            store.getEventList().addList(event);
+                            store = guiHandler.bot.getStore();
+                            int interval = Integer.parseInt(store.getCommands().get(index).interval);
+                            String content = store.getCommands().get(index).text;
+                            boolean repeat = Boolean.parseBoolean(store.getCommands().get(index).repeating);
+                            if (repeat) {
+                                System.out.println("Testing repeating: interval:" + interval + " name: " + command.name + " content: " + content);
+                                ses.schedule(this, interval, TimeUnit.SECONDS);
+                                //ses.schedule(this, 10, TimeUnit.SECONDS);
+                            } else {
+                                //TODO start new runnable series for turning commands on to repeating while bot running
+                                // end old editions of runnables to ensure no crossover
+                                // fix issue when restarting bot through GUI restart button for repeating schedule 
+                                System.out.println("Command " + command.name + " stopping repeat schedule");
+                            }
                         }
-                    });
+                    }, 0, TimeUnit.SECONDS);*/
                 } else {
+
+                    ses.schedule(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            System.out.println("Testing repeating: interval:" + command.interval + " name: " + command.name + " content: " + command.text);
+                            ses.schedule(this, Integer.parseInt(command.interval), TimeUnit.SECONDS);
+                            //ses.schedule(this, 10, TimeUnit.SECONDS);
+                        }
+                    }, 0, TimeUnit.SECONDS);
                     ses.scheduleWithFixedDelay(new Runnable() {
                         @Override
                         public void run() {
@@ -74,6 +108,47 @@ public final class TimerManagement {
                         }
                     });
 
+                }
+            }
+        }
+    }
+
+    public void reschedule(String commandToSchedule) {
+        for (int i = 0; i < store.getCommands().size(); i++) {
+
+            final ConfigParameters.Command command = guiHandler.bot.getStore().getCommands().get(i);
+            if (command.name.equals(commandToSchedule)) {
+                int index = i;
+                int iDelay = Integer.parseInt(command.initialDelay);
+                int interval = Integer.parseInt(command.interval);
+                if (interval < 600) {
+                    String event = "Repeating interval too short for command " + command.name;
+                    Platform.runLater(() -> {
+                        store.getEventList().addList(event);
+                    });
+                } else {
+                    ses.schedule(new Runnable() {
+                        Datastore store;
+
+                        @Override
+                        public void run() {
+                            store = guiHandler.bot.getStore();
+                            int interval = Integer.parseInt(store.getCommands().get(index).interval);
+                            String content = store.getCommands().get(index).text;
+                            boolean repeat = Boolean.parseBoolean(store.getCommands().get(index).repeating);
+                            if (repeat) {
+                                System.out.println("Testing repeating: interval:" + interval + " name: " + command.name + " content: " + content);
+                                ses.schedule(this, interval, TimeUnit.SECONDS);
+                                //ses.schedule(this, 10, TimeUnit.SECONDS);
+                            } else {
+                                //TODO start new runnable series for turning commands on to repeating while bot running
+                                // end old editions of runnables to ensure no crossover
+                                // fix issue when restarting bot through GUI restart button for repeating schedule 
+                                System.out.println("Command " + command.name + " stopping repeat schedule");
+                            }
+                        }
+                    }, 0, TimeUnit.SECONDS);
+                    //}, iDelay, interval);
                 }
             }
         }
@@ -106,6 +181,43 @@ public final class TimerManagement {
             pongCounter = 0;
         }
 
+    }
+
+    @ThreadSafe
+    public static class repeatingCommandHandler {
+
+        public repeatingCommandHandler() {
+
+        }
+
+        public void testRPC() {
+            Runnable rTest = new Runnable() {
+                @Override
+                public void run() {
+
+                    System.out.println("Testing repeating: interval:" + 7 + " name: " + 555 + " content: " + 999);
+                    ses.schedule(this, Integer.parseInt("7"), TimeUnit.SECONDS);
+                    //ses.schedule(this, 10, TimeUnit.SECONDS);
+                }
+            };
+            List<Thread> threads = new ArrayList<>();
+            Thread rT = new Thread(rTest);
+            rT.setName("command name here");
+            threads.add(rT);
+            for (Thread tn : threads) {
+                if (tn.getName().equals("command name here")) {
+                    threads.remove(tn);
+                }
+            }
+        }
+
+    }
+
+    public class T extends Thread {
+
+        public void run() {
+            System.out.println("Test 1");
+        }
     }
 
 }

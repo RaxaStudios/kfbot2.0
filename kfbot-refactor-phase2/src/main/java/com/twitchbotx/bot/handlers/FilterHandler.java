@@ -2,8 +2,8 @@ package com.twitchbotx.bot.handlers;
 
 import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+//import org.w3c.dom.Element;
+//import org.w3c.dom.Node;
 
 import java.util.logging.Logger;
 
@@ -46,7 +46,8 @@ public final class FilterHandler {
                 }
                 sb.append(filters[j]);
             }
-            return ".w " + user + " Current filters: [" + sb.toString() + "]";
+            return "";
+                    //".w " + user + " Current filters: [" + sb.toString() + "]";
         } catch (IllegalArgumentException e) {
             LOGGER.info(e.toString());
         }
@@ -79,14 +80,14 @@ public final class FilterHandler {
             filter.seconds = "600";
             boolean added = store.addFilter(filter);
             if(added) {
-                return ".w " + user + " Filter added.";
+                return "Filter added.";
             }
 
         } catch (IllegalArgumentException e) {
             LOGGER.info(e.toString());
         }
 
-        return ".w " + user + " Filter could not be added.";
+        return "Filter could not be added.";
     }
 
     /**
@@ -107,13 +108,13 @@ public final class FilterHandler {
             final boolean deleted = store.deleteFilter(filterName);
 
             if(deleted) {
-                return ".w " + user + " Filter deleted.";
+                return "Filter deleted.";
             }
-            return ".w " + user + " Filter not found.";
+            return "Filter not found.";
         } catch (IllegalArgumentException e) {
             LOGGER.info(e.toString());
         }
 
-        return ".w " + user + " Filter could not be deleted.";
+        return "Filter could not be deleted.";
     }
 }

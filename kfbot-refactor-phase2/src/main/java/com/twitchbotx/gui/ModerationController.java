@@ -7,7 +7,7 @@ package com.twitchbotx.gui;
 
 import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
-import com.twitchbotx.bot.handlers.FilterHandler;
+//import com.twitchbotx.bot.handlers.FilterHandler;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
@@ -15,16 +15,16 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
-import javafx.scene.control.Button;
+//import javafx.geometry.Pos;
+//import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
-import javafx.scene.control.ScrollPane;
+//import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.VBox;
+//import javafx.scene.layout.VBox;
 
 /**
  * FXML Controller class
@@ -65,6 +65,7 @@ public class ModerationController implements Initializable {
 
     @FXML
     private void dash(ActionEvent event) {
+        setDimensions();
         myController.loadScreen(guiHandler.dashboardID, guiHandler.dashboardFile);
         myController.setScreen(guiHandler.dashboardID);
         myController.setId("dashboard");
@@ -150,11 +151,9 @@ public class ModerationController implements Initializable {
 
     }
 
-    /*
-    *  TODO REGEX options
-     */
     @FXML
     public void regex(ActionEvent event) {
+        setDimensions();
         myController.loadScreen(guiHandler.regexID, guiHandler.regexFile);
         myController.setScreen(guiHandler.regexID);
         myController.setId("regex");
@@ -166,7 +165,7 @@ public class ModerationController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+       
         filterStatus.setVisible(false);
         store = guiHandler.bot.getStore();
         String[] filters = new String[this.store.getFilters().size()];
@@ -181,4 +180,14 @@ public class ModerationController implements Initializable {
         filterList.setItems(filterObL);
     }
 
+        guiHandler.dimensions dm = ScreensController.dm;
+
+    private void setDimensions() {
+        int h = (int) guiHandler.stage.getHeight();
+        int w = (int) guiHandler.stage.getWidth();
+        dm.setHeight(h);
+        dm.setWidth(w);
+    }
+    
+    
 }

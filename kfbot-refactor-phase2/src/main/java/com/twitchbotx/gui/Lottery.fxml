@@ -10,14 +10,14 @@
 
 <AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.LotteryController">
    <children>
-      <Button layoutX="414.0" layoutY="355.0" mnemonicParsing="false" onAction="#showQueue" prefHeight="25.0" prefWidth="95.0" text="Show/Update" />
+      <Button layoutX="404.0" layoutY="355.0" mnemonicParsing="false" onAction="#showQueue" prefHeight="25.0" prefWidth="115.0" text="Show/Update" />
       <ScrollPane fx:id="queueList" layoutX="345.0" layoutY="41.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="306.0" prefWidth="232.0" />
       <Label layoutX="407.0" layoutY="5.0" prefHeight="25.0" prefWidth="108.0" text="Current Queue" textAlignment="JUSTIFY">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <Button layoutX="227.0" layoutY="88.0" mnemonicParsing="false" onAction="#clearQueue" prefHeight="25.0" prefWidth="95.0" text="Clear Queue" />
+      <Button layoutX="221.0" layoutY="88.0" mnemonicParsing="false" onAction="#clearQueue" prefHeight="25.0" prefWidth="108.0" text="Clear Queue" />
       <Button layoutX="246.0" layoutY="47.0" mnemonicParsing="false" onAction="#closeQueue" prefHeight="25.0" prefWidth="55.0" text="Close" />
       <Button layoutX="68.0" layoutY="355.0" mnemonicParsing="false" onAction="#goToDashboard" text="Dashboard" />
       <Label layoutX="197.0" layoutY="-7.0" prefHeight="50.0" prefWidth="142.0" text="Lottery Manager" wrapText="true">

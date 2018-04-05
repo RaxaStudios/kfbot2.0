@@ -60,6 +60,7 @@ public class RegexController implements Initializable {
 
     @FXML
     private void moderation(ActionEvent event) {
+        setDimensions();
         myController.loadScreen(guiHandler.moderationID, guiHandler.moderationFile);
         myController.setScreen(guiHandler.moderationID);
         myController.setId("moderation");
@@ -71,18 +72,26 @@ public class RegexController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
         store = guiHandler.bot.getStore();
-                String[] filters = new String[this.store.getRegexes().size()];
+        String[] filters = new String[this.store.getRegexes().size()];
         for (int i = 0; i < store.getRegexes().size(); i++) {
             final ConfigParameters.FilterRegex filter = store.getRegexes().get(i);
-            filters[i] = (i+1) + " " + filter.content;
+            filters[i] = (i + 1) + " " + filter.content;
         }
         for (int j = 0; j < filters.length; j++) {
             String filter = filters[j];
             filterObL.add(filter);
         }
         filterList.setItems(filterObL);
+    }
+
+    guiHandler.dimensions dm = ScreensController.dm;
+
+    private void setDimensions() {
+        int h = (int) guiHandler.stage.getHeight();
+        int w = (int) guiHandler.stage.getWidth();
+        dm.setHeight(h);
+        dm.setWidth(w);
     }
 
 }

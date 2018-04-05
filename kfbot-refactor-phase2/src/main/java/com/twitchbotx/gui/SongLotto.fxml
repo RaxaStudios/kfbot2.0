@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.SongLottoController">
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.SongLottoController">
   
 
     <children>
@@ -20,7 +20,7 @@
       <TextField fx:id="username" layoutX="83.0" layoutY="184.0" style="-fx-border-color: grey;" />
       <TextField fx:id="songName" layoutX="83.0" layoutY="220.0" prefHeight="27.0" prefWidth="151.0" style="-fx-border-color: grey;" />
       <Button layoutX="254.0" layoutY="208.0" mnemonicParsing="false" onAction="#addUser" text="Add User" />
-      <Button layoutX="420.0" layoutY="353.0" mnemonicParsing="false" onAction="#showQueue" text="Show/Update" />
+      <Button layoutX="410.0" layoutY="353.0" mnemonicParsing="false" onAction="#showQueue" prefHeight="25.0" prefWidth="110.0" text="Show/Update" />
       <Label layoutX="68.0" layoutY="43.0" text="Song Lotto Status" underline="true">
          <font>
             <Font size="14.0" />
