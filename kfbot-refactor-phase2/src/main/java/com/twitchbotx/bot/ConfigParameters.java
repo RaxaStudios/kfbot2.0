@@ -150,7 +150,7 @@ public final class ConfigParameters {
                     + ", sStatus=" + spoopathonStatus
                     + ", mStatus=" + marathonStatus
                     + ", lottoStatus=" + lottoStatus
-                    + ", spoopStatus=" + songLottoStatus
+                    + ", songLottoStatus=" + songLottoStatus
                     + ", pyramidResponse='" + pyramidResponse + '\''
                     + '}';
         }
