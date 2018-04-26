@@ -286,7 +286,7 @@ public class LotteryHandler {
                 ObjectInputStream ois = new ObjectInputStream(fin);
                 LinkedHashMap<String, Entrant<Integer, String>> m1 = (LinkedHashMap<String, Entrant<Integer, String>>) ois.readObject();
                 m1.entrySet().forEach((m) -> {
-                    //System.out.println("Current map item: " + m.getKey() + "  current tickets: " + m.getValue().getContent());
+                    System.out.println("Current map item: " + m.getKey() + "  current tickets: " + m.getValue().getContent());
                     currAdded.add(m.getValue().getContent());
                     prevAdded.add(m.getValue().getContent());
                     currPool.add(m.getKey());
@@ -318,6 +318,8 @@ public class LotteryHandler {
         }
 
         public synchronized boolean addUser(String user, String content) {
+            System.out.println("Curr pool: " + currPool);
+            System.out.println("Prev add: " + prevAdded);
             String displayName = CommandParser.displayName;
             boolean nameCheck = user.equalsIgnoreCase(displayName);
             if (!nameCheck) {
@@ -348,7 +350,11 @@ public class LotteryHandler {
             //add song to currAdded
             //possibly check against prevAdded so songs can't be requested twitch without reset
             if (currPool.contains(user)) {
-                sendMessage(displayName + " already entered with song: " + MAP.get(user).getContent());
+                sendMessage(displayName + " already entered in lottery");
+                System.out.println(MAP.get(user));
+                
+                
+                        //+ MAP.get(user).getContent());
                 return false;
             } else {
                 currPool.add(user);

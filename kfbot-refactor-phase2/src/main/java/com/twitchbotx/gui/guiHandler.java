@@ -129,7 +129,7 @@ public class guiHandler extends Application {
             while (scan.hasNext()) {
                 temp = scan.nextLine();
                 if (temp.contains(".")) {
-                    //System.out.println(temp);
+                    System.out.println(temp);
                     int numEndIndex = temp.indexOf(".");
                     numSong = temp.substring(0, numEndIndex);
                     songList.add(temp);
@@ -140,7 +140,11 @@ public class guiHandler extends Application {
             Platform.runLater(new Runnable() {
             @Override
             public void run() {
+                try {
                 guiHandler.bot.getStore().getEventList().addList("Successfully parsed song list from jdSongs.txt");
+                } catch(NullPointerException e){
+                    e.printStackTrace();
+                }
             }
         });
             System.out.println("Successfully parsed song list from jdSongs.txt");
