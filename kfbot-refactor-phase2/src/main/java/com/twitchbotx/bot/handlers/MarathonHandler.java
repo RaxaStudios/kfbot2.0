@@ -27,9 +27,11 @@ public class MarathonHandler {
     private static final Logger LOGGER = Logger.getLogger(TwitchBotX.class.getSimpleName());
 
     private final Datastore store = guiHandler.bot.getStore();
+
     String SQLURL = store.getConfiguration().sqlMURL;
     String USER = store.getConfiguration().sqlUser;
     String PASS = store.getConfiguration().sqlPass;
+
     static Connection con = null;
     static Statement stmt = null;
     static String sqlStatement = "";
