@@ -27,9 +27,9 @@ public class MarathonHandler {
     private static final Logger LOGGER = Logger.getLogger(TwitchBotX.class.getSimpleName());
 
     private final Datastore store = guiHandler.bot.getStore();
-    static String SQLURL = "jdbc:mysql://raxastudios.com:3306/raxastud_kfTimer";
-    static String USER = "raxastud_raxa";
-    static String PASS = "!Soccerx11";
+    static String SQLURL = "";
+    static String USER = "";
+    static String PASS = "";
     static Connection con = null;
     static Statement stmt = null;
     static String sqlStatement = "";
