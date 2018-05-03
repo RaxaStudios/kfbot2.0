@@ -405,11 +405,6 @@ public class sqlHandler {
 
     }
 
-    private void sendEvent(String game, int points) {
-        String eventMsg = "Spoopathon Event: " + points + " added to  " + game;
-        DashboardController dc = new DashboardController();
-        dc.eventObLAdd(eventMsg);
-    }
 
     private void sendEvent(final String msg) {
         String event = msg;

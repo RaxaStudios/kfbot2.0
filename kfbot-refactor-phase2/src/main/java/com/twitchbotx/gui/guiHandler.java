@@ -129,7 +129,7 @@ public class guiHandler extends Application {
             while (scan.hasNext()) {
                 temp = scan.nextLine();
                 if (temp.contains(".")) {
-                    System.out.println(temp);
+                    //System.out.println(temp);
                     int numEndIndex = temp.indexOf(".");
                     numSong = temp.substring(0, numEndIndex);
                     songList.add(temp);

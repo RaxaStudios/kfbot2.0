@@ -109,6 +109,8 @@ public final class ConfigParameters {
         
         public String marathonStatus;
 
+        public int maxMarathonHour;
+        
         public String lottoStatus;
         
         public String songLottoStatus;
@@ -120,7 +122,8 @@ public final class ConfigParameters {
         public String pyramidResponse;
 
         public String pings;
-
+        
+    
         @Override
         public String toString() {
             return "Configuration{"
@@ -149,6 +152,7 @@ public final class ConfigParameters {
                     + ", streamlabsToken=" + streamlabsToken
                     + ", sStatus=" + spoopathonStatus
                     + ", mStatus=" + marathonStatus
+                    + ", maxMarathonHour=" + maxMarathonHour
                     + ", lottoStatus=" + lottoStatus
                     + ", songLottoStatus=" + songLottoStatus
                     + ", pyramidResponse='" + pyramidResponse + '\''

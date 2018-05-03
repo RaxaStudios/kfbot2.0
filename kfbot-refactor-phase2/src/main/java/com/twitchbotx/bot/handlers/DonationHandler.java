@@ -48,13 +48,27 @@ public class DonationHandler implements Runnable {
             JsonNode data = new ObjectMapper().readTree(read.readLine());
 
             String donation = data.get("data").toString();
-            //System.out.println("donation:  " + donation);
+            System.out.println("donation:  " + donation);
             donation = donation.replace("[", "");
             donation = donation.replace("]", "");
             JsonNode low = new ObjectMapper().readTree(donation);
             if (tempCount == 0) {
                 temp = low.get("donation_id").asText();
                 tempCount++;
+                //for testing 
+                temp = low.get("donation_id").asText();
+                double amount = low.get("amount").asDouble();
+                DecimalFormat f = new DecimalFormat("##.00");
+
+                String outAmount = (String) f.format(amount);
+                int am = low.get("amount").asInt();
+                outAmount = outAmount.replaceAll("[^0-9]", "");
+                System.out.println("DONATIONID:" + temp);
+                System.out.println("Donation amount: $" + am + " formatted for marathon:" + outAmount);
+                String username = low.get("name").asText();
+                System.out.println("From: " + username);
+                String msg = low.get("message").asText();
+                System.out.println("Message: " + msg);
             }
 
             if (temp.equals("") || !temp.equals(low.get("donation_id").asText())) {
@@ -74,13 +88,21 @@ public class DonationHandler implements Runnable {
                 String msg = low.get("message").asText();
                 System.out.println("Message: " + msg);
 
-                CountHandler ch = new CountHandler(store, outstream);
-                //ch.addPoints("!addPoints " + outAmount);
-                sendEvent(username, msg, am);
-                if (!msg.contains("#")) {
-                    messenger.sendMessage(".w Raxa " + username + " donated $" + am + " for spoopathon with no #, message: \"" + msg + "\"");
-                } else {
-                    addSubSQLPoints(msg, am);
+                //check for enabled status of marathon and spoopathon
+                String spoopEnabled = this.store.getConfiguration().spoopathonStatus;
+                String marathonEnabled = this.store.getConfiguration().marathonStatus;
+                if (marathonEnabled.equals("on")) {
+                    MarathonHandler mh = new MarathonHandler(store, outstream);
+                    //sends w/out decimal ie $10.00 = 10
+                    mh.addDollars(am);
+                    sendEvent(username, msg, am);
+                }
+                if (spoopEnabled.equals("on")) {
+                    if (!msg.contains("#")) {
+                        messenger.sendMessage(".w Raxa " + username + " donated $" + am + " for spoopathon with no #, message: \"" + msg + "\"");
+                    } else {
+                        addSubSQLPoints(msg, am);
+                    }
                 }
             }
         } catch (Exception e) {

@@ -67,7 +67,6 @@ public final class CommandParser {
     public CommandParser(final Datastore store, final PrintStream stream) {
 
         //TODO match xml file with all commands to ensure proper authorization and directions
-        
         // all the handlers for different messages
         this.commandOptionsHandler = new CommandOptionHandler(store);
         this.pyramidDetector = new PyramidDetector(store);
@@ -502,6 +501,46 @@ public final class CommandParser {
         messenger.sendEditorMessage(editorCommandHandler.parseForCommand(user, level, msg, channel));
     }
 
+    public void handleUserNotice(String msg) {
+        //System.out.println("USERNOTICE FOUND msg=" + msg);
+        /*
+        ** example msg: 
+        **@badges=subscriber/0,premium/1;color=#FF69B4;display-name=MutantLittle;emotes=;id=570922ab-358d-4d65-a312-89e26e7e0d9d;login=mutantlittle;mod=0;msg-id=sub;msg-param-months=1;msg-param-sub-plan-name=The\sFruit\sBasket\s:D;msg-param-sub-plan=Prime;room-id=59712498;subscriber=0;system-msg=MutantLittle\sjust\ssubscribed\swith\sTwitch\sPrime!;tmi-sent-ts=1524967138517;turbo=0;user-id=92690807;user-type= :tmi.twitch.tv USERNOTICE #kungfufruitcup
+         */
+        int beginTier = msg.indexOf("msg-param-sub-plan=") + 19;
+        int endTier = msg.indexOf(";", beginTier);
+        String subTier = msg.substring(beginTier, endTier);
+        //System.out.println(subTier);
+        int beginMonths = msg.indexOf("msg-param-months=") + 17;
+        int endMonths = msg.indexOf(";", beginMonths);
+        String subMonths = msg.substring(beginMonths, endMonths);
+        //System.out.println(subMonths);
+        int subPoints = 0;
+        if (subTier.equals("Prime") || subTier.equals(1000)) {
+            subPoints = 1;
+        } else if (subTier.equals(2000)) {
+            subPoints = 2;
+        } else if (subTier.equals(3000)) {
+            subPoints = 6;
+        }
+        if (subPoints != 0 && Integer.parseInt(subMonths) < 2) {
+            //TODO options for different values for new versus resub value towards marathon
+            mHandler.addSub(subPoints);
+        }
+    }
+
+    public void handleBits(String msg) {
+        /*
+        ** example msg:
+        **@badges=subscriber/0,bits/100;bits=100;color=;display-name=King_of_Death_;emotes=9:68-69,71-72;id=0e5c1c5d-cc9a-4d36-be6b-2224c285b674;mod=0;room-id=59712498;subscriber=1;tmi-sent-ts=1524965816604;turbo=0;user-id=107746834;user-type= :king_of_death_!king_of_death_@king_of_death_.tmi.twitch.tv PRIVMSG #kungfufruitcup :cheer100 I'm gonna go stream some ME2, I will be back later to lurk <3 <3
+         */
+        int beginAmt = msg.indexOf("bits=") + 5;
+        int endAmt = msg.indexOf(";", beginAmt);
+        String amt = msg.substring(beginAmt, endAmt);
+        //System.out.println(amt);
+        mHandler.addBits(Integer.parseInt(amt));
+    }
+
     /**
      * This method parses all incoming messages from Twitch IRC.
      *
@@ -530,7 +569,7 @@ public final class CommandParser {
             boolean isSub = false;
             String username = "";
             String chanFind = msg;
-
+            String sendRaw = msg;
             // This is a message from a user.
             // If it's the broadcaster, he/she is a mod.
             LOGGER.info(msg);
@@ -590,6 +629,15 @@ public final class CommandParser {
             final String hasPrivMsg = msg.substring(0, channelPosition);
             final int privMsgIndex = hasPrivMsg.indexOf("PRIVMSG");
             if (privMsgIndex == -1) {
+                //check for "USERNOTICE" alternate message
+                if (hasPrivMsg.contains("USERNOTICE")) {
+                    handleUserNotice(sendRaw);
+                    return;
+                }
+                if (hasPrivMsg.contains("bits=")) {
+                    handleBits(sendRaw);
+                    return;
+                }
                 return;
             }
 
@@ -610,6 +658,7 @@ public final class CommandParser {
             String channel = chanFind.substring(channelName + 1, chanIndex);
             String botName = store.getConfiguration().account;
             System.out.println(channel + " " + botName);
+
             if (channel.equalsIgnoreCase(botName)) {
                 handleEditorCommand(username, msg, channel);
             } else {

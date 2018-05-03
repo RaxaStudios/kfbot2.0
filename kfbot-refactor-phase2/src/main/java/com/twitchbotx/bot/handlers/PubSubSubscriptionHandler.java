@@ -105,6 +105,8 @@ public class PubSubSubscriptionHandler {
             System.out.println("Subs PubSub connected");
             ObjectNode dataNode = JsonNodeFactory.instance.objectNode();
             dataNode.putArray("topics").add("channel-subscribe-events-v1." + CHANNEL_ID);
+            dataNode.putArray("topics").add("chat_moderator_actions." + CHANNEL_ID);
+            dataNode.putArray("topics").add("chat_channel_moderation." + CHANNEL_ID);
             dataNode.put("auth_token", CHANNEL_AUTH_TOKEN);
             ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
             rootNode.put("type", "LISTEN");
@@ -119,7 +121,6 @@ public class PubSubSubscriptionHandler {
             String enabled = this.store.getConfiguration().spoopathonStatus;
             String marathonEnabled = this.store.getConfiguration().marathonStatus;
             if (enabled.equals("on")) {
-
                 try {
                     JsonNode root = new ObjectMapper().readTree(text);
                     System.out.println(root.toString());
@@ -165,26 +166,68 @@ public class PubSubSubscriptionHandler {
                                 System.out.println("PRINT ONLY going to subSQL: " + msg + " p: " + spoopPoints);
                                 addSubSQLPoints(msg, spoopPoints);
                             }
-
-                            //sub point tracker
-                            if (months == 1 || months == 0) {
-                                //add 1 to subPoints in sql table kfTimer, new subs only
-                                CountHandler addSubPoint = new CountHandler(store, outstream);
-                                //addSubPoint.addSubPointTracker();
-                            }
-
-                            //keep track of sub points, first 180 new sub points are double points
-                            CountHandler getPoints = new CountHandler(store, outstream);
-                            int subNum = 0;
-                            //getPoints.getSubPoints();
-                            if ((months == 1 || months == 0) && subNum < 201) {
-                                points *= 2;
-                                //getPoints.addSubPoint();
-                            }
                             System.out.println("months" + months + " subPlan:" + subPlan + " points: " + points);
-                            //send information to CountHandler.java
-                            //addPoints(points);
+                        }
 
+                    } else if (root.get("type").asText().contains("PONG")) {
+                        pongCounter++;
+                    } else if (root.get("type").asText().equalsIgnoreCase("chat_channel_moderation")) {
+                        String topic = root.get("data").get("topic").asText();
+                        if (topic.equalsIgnoreCase("channel-subscribe-events-v1." + CHANNEL_ID)) {
+                            JsonNode messageNode = new ObjectMapper().readTree(root.get("data").asText());
+                            System.out.println(messageNode.toString());
+                            String createdBy= messageNode.get("created_by").asText();
+                            String action = messageNode.get("moderation_action").asText();
+                            System.out.println(createdBy + "  modified settings, action info text: " + action);
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (marathonEnabled.equals("on")) {
+                try {
+                    JsonNode root = new ObjectMapper().readTree(text);
+                    System.out.println(root.toString());
+                    if (root.get("type").asText().equalsIgnoreCase("MESSAGE")) {
+                        String topic = root.get("data").get("topic").asText();
+                        if (topic.equalsIgnoreCase("channel-subscribe-events-v1." + CHANNEL_ID)) {
+                            JsonNode messageNode = new ObjectMapper().readTree(root.get("data").get("message").asText());
+                            System.out.println(messageNode.toString());
+                            String userId = messageNode.get("user_id").asText();
+                            int months = messageNode.get("months").asInt();
+                            String displayName = messageNode.get("display_name").asText();
+                            String subPlan = messageNode.get("sub_plan").asText();
+                            int points = 0;
+                            int subPoints = 0;
+                            String subTier = "";
+                            if (subPlan.equals("Prime")) {
+                                points = 500;
+                                subPoints = 1;
+                                subTier = "Prime";
+                            } else if (subPlan.equals("1000")) {
+                                points = 500;
+                                subPoints = 1;
+                                subTier = "Tier 1";
+                            } else if (subPlan.equals("2000")) {
+                                points = 1000;
+                                subPoints = 2;
+                                subTier = "Tier 2";
+                            } else if (subPlan.equals("3000")) {
+                                points = 2500;
+                                subPoints = 6;
+                                subTier = "Tier 3";
+                            }
+                            String msg = messageNode.get("sub_message").get("message").asText();
+                            if (months < 2) {
+                                months = 0;
+                            }
+                            sendEvent(displayName, msg, subTier, months);
+
+                            MarathonHandler mh = new MarathonHandler(store, outstream);
+                            mh.addSub(subPoints);
+                            System.out.println("months" + months + " subPlan:" + subPlan + " points: " + points);
                         }
                     } else if (root.get("type").asText().contains("PONG")) {
                         pongCounter++;
@@ -193,6 +236,7 @@ public class PubSubSubscriptionHandler {
                     e.printStackTrace();
                 }
             }
+
         }
 
         @Override
@@ -223,9 +267,8 @@ public class PubSubSubscriptionHandler {
             System.out.println("PubSub disconnected, by server: " + closedByServer);
         }
 
-        public void addPoints(int points) {
-            CountHandler ch = new CountHandler(store, outstream);
-            //ch.addPoints("!addPoints " + Integer.toString(points));
+        public void addPoints(int subPoints) {
+
         }
 
         public void addDonationWarItem(String msg, int points) {

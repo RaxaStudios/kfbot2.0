@@ -98,6 +98,7 @@ public class PubSubBitsHandler {
             //TODO change to synchronized get method in store            
             String enabled = this.store.getConfiguration().spoopathonStatus;
             String marathonEnabled = this.store.getConfiguration().marathonStatus;
+            //check for spoopathon enabled
             if (enabled.equals("on")) {
                 String incoming = text;
                 try {
@@ -116,12 +117,37 @@ public class PubSubBitsHandler {
                             sendEvent(userName, msg, bits);
                             //bits1 = bits1 / 100;
                             int b = (int) ((bits1) / 100);
-                            //addPoints(bits);
                             if (!msg.contains("#") && bits > 99) {
                                 messenger.sendMessage("@" + userName + ", let a mod know what game you'd like to choose for !spoopathon");
                             } else {
                                 addSubSQLPoints(msg, b);
                             }
+                        }
+                    } else if (root.get("type").asText().contains("PONG")) {
+                        pongCounter++;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            
+            //check for marathon instead
+            if (marathonEnabled.equals("on")) {
+                String incoming = text;
+                try {
+                    JsonNode root = new ObjectMapper().readTree(incoming);
+                    if (root.get("type").asText().equalsIgnoreCase("MESSAGE")) {
+                        String topic = root.get("data").get("topic").toString();;
+                        topic = topic.replaceAll("\"", "");
+                        if (topic.equalsIgnoreCase("channel-bits-events-v1." + CHANNEL_ID)) {
+                            JsonNode messageNode = new ObjectMapper().readTree(root.get("data").get("message").asText());
+                            int bits = messageNode.get("data").get("bits_used").asInt();
+                            double bits1 = messageNode.get("data").get("bits_used").asDouble();
+                            String userName = messageNode.get("data").get("user_name").asText();
+                            String msg = messageNode.get("data").get("chat_message").asText();
+                            //bits are added 1 point per cent
+                            sendEvent(userName, msg, bits);
+                            addPoints(bits);
                         }
                     } else if (root.get("type").asText().contains("PONG")) {
                         pongCounter++;
@@ -162,8 +188,8 @@ public class PubSubBitsHandler {
 
         public void addPoints(int bits) {
             System.out.println(bits + " BITS ADDPOINTS");
-            CountHandler ch = new CountHandler(store, outstream);
-            //ch.addPoints("!addPoints " + Integer.toString(bits));
+            MarathonHandler mh = new MarathonHandler(store, outstream);
+            mh.addBits(bits);
         }
 
         public void addSubSQLPoints(String msg, int points) {

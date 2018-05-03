@@ -38,6 +38,7 @@ public class MarathonHandler {
     static boolean first = true;
     int minutes = 0;
     int hours = 12;
+    int bitPool = 0;
     TwitchMessenger messenger;
 
     public MarathonHandler(Datastore store, final PrintStream out) {
@@ -46,144 +47,161 @@ public class MarathonHandler {
 
     public void addPoints(String msg) {
 
-        //$5 = 500 points = 1 minute
         //tier1 = 500 = 1 sub point, tier2 = 1000 = 2 sub points, tier3 = 2500 = 6 sub points
-        //first 180 sub points are x2 
+        /*
+        ** 1 sub point = 5 minutes
+        ** $2 = 1 minute
+        ** 1 point = 1 second
+         */
         int sep = msg.indexOf(" ");
         int amt = new Integer(msg.substring(sep + 1));
-        String addP = "Update kfTimer SET points = points +" + amt + " WHERE indexID=\'0\'";
+        int pointHours = 0;
+        int pointMins = 0;
+        //get point value, add amt, update point value directly
+        String getP = "SELECT points, baseHour FROM kfTimer";
+        int currentPoints = 0;
+        int baseHour = 0;
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            con = DriverManager.getConnection(SQLURL, USER, PASS);
+            stmt = con.createStatement();
+            ResultSet ap = stmt.executeQuery(getP);
+            while (ap.next()) {
+                currentPoints = ap.getInt("points");
+                baseHour = ap.getInt("baseHour");
+            }
+            con.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("amt= " + amt + " currentPoints= " + currentPoints);
+        amt = amt + currentPoints;
+        int sendAmt = amt;
+        //amt -> time value -> update sql total time
+        while (amt > (59)) {
+            amt -= 60;
+            pointMins++;
+            if (pointMins > 59) {
+                pointHours++;
+                pointMins = 0;
+            }
+        }
+        System.out.println(pointHours + " " + pointMins);
+        //get base hour and add to hours prior to update
+        //take max hour setting from configuration 
+        pointHours = pointHours + baseHour;
+        int maxHour = store.getConfiguration().maxMarathonHour;
+        if (pointHours > (maxHour - 1)) {
+            pointHours = maxHour;
+            minutes = 0;
+        }
 
         //begin update sql point value
+        String addP = "Update kfTimer SET points = \'" + sendAmt + "\', hours=\'" + pointHours + "\', minutes=\'" + pointMins + "\' WHERE indexID=\'0\'";
         try {
             Class.forName("com.mysql.jdbc.Driver");
             con = DriverManager.getConnection(SQLURL, USER, PASS);
             stmt = con.createStatement();
             stmt.execute(addP);
+            con.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println(addP);
+    }
 
-        //begin get point value after update
-        String getP = "SELECT points FROM kfTimer";
-        int currentPoints = 0;
-        try {
-            ResultSet ap = stmt.executeQuery(getP);
-            ResultSetMetaData apmd = ap.getMetaData();
-            int apc = apmd.getColumnCount();
+    //sub addition system -> addPoints
+    public void addSub(int subPoints) {
+        //convert sub points to regular points
+        //TODO utilize the setting made available in marathon controller for this
+        //hard coded for 4/27 marathon 1 sub point = 5 minutes = (200points/1minute)*5 = 1000 points
 
-            while (ap.next()) {
-                for (int i = 1; i <= apc; i++) {
-                    currentPoints = ap.getInt(i);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //if points are greater than 660,000 
-        //return and set time, this will equal the 30 hour cap
-        //check hour value from SQL
-        String getH = "SELECT hours FROM kfTimer";
-        int hValue = 0;
-        try {
-            ResultSet hp = stmt.executeQuery(getH);
-            ResultSetMetaData hmd = hp.getMetaData();
-            int hc = hmd.getColumnCount();
-
-            while (hp.next()) {
-                for (int i = 1; i <= hc; i++) {
-                    hValue = hp.getInt(i);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        // System.out.println(hValue + "HVALUE");
-        boolean send = true;
-
-        if (currentPoints > 660000 || hValue > 29) {
-            currentPoints = 660000;
-            if (first) {
-                messenger.sendMessage("30 hour marathon cap has been reached! kffcCheer");
-                first = false;
-            }
-            send = false;
-        }
-
-        //begin parse points to time value
-        int minuteValue = 0;
+        //get value of sub from sql, 1 sub point = subPointValue in minutes @ 60 points = 1 minute
+        int subPointValue = 0;
         //set minute value from sql query
-        String minValue = "SELECT minValue FROM kfTimer";
-        try {
-            ResultSet aM = stmt.executeQuery(minValue);
-            while (aM.next()) {
-                minuteValue = aM.getInt("minValue");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        //set default value
-        if (minuteValue == 0) {
-            minuteValue = 500;
-        }
-        //sql query to get current values
-        String tTime = "SELECT hours, minutes, seconds FROM kfTimer";
-
+        String subValue = "SELECT subValue FROM kfTimer";
         try {
             Class.forName("com.mysql.jdbc.Driver");
             con = DriverManager.getConnection(SQLURL, USER, PASS);
             stmt = con.createStatement();
-            ResultSet ap = stmt.executeQuery(tTime);
-            while (ap.next()) {
-                hours = Integer.parseInt(ap.getString("hours"));
-                minutes = Integer.parseInt(ap.getString("minutes"));
+            ResultSet aM = stmt.executeQuery(subValue);
+            while (aM.next()) {
+                subPointValue = aM.getInt("subValue");
             }
-        } catch (IllegalArgumentException il) {
-            System.out.println("Syntax: !s-addPoints [gameID] [points]");
-        } catch (SQLException sql) {
-            sql.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        System.out.println(hours + "HOURS " + currentPoints + "cP");
-        while (currentPoints > (minuteValue - 1)) {
-            currentPoints -= minuteValue;
-            minutes++;
-            if (minutes > 59) {
-                hours++;
-                minutes = 0;
-            }
-        }
-        if (hours > 29) {
-            hours = 30;
-            minutes = 0;
-        }
-        System.out.println(hours + "H " + minutes + "M " + currentPoints + "cP");
-        //format minutes
-        String format = "";
-        if (minutes < 10) {
-            format = "0" + Integer.toString(minutes);
-        } else {
-            format = Integer.toString(minutes);
-        }
-        System.out.println("formatted minutes: " + format);
-        //begin update time values and close connection
-        String updateTime = "UPDATE kfTimer SET hours=\'" + hours + "\', minutes=\'" + format + "\', seconds=\'00\' WHERE indexID=\'0\'";
-        System.out.println(updateTime);
-        try {
-            stmt.executeUpdate(updateTime);
             con.close();
-            if (send) {
-                if (amt > 0) {
-                    messenger.sendMessage("Added " + amt + " points to the marathon timer.");
-                } else if (amt == 0) {
-                    messenger.sendMessage("Timer stats updated");
-                }
-            }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        //set default value 1 sub point = 5 minutes
+        if (subPointValue == 0) {
+            subPointValue = 5;
         }
 
+        int pointsToAdd = 0;
+        int minutesToAdd = 0;
+        minutesToAdd = subPoints * subPointValue; // 1 sub point * minute value
+        pointsToAdd = minutesToAdd * 60; //convert minutes to seconds, 1 point = 1 sec
+        addPoints("!addPoints " + pointsToAdd);
+
+    }
+
+    //dollar addition system -> addPoints
+    public void addDollars(int dollars) {
+        //convert dollars to regular points
+        //TODO utilize the setting made in marathon controller for this
+        //hard coded for 4/27 marathon $2 = 1 minute = 200points
+
+        //dollar value comes in as $10.00 = 10
+        
+        //get value of dollar from sql
+        //$ amount and how many minutes equal 
+        int dollarValue = 0;
+        int dollarMinute = 0;
+        //set minute value from sql query
+        String minValue = "SELECT dollarValue, dollarMinute FROM kfTimer";
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            con = DriverManager.getConnection(SQLURL, USER, PASS);
+            stmt = con.createStatement();
+            ResultSet aM = stmt.executeQuery(minValue);
+            while (aM.next()) {
+                dollarValue = aM.getInt("dollarValue");
+                dollarMinute = aM.getInt("dollarMinute");
+            }
+            con.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //set default value of $2 = 1 minute
+        if (dollarValue == 0) {
+            dollarValue = 2;
+        }
+        if (dollarMinute == 0) {
+            dollarMinute = 1;
+        }
+
+        int pointsToAdd = 0;
+        double minutesToAdd = dollars * ((double) dollarMinute / dollarValue);
+        pointsToAdd = (int) minutesToAdd * 60;
+
+        addPoints("!addPoints " + pointsToAdd);
+    }
+
+    // bit addition system -> addPoints
+    public void addBits(int bits) {
+        int b = 0;
+        // $1 = 100 bits, convert and send
+        if (bits > 99) {
+            b = (int) ((double) (bits) / 100);
+        } else {
+            bitPool = bitPool + bits;
+            if (bitPool > 99) {
+                b = b + 1;
+                bitPool = bitPool - 100;
+            }
+        }
+        addPoints("!addPoints " + b);
     }
 
     public void totalTime() {
@@ -224,7 +242,7 @@ public class MarathonHandler {
             stmt = con.createStatement();
 
             long now = System.currentTimeMillis();
-            String resetTimer = "Update kfTimer SET startTime=\'" + now + "\', hours=\'12\', minutes=\'00\', seconds=\'00\', points=\'0\', baseTime=\'12:00:00\'  WHERE indexID=\'0\'";
+            String resetTimer = "Update kfTimer SET startTime=\'" + now + "\', hours=\'10\', minutes=\'00\', seconds=\'00\', points=\'0\', baseTime=\'10:00:00\'  WHERE indexID=\'0\'";
 
             stmt.executeUpdate(resetTimer);
             con.close();
@@ -233,7 +251,6 @@ public class MarathonHandler {
             e.printStackTrace();
         }
     }
-
 
     public void setTime(String msg) {
         int sep = msg.indexOf(" ");
@@ -263,10 +280,50 @@ public class MarathonHandler {
             e.printStackTrace();
         }
     }
-    
+
+    public void setSubValue(String value) {
+        //sql statement update subValue item
+        String updateS = "Update kfTimer SET subValue = \'" + value + "\' WHERE indexID=\'0\'";
+
+        //begin update sql point value
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            con = DriverManager.getConnection(SQLURL, USER, PASS);
+            stmt = con.createStatement();
+            stmt.execute(updateS);
+            con.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setDollarValue(String dollar, String minute) {
+        //sql statement update items dollarValue and dollarMinute
+        String updateD = "Update kfTimer SET dollarValue = \'" + dollar + "\', dollarMinute = \'" + minute + "\' WHERE indexID=\'0\'";
+
+        //begin update sql point value
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            con = DriverManager.getConnection(SQLURL, USER, PASS);
+            stmt = con.createStatement();
+            stmt.execute(updateD);
+            con.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addMinutes(String minutes) {
+        //convert to points and !addPoints
+        int minutesToAdd = Integer.parseInt(minutes);
+        int points = minutesToAdd * 60;
+        System.out.println("adding " + points + " points/seconds");
+        addPoints("!addPoints " + points);
+    }
+
     //set value of base time(aka marathon lowest end time, normally 12 hours)
-    public void setBaseTime(String msg){
-        int amt = Integer.parseInt(msg.substring(msg.indexOf(" ")));
+    public void setBaseTime(String msg) {
+        String amt = msg.substring(msg.indexOf(" ") + 1);
         try {
             Class.forName("com.mysql.jdbc.Driver");
             con = DriverManager.getConnection(SQLURL, USER, PASS);
@@ -281,11 +338,10 @@ public class MarathonHandler {
             e.printStackTrace();
         }
     }
-    
 
     //set the value of each minute in the SQL database
     public void setMinValue(String msg) {
-        int amt = Integer.parseInt(msg.substring(msg.indexOf(" ")));
+        String amt = msg.substring(msg.indexOf(" ") + 1);
         try {
             Class.forName("com.mysql.jdbc.Driver");
             con = DriverManager.getConnection(SQLURL, USER, PASS);

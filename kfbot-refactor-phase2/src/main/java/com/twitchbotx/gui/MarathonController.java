@@ -57,6 +57,15 @@ public class MarathonController implements Initializable {
     TextField setSec;
 
     @FXML
+    TextField setSubText;
+    
+    @FXML
+    TextField setDollarText;
+    
+    @FXML
+    TextField setDollarMinText;
+    
+    @FXML
     TextField setBaseHour;
 
     @FXML
@@ -81,8 +90,35 @@ public class MarathonController implements Initializable {
     Label currentMinValue;
 
     @FXML
+    Label currentSubPointValue;
+    
+    @FXML
+    Label currentDollarValue;
+    
+    @FXML
     Label currentTotalTime;
 
+        @FXML
+    private void submitSubPoint(ActionEvent event){
+        setSubText.selectAll();
+        setSubText.copy();
+        String amt = setSubText.getText();   
+        mHandler.setSubValue(amt);
+    }
+    
+    @FXML
+    private void submitDollarPoint(ActionEvent event){
+        setDollarText.selectAll();
+        setDollarText.copy();
+        String dollar = setDollarText.getText();
+        setDollarMinText.selectAll();
+        setDollarMinText.copy();
+        String minute = setDollarMinText.getText();
+        mHandler.setDollarValue(dollar, minute);
+    }
+    
+    
+    
     @FXML
     private void submitSetTime(ActionEvent event) {
         String msg;
@@ -136,14 +172,13 @@ public class MarathonController implements Initializable {
     }
 
     @FXML
-    private void addPoints(ActionEvent event) {
+    private void addMinutes(ActionEvent event) {
         String msg = "";
         String points = "";
         addPointsText.selectAll();
         addPointsText.copy();
         points = addPointsText.getText();
-        msg = "!addPoints " + points;
-        mHandler.addPoints(msg);
+        mHandler.addMinutes(points);
     }
 
     @FXML
@@ -197,7 +232,8 @@ public class MarathonController implements Initializable {
         }
         currentBaseTime.setText(timeText);
         closeConnection();
-
+        
+        
         //create points connection
         Statement points = connect();
 
@@ -229,22 +265,31 @@ public class MarathonController implements Initializable {
         //test number
         //currentPoints = 500;
         int minuteValue = 500;
+        int dollarValue = 0;
+        int dollarMinute = 0;
+        int subValue = 0;
         //set minute value from sql query
-        String minValue = "SELECT minValue FROM kfTimer";
+        String minValue = "SELECT minValue, dollarValue, dollarMinute, subValue FROM kfTimer";
         try {
             ResultSet aM = points.executeQuery(minValue);
             while (aM.next()) {
                 minuteValue = aM.getInt("minValue");
+                dollarValue = aM.getInt("dollarValue");
+                dollarMinute = aM.getInt("dollarMinute");
+                subValue = aM.getInt("subValue");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         //set default value
         if (minuteValue == 0) {
-            minuteValue = 500;
+            minuteValue = 60;
         }
         currentMinValue.setText(String.valueOf(minuteValue));
-
+        currentSubPointValue.setText(String.valueOf(subValue));
+        currentDollarValue.setText("$"+String.valueOf(dollarValue)+"/"+String.valueOf(dollarMinute));
+        
+        
         int hours = 0;
         int minutes = 0;
         System.out.println(hours + "HOURS " + currentPoints + "cP");

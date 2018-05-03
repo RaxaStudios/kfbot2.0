@@ -104,6 +104,8 @@ public final class XmlDatastore implements Datastore {
         configuration.spoopathonStatus = this.elements.configNode.getElementsByTagName("sStatus").item(0).getTextContent();
         
         configuration.marathonStatus = this.elements.configNode.getElementsByTagName("mStatus").item(0).getTextContent();
+        
+        configuration.maxMarathonHour = Integer.parseInt(this.elements.configNode.getElementsByTagName("maxMarathonHour").item(0).getTextContent());
 
         configuration.lottoStatus = this.elements.configNode.getElementsByTagName("lottoStatus").item(0).getTextContent();
         

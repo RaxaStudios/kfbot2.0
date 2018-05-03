@@ -198,12 +198,12 @@ public final class TwitchBotX {
             // Begin connecting to and listening to Twitch PubSub 
             //startPubSub(store, out);
             //Start StreamLabs listener
-            //startSL(store, out);
+            startSL(store, out);
             // start all periodic timers for broadcasting events
-            startTimers(store, out);
+            //startTimers(store, out);
 
             // start checking for PING messages
-            startPingPong(store, out);
+            /*startPingPong(store, out);
             System.out.println("Recon? " + reconnect);
             if (!reconnect) {
                 final String ReadyMessage = "/me > " + BOT_VERSION + " has joined the channel.";
@@ -211,7 +211,7 @@ public final class TwitchBotX {
                         + store.getConfiguration().joinedChannel
                         + " :"
                         + ReadyMessage);
-            }
+            }*/
 
             LOGGER.info("Bot is now ready for service.");
 
@@ -258,7 +258,7 @@ public final class TwitchBotX {
 
         PubSubSubscriptionHandler.connect(store, out);
 
-        WhisperHandler.connect(store, out);
+        //WhisperHandler.connect(store, out);
 
         PubSubBitsHandler.connect(store, out);
     }
