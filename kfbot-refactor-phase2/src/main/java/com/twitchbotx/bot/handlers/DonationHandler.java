@@ -48,7 +48,7 @@ public class DonationHandler implements Runnable {
             JsonNode data = new ObjectMapper().readTree(read.readLine());
 
             String donation = data.get("data").toString();
-            System.out.println("donation:  " + donation);
+            //System.out.println("donation:  " + donation);
             donation = donation.replace("[", "");
             donation = donation.replace("]", "");
             JsonNode low = new ObjectMapper().readTree(donation);

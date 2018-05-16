@@ -84,7 +84,7 @@ public final class TwitchBotX {
             LOGGER.log(Level.WARNING, "An error occurred with I/O in beginReadingMessages, perhaps with the Twitch API: {0}", e.toString());
             reconCount++;
             e.printStackTrace();
-            reconnect();
+            store.getBot().reconnect();
         } catch (NullPointerException e) {
             LOGGER.log(Level.WARNING, "Shutting down bot");
         } catch (Exception e) {
@@ -150,7 +150,7 @@ public final class TwitchBotX {
             } catch (IOException e) {
                 LOGGER.log(Level.WARNING, "An error occurred with I/O, perhaps with the Twitch API: {0}", e.toString());
                 reconCount++;
-                reconnect();
+                store.getBot().reconnect();
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "A general error occurred parsing the message: {0}", e.toString());
                 reconCount++;
@@ -179,7 +179,7 @@ public final class TwitchBotX {
             out.println("NICK " + store.getConfiguration().account);
             out.println("JOIN #" + store.getConfiguration().joinedChannel);
             //TODO alternate method of adding filters in bot's channel
-            out.println("JOIN #" + store.getConfiguration().account);
+            //out.println("JOIN #" + store.getConfiguration().account);
             out.println("CAP REQ :twitch.tv/tags");
             out.println("CAP REQ :twitch.tv/commands");
             //out.println("CAP REQ :twitch.tv/membership");
@@ -203,7 +203,7 @@ public final class TwitchBotX {
             //startTimers(store, out);
 
             // start checking for PING messages
-            /*startPingPong(store, out);
+            startPingPong(store, out);
             System.out.println("Recon? " + reconnect);
             if (!reconnect) {
                 final String ReadyMessage = "/me > " + BOT_VERSION + " has joined the channel.";
@@ -211,7 +211,7 @@ public final class TwitchBotX {
                         + store.getConfiguration().joinedChannel
                         + " :"
                         + ReadyMessage);
-            }*/
+            }
 
             LOGGER.info("Bot is now ready for service.");
 

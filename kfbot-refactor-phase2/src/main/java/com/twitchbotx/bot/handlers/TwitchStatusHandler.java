@@ -11,6 +11,7 @@ import java.net.URLConnection;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
@@ -86,10 +87,10 @@ public final class TwitchStatusHandler {
         try {
             String followURL = store.getConfiguration().followage;
             //test values
-            //followURL = followURL.replaceAll("#user", "raxa");
-            //followURL = followURL.replaceAll("#streamer", "kungfufruitcup");
-            followURL = followURL.replaceAll("#user", user);
-            followURL = followURL.replaceAll("#streamer", store.getConfiguration().joinedChannel);
+            followURL = followURL.replaceAll("#user", "talon2461");
+            followURL = followURL.replaceAll("#streamer", "kungfufruitcup");
+            //followURL = followURL.replaceAll("#user", user);
+            //followURL = followURL.replaceAll("#streamer", store.getConfiguration().joinedChannel);
             URL url = new URL(followURL);
             URLConnection con = (URLConnection) url.openConnection();
             con.setRequestProperty("Accept", "application/vnd.twitchtv.v3+json");
@@ -102,15 +103,20 @@ public final class TwitchStatusHandler {
                 response.append(inputLine);
             }
 
+            System.out.println(response);
+            
             int bi = response.toString().indexOf("\"created_at\":") + 14;
             int ei = response.toString().indexOf("\"", bi);
             String s = response.toString().substring(bi, ei);
-
+            
+            System.out.println(s);
+            
             DateTimeFormatter full = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss'Z'");
             DateTimeFormatter format = DateTimeFormatter.ofPattern("MMM dd, uuuu");
-
+            ZoneId z = ZoneId.of("UTC-1");
             LocalDateTime begin = LocalDateTime.parse(s, full);
-            LocalDateTime today = LocalDateTime.now();
+            begin.atZone(z);
+            LocalDateTime today = LocalDateTime.now(z);
             long diff = ChronoUnit.MILLIS.between(begin, today);
             long diffDay = diff / (24 * 60 * 60 * 1000);
             diff = diff - (diffDay * 24 * 60 * 60 * 1000);
@@ -120,7 +126,12 @@ public final class TwitchStatusHandler {
             diff = diff - (diffMinutes * 60 * 1000);
             long diffSeconds = diff / 1000;
             diff = diff - (diffSeconds * 1000);
-
+           if(diffDay < 0 || diffHours < 0 || diffMinutes < 0){
+                diffDay = 0;
+                diffHours = 0;
+                diffMinutes = 0;
+                diffSeconds = 0;
+            }
             String beginFormatted = begin.format(format);
             String gap = diffDay +" days " + diffHours + " hours " + diffMinutes +" minutes " + diffSeconds + " seconds"; 
             System.out.println("test formatting: milis:" + diff + " " + diffDay + "days " + diffHours + ":" + diffMinutes + ":" + diffSeconds);

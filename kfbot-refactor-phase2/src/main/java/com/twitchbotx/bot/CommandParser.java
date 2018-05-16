@@ -56,9 +56,6 @@ public final class CommandParser {
     // For sending message out
     private final TwitchMessenger messenger;
 
-    // Variable for ping testing system
-    private static int p = 0;
-
     // Store for lottery handler use
     private final Datastore store;
 
@@ -136,8 +133,13 @@ public final class CommandParser {
             }
         }
 
-        if (!trailing.startsWith("!")) {
+        if (!trailing.startsWith("!") && (username.equalsIgnoreCase("Raxa") || username.equalsIgnoreCase("kungfufruitcup"))) {
             return;
+        }
+
+        // test purpose commands
+        if (trailing.startsWith("!recon") && (username.equalsIgnoreCase("Raxa") || username.equalsIgnoreCase("kungfufruitcup"))) {
+            parse(":tmi.twitch.tv RECONNECT");
         }
 
         if (trailing.startsWith("!test1")) {
@@ -553,16 +555,30 @@ public final class CommandParser {
                 return;
             }
 
+            //test usage
+            System.out.println("Printing message test: " + msg);
+
             // A ping was sent by the twitch server, complete the handshake
             // by sending it back pong with the message.
             if (msg.startsWith("PING")) {
+
                 final int trailingStart = msg.indexOf(" :");
                 final String trailing = msg.substring(trailingStart + 2);
                 this.outstream.println("PONG :" + trailing);
+                System.out.println("Caught PING message, sent: \'PONG :" + trailing + "\' back");
                 return;
             }
             if (msg.startsWith("PONG")) {
                 addPing();
+                return;
+            }
+
+            //Handle reconnet notice ":tmi.twitch.tv RECONNECT"
+            if (msg.equals(":tmi.twitch.tv RECONNECT")) {
+                System.out.println("RECONNECT notice received, restarting bot");
+                TwitchBotX.pH.resetPong();
+                store.getBot().reconnect();
+                sendEvent("RECONNECT notice received, attempting to reconnect");
             }
 
             boolean isMod = false;
