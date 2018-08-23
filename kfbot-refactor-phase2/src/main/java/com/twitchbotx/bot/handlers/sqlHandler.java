@@ -232,6 +232,11 @@ public class sqlHandler {
         return size;
     }
 
+    /**
+     * 
+     * @param msg !addPoints [gameId] [points]
+     * @return boolean success
+     */
     public boolean addPoints(String msg) {
         String enabled = this.store.getConfiguration().spoopathonStatus;
         System.out.println(enabled);
@@ -405,7 +410,8 @@ public class sqlHandler {
 
     }
 
-
+    
+    
     private void sendEvent(final String msg) {
         String event = msg;
         Platform.runLater(new Runnable() {

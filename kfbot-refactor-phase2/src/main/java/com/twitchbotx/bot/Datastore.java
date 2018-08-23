@@ -56,8 +56,9 @@ public interface Datastore {
      *
      * @param value
      * The value to be set to
+     * @return success or failure
      */
-    void modifyConfiguration(final String node, final String value);
+    boolean modifyConfiguration(final String node, final String value);
 
     /*
      * Methods to configure and utilize a global connection system

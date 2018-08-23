@@ -6,6 +6,7 @@
 package com.twitchbotx.gui;
 
 import com.twitchbotx.bot.*;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
@@ -68,6 +69,8 @@ public class CommandsController implements ControlledScreen {
                 final ConfigParameters.Command command = this.store.getCommands().get(i);
                 commandName[i] = command.name;
             }
+            //alphabetize here
+            Arrays.sort(commandName);
             for (int i = 0; i < commandName.length; i++) {
                 String cI = commandName[i];
                 Button cN = new Button(cI);
@@ -86,6 +89,7 @@ public class CommandsController implements ControlledScreen {
         }
     }
 
+    @Override
     public void setScreenParent(ScreensController screenParent) {
         myController = screenParent;
     }
@@ -157,7 +161,7 @@ public class CommandsController implements ControlledScreen {
         commandInfo.getChildren().add(vB);
         // myController.setScreen(guiHandler.dashboardID);
     }
-    
+
     guiHandler.dimensions dm = ScreensController.dm;
 
     private void setDimensions() {

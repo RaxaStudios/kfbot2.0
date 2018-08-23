@@ -15,6 +15,8 @@ import java.io.File;
 //import java.io.PrintStream;
 //import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 //import java.util.Collections;
 import java.util.List;
 //import java.util.Map;
@@ -81,10 +83,24 @@ public final class XmlDatastore implements Datastore {
 
         configuration.numCounters = Integer.parseInt(this.elements.configNode.getElementsByTagName("numberOfCounters").item(0).getTextContent());
 
+        configuration.subReply = this.elements.configNode.getElementsByTagName("subReply").item(0).getTextContent();
+        
+        configuration.subNormalReply = this.elements.configNode.getElementsByTagName("subNormalReply").item(0).getTextContent();
+
+        configuration.subPrimeReply = this.elements.configNode.getElementsByTagName("subPrimeReply").item(0).getTextContent();
+
+        configuration.subNewNormalReply = this.elements.configNode.getElementsByTagName("subNewNormalReply").item(0).getTextContent();
+
+        configuration.subNewPrimeReply = this.elements.configNode.getElementsByTagName("subNewPrimeReply").item(0).getTextContent();
+
+        configuration.subSingleGiftReply = this.elements.configNode.getElementsByTagName("subSingleGiftReply").item(0).getTextContent();
+
+        configuration.subMassGiftReply = this.elements.configNode.getElementsByTagName("subMassGiftReply").item(0).getTextContent();
+
         configuration.pyramidResponse = this.elements.configNode.getElementsByTagName("pyramidResponse").item(0).getTextContent();
 
         configuration.sqlURL = this.elements.configNode.getElementsByTagName("sqlURL").item(0).getTextContent();
-        
+
         configuration.sqlMURL = this.elements.configNode.getElementsByTagName("sqlMURL").item(0).getTextContent();
 
         configuration.sqlUser = this.elements.configNode.getElementsByTagName("sqlUser").item(0).getTextContent();
@@ -100,17 +116,17 @@ public final class XmlDatastore implements Datastore {
         configuration.botWhisperToken = this.elements.configNode.getElementsByTagName("botWhisperToken").item(0).getTextContent();
 
         configuration.streamlabsToken = this.elements.configNode.getElementsByTagName("streamlabsToken").item(0).getTextContent();
-        
+
         configuration.spoopathonStatus = this.elements.configNode.getElementsByTagName("sStatus").item(0).getTextContent();
-        
+
         configuration.marathonStatus = this.elements.configNode.getElementsByTagName("mStatus").item(0).getTextContent();
-        
+
         configuration.maxMarathonHour = Integer.parseInt(this.elements.configNode.getElementsByTagName("maxMarathonHour").item(0).getTextContent());
 
         configuration.lottoStatus = this.elements.configNode.getElementsByTagName("lottoStatus").item(0).getTextContent();
-        
+
         configuration.songLottoStatus = this.elements.configNode.getElementsByTagName("songLottoStatus").item(0).getTextContent();
-        
+
         return configuration;
     }
 
@@ -291,11 +307,17 @@ public final class XmlDatastore implements Datastore {
     }
 
     @Override
-    public void modifyConfiguration(final String node, final String value) {
-        final Node n = this.elements.configNode.getElementsByTagName(node).item(0);
-        final Element el = (Element) n;
-        el.setTextContent(value);
-        commit();
+    public boolean modifyConfiguration(final String node, final String value) {
+        try {
+            final Node n = this.elements.configNode.getElementsByTagName(node).item(0);
+            final Element el = (Element) n;
+            el.setTextContent(value);
+            commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -310,6 +332,11 @@ public final class XmlDatastore implements Datastore {
                 return false;
             }
         }
+        Calendar calendar = Calendar.getInstance();
+        Date now = calendar.getTime();
+        Date cdTime = new Date(now.getTime());
+        Long getCdTime = cdTime.getTime();
+
         Element newNode = this.elements.doc.createElement("command");
         newNode.appendChild(this.elements.doc.createTextNode(msg));
         newNode.setAttribute("name", command.toLowerCase());
@@ -318,7 +345,7 @@ public final class XmlDatastore implements Datastore {
         newNode.setAttribute("initialDelay", initDelay);
         newNode.setAttribute("interval", interval);
         newNode.setAttribute("cooldownInSec", cooldown);
-        newNode.setAttribute("cdUntil", "");
+        newNode.setAttribute("cdUntil", Long.toString(getCdTime));
         newNode.setAttribute("sound", sound);
         newNode.setAttribute("disabled", "false");
         this.elements.commands.appendChild(newNode);

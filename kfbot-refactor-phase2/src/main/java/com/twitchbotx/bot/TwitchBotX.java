@@ -1,11 +1,15 @@
 package com.twitchbotx.bot;
 
 //import com.twitchbotx.bot.ConfigParameters.Elements;
+import com.twitchbotx.bot.TimerManagement.Task;
+import com.twitchbotx.bot.handlers.CommonUtility;
 import com.twitchbotx.bot.handlers.DonationHandler;
 import com.twitchbotx.bot.handlers.PubSubBitsHandler;
 import com.twitchbotx.bot.handlers.PubSubSubscriptionHandler;
 import com.twitchbotx.bot.handlers.WhisperHandler;
 import com.twitchbotx.gui.DashboardController;
+import static com.twitchbotx.gui.DashboardController.eventObL;
+import com.twitchbotx.gui.guiHandler;
 //import com.twitchbotx.gui.SpoopathonController;
 //import com.twitchbotx.gui.guiHandler;
 import java.io.BufferedReader;
@@ -13,9 +17,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
-//import java.util.concurrent.ExecutorService;
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,7 +32,7 @@ import java.util.logging.Logger;
  */
 public final class TwitchBotX {
 
-    private static final Logger LOGGER = Logger.getLogger(TwitchBotX.class.getSimpleName());
+    private Logger LOGGER;
     private static volatile boolean cancelled = false;
     private final Datastore store;
     private PrintStream out;
@@ -47,6 +54,7 @@ public final class TwitchBotX {
         this.out = getOut;
         this.in = getIn;
         this.socket = getSocket;
+        LOGGER = CommonUtility.ERRORLOGGER;
     }
 
     public Socket getSock() {
@@ -82,7 +90,7 @@ public final class TwitchBotX {
             throw new NullPointerException();
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "An error occurred with I/O in beginReadingMessages, perhaps with the Twitch API: {0}", e.toString());
-            reconCount++;
+            ///reconCount++;
             e.printStackTrace();
             store.getBot().reconnect();
         } catch (NullPointerException e) {
@@ -96,8 +104,11 @@ public final class TwitchBotX {
     public void cancel() {
         cancelled = true;
         out.println("ping");
-        sPP.shutdownNow();
-        TimerManagement.ses.shutdownNow();
+        //clear out old timers before
+        for (Entry<String, Task> fr : timers.getLHM().entrySet()) {
+            fr.getValue().shutdown();
+            timers.getLHM().remove(fr.getKey());
+        }
         out = null;
         in = null;
     }
@@ -118,41 +129,27 @@ public final class TwitchBotX {
         if (reconCount > 5) {
             LOGGER.severe("Reconnection failed after 5 attempts");
         } else {
+            Thread botT;
             try {
-                //create new bot
-
-                LOGGER.info("Attempt to reconnect to Twitch servers.");
+                eventObL.addList("Restarting bot");
                 socket = null;
-                out = null;
-                in = null;
-                sPP.shutdownNow();
-                TimerManagement.ses.shutdownNow();
-                // start all periodic timers for broadcasting events
-                startTimers(store, out);
-                
-                socket = new Socket(store.getConfiguration().host, store.getConfiguration().port);
-                socket.setKeepAlive(true);
-                //socket.setSoTimeout(5 * 60 * 1000);
-                out = new PrintStream(socket.getOutputStream());
-                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                store.getBot().cancel();
+                store.getBot().createBot();
+                store.getBot().start(true);
+                botT = new Thread() {
+                    @Override
+                    public void run() {
+                        store.getBot().beginReadingMessages();
+                    }
+                };
+                botT.start();
 
-                // Twitch uses IRC protocol to connect, this is how to connect
-                // to the Twitch API
-                out.println("PASS " + store.getConfiguration().password);
-                out.println("NICK " + store.getConfiguration().account);
-                out.println("JOIN #" + store.getConfiguration().joinedChannel);
-                out.println("CAP REQ :twitch.tv/tags");
-                out.println("CAP REQ :twitch.tv/commands");
-                out.println("PING");
-                cancelled = false;
-
-                //beginReadingMessages(elements);
-            } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "An error occurred with I/O, perhaps with the Twitch API: {0}", e.toString());
-                reconCount++;
-                store.getBot().reconnect();
+                eventObL.addList("Bot connected to chat");
+            } catch (NullPointerException e) {
+                CommonUtility.ERRORLOGGER.severe(e.toString());
+                eventObL.addList("No instance to cancel, restart the application");
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "A general error occurred parsing the message: {0}", e.toString());
+                LOGGER.log(Level.SEVERE, "A general error occurred in recon: {0}", e.toString());
                 reconCount++;
             }
         }
@@ -173,6 +170,8 @@ public final class TwitchBotX {
             LOGGER.info("KfBot for Twitch " + BOT_VERSION + " by Raxa");
             socket = new Socket(store.getConfiguration().host, store.getConfiguration().port);
             socket.setKeepAlive(true);
+            // test false disconnect
+            //socket.setSoTimeout(5000);
             out = new PrintStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out.println("PASS " + store.getConfiguration().password);
@@ -198,14 +197,15 @@ public final class TwitchBotX {
             // Begin connecting to and listening to Twitch PubSub 
             //startPubSub(store, out);
             //Start StreamLabs listener
-            startSL(store, out);
-            // start all periodic timers for broadcasting events
-            //startTimers(store, out);
+            if (!reconnect) {
+                startSL(store, out);
+            }
 
             // start checking for PING messages
             startPingPong(store, out);
             System.out.println("Recon? " + reconnect);
             if (!reconnect) {
+
                 final String ReadyMessage = "/me > " + BOT_VERSION + " has joined the channel.";
                 out.println("PRIVMSG #"
                         + store.getConfiguration().joinedChannel
@@ -214,6 +214,11 @@ public final class TwitchBotX {
             }
 
             LOGGER.info("Bot is now ready for service.");
+
+            //clear out old timers before
+            // TimerManagement.getLHM().clear();
+            // start all periodic timers for broadcasting events
+            startTimers(store, out);
 
             // start doing a blocking read on the socket
             //beginReadingMessages();
@@ -233,16 +238,16 @@ public final class TwitchBotX {
         sPP.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
-                System.out.println("DO SOME PING PONGS");
+                // System.out.println("DO SOME PING PONGS");
                 int pCheck = pH.getPong();
-                System.out.println("Pong count: " + pCheck);
+                //System.out.println("Pong count: " + pCheck);
                 if (pCheck == 0) {
                     LOGGER.severe("LOST CONNECTION ATTEMPTING TO RECONNECT");
                     store.getBot().reconnect();
                 } else {
                     pH.resetPong();
                     out.println("PING");
-                    System.out.println("Sent Ping");
+                    //System.out.println("Sent Ping");
                 }
             }
         }, 1, 4, TimeUnit.MINUTES);
@@ -259,15 +264,15 @@ public final class TwitchBotX {
         PubSubSubscriptionHandler.connect(store, out);
 
         //WhisperHandler.connect(store, out);
-
         PubSubBitsHandler.connect(store, out);
     }
 
     //start streamlabs listener
     public void startSL(final Datastore store, final PrintStream out) {
         DonationHandler slh = new DonationHandler(store, out);
-        ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
-        ses.scheduleWithFixedDelay(slh, 0, 60, TimeUnit.SECONDS);
+        ThreadFactory tF = Executors.defaultThreadFactory();
+        ScheduledExecutorService s = Executors.newSingleThreadScheduledExecutor(tF);
+        s.scheduleWithFixedDelay(slh, 0, 60, TimeUnit.SECONDS);
     }
 
     /*

@@ -22,7 +22,7 @@ public final class TwitchStatusHandler {
     private static final Logger LOGGER = Logger.getLogger(TwitchStatusHandler.class.getSimpleName());
 
     private final Datastore store;
-
+    
     public TwitchStatusHandler(final Datastore store) {
         this.store = store;
     }
@@ -87,10 +87,10 @@ public final class TwitchStatusHandler {
         try {
             String followURL = store.getConfiguration().followage;
             //test values
-            followURL = followURL.replaceAll("#user", "talon2461");
-            followURL = followURL.replaceAll("#streamer", "kungfufruitcup");
-            //followURL = followURL.replaceAll("#user", user);
-            //followURL = followURL.replaceAll("#streamer", store.getConfiguration().joinedChannel);
+            //followURL = followURL.replaceAll("#user", "raxa");
+            //followURL = followURL.replaceAll("#streamer", "kungfufruitcup");
+            followURL = followURL.replaceAll("#user", user);
+            followURL = followURL.replaceAll("#streamer", store.getConfiguration().joinedChannel);
             URL url = new URL(followURL);
             URLConnection con = (URLConnection) url.openConnection();
             con.setRequestProperty("Accept", "application/vnd.twitchtv.v3+json");

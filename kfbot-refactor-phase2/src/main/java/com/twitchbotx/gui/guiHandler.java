@@ -8,9 +8,12 @@ package com.twitchbotx.gui;
 import com.twitchbotx.bot.*;
 import com.twitchbotx.bot.ConfigParameters.Elements;
 import com.twitchbotx.bot.client.TwitchMessenger;
+import com.twitchbotx.bot.handlers.CommonUtility;
+import com.twitchbotx.bot.handlers.SpoopathonHandler;
 //import com.twitchbotx.bot.handlers.LotteryHandler;
 import eu.mihosoft.scaledfx.ScalableContentPane;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 //import java.io.OutputStreamWriter;
 import java.io.PrintStream;
@@ -19,9 +22,17 @@ import java.net.Socket;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 //import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Group;
@@ -30,6 +41,8 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 //import javafx.concurrent.Task;
 import javax.annotation.concurrent.GuardedBy;
+import javax.xml.parsers.ParserConfigurationException;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -46,7 +59,9 @@ public class guiHandler extends Application {
     public Socket socket;
     public final static List<String> songList = new java.util.ArrayList<>();
     private Scanner scan;
-
+    public static FileHandler FH;
+    private static Logger LH;
+    
     //refine event viewer mod actions, command updates, etc
     public static String dashboardID = "dashboard";
     public static String dashboardFile = "Dashboard.fxml";
@@ -56,9 +71,19 @@ public class guiHandler extends Application {
     public static String commandsFile = "Commands.fxml";
     public static String commandEditorID = "commandEditor";
     public static String commandEditorFile = "CommandEditor.fxml";
+    public static String timedID = "timed";
+    public static String timedFile = "TimedCommands.fxml";
     //configuration -> account settings, joined channel
     public static String configurationID = "configuration";
     public static String configurationFile = "Configuration.fxml";
+    public static String respEditID = "RespEdit";
+    public static String respEditFile = "ResponseLanding.fxml";
+    public static String subEditID = "SubEdit";
+    public static String subEditFile = "SubEdit.fxml";
+    public static String bitEditID = "BitEdit";
+    public static String bitEditFile = "BitEdit.fxml";
+    public static String raidEditID = "RaidEdit";
+    public static String raidEditFile = "RaidEdit.fxml";
     //moderation -> filters, phrases, toggles, spam
     public static String moderationID = "moderation";
     public static String moderationFile = "Moderation.fxml";
@@ -115,10 +140,20 @@ public class guiHandler extends Application {
             //out.println("NICK " + store.getConfiguration().account);
             //out.println("JOIN #" + store.getConfiguration().joinedChannel);
             messenger = new TwitchMessenger(store.getBot().getOut(), store.getConfiguration().joinedChannel);
-        } catch (Exception e) {
+        } catch (IOException | ParserConfigurationException | SAXException e) {
             e.printStackTrace();
         }
-
+        LH = CommonUtility.ERRORLOGGER;
+        try {
+            // initialize Filehandler and logger
+            FH = new FileHandler("errors.log", true);
+            LH.addHandler(FH);
+            SimpleFormatter formatter = new SimpleFormatter();
+            FH.setFormatter(formatter);
+        } catch (IOException | SecurityException ex) {
+            LH.log(Level.SEVERE, null, ex);
+        }
+        
         //create songlist based on text content
         try {
             Path location = Paths.get("");
@@ -137,18 +172,15 @@ public class guiHandler extends Application {
             }
             //first line is added to list to take spot 0 in list 
             //System.out.println(songList);
-            Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
+            Platform.runLater(() -> {
                 try {
-                guiHandler.bot.getStore().getEventList().addList("Successfully parsed song list from jdSongs.txt");
+                    guiHandler.bot.getStore().getEventList().addList("Successfully parsed song list from jdSongs.txt");
                 } catch(NullPointerException e){
                     e.printStackTrace();
                 }
-            }
-        });
+            });
             System.out.println("Successfully parsed song list from jdSongs.txt");
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Error occured trying to create song list");
         }
@@ -159,6 +191,9 @@ public class guiHandler extends Application {
         //CommandParser.songs.writeMap(MAP);
         CommandParser.songs.getMapFromFile();
 
+        // attempt to recover spoopathon points map from spoopUser.map
+        CommandParser.spoop.getMapFromFile();
+        
         //create and show GUI
         ScreensController container = new ScreensController();
         container.loadScreen(dashboardID, dashboardFile);
@@ -175,35 +210,42 @@ public class guiHandler extends Application {
         testScale.getStylesheets().add("https://fonts.googleapis.com/css?family=Comfortaa");
         //stage.setScene(scene);
         stage.setScene(testScale);
-        stage.setTitle("Kungfufruit Bot 2.0");
+        stage.setTitle("RaxaBot");
         stage.getIcons().add(new Image("http://kf.bot.raxastudios.com/kffcLove.png"));
         stage.show();
         stage.setOnCloseRequest(e -> System.exit(0));
         //System.out.println("test print after open bot data: " + store.getBot().getSock().toString());
     }
 
+    public static String nowDateFormatted(){
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+	LocalDateTime now = LocalDateTime.now();
+        String returnDate = dtf.format(now);
+        return returnDate;
+    }
+    
     //storage for width/height variables to allow scalable content
     public static class dimensions {
 
-        @GuardedBy("this")
+
         private int width = 600;
-        @GuardedBy("this")
+
         private int height = 400;
 
-        public synchronized int getWidth() {
-            return this.width;
+        public int getWidth() {
+            return width;
         }
 
-        public synchronized void setWidth(int w) {
-            this.width = w;
+        public void setWidth(int w) {
+            width = w;
         }
 
-        public synchronized int getHeight() {
-            return this.height;
+        public int getHeight() {
+            return height;
         }
 
-        public synchronized void setHeight(int h) {
-            this.height = h;
+        public void setHeight(int h) {
+            height = h;
         }
     }
 }

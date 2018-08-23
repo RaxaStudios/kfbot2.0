@@ -10,12 +10,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.client.TwitchMessenger;
 import com.twitchbotx.gui.DashboardController;
+import com.twitchbotx.gui.guiHandler;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DecimalFormat;
+import javafx.application.Platform;
 
 /**
  *
@@ -69,6 +71,11 @@ public class DonationHandler implements Runnable {
                 System.out.println("From: " + username);
                 String msg = low.get("message").asText();
                 System.out.println("Message: " + msg);
+                //check for enabled status of marathon and spoopathon
+                String spoopEnabled = this.store.getConfiguration().spoopathonStatus;
+                String marathonEnabled = this.store.getConfiguration().marathonStatus;
+                System.out.println("spoop enabled: " + spoopEnabled);
+                System.out.println("marathon enabled: " + marathonEnabled);
             }
 
             if (temp.equals("") || !temp.equals(low.get("donation_id").asText())) {
@@ -91,6 +98,8 @@ public class DonationHandler implements Runnable {
                 //check for enabled status of marathon and spoopathon
                 String spoopEnabled = this.store.getConfiguration().spoopathonStatus;
                 String marathonEnabled = this.store.getConfiguration().marathonStatus;
+                //System.out.println("spoop enabled: " + spoopEnabled);
+                //System.out.println("marathon enabled: " + marathonEnabled);
                 if (marathonEnabled.equals("on")) {
                     MarathonHandler mh = new MarathonHandler(store, outstream);
                     //sends w/out decimal ie $10.00 = 10
@@ -99,7 +108,8 @@ public class DonationHandler implements Runnable {
                 }
                 if (spoopEnabled.equals("on")) {
                     if (!msg.contains("#")) {
-                        messenger.sendMessage(".w Raxa " + username + " donated $" + am + " for spoopathon with no #, message: \"" + msg + "\"");
+                        System.out.println("Whisper sent here from donation handler .w Raxa "+ username + " donated $" + am + " for spoopathon with no #, message: \"" + msg + "\"");
+                        messenger.sendWhisper("/w Raxa " + username + " donated $" + am + " for spoopathon with no #, message: \"" + msg + "\"");
                     } else {
                         addSubSQLPoints(msg, am);
                     }
@@ -119,7 +129,11 @@ public class DonationHandler implements Runnable {
 
     private void sendEvent(String user, String msg, int amount) {
         String eventMsg = "Donation Event: " + user + " donated $" + amount + " with message: " + msg;
-        DashboardController dc = new DashboardController();
-        dc.eventObLAdd(eventMsg);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                guiHandler.bot.getStore().getEventList().addList(eventMsg);
+            }
+        });
     }
 }

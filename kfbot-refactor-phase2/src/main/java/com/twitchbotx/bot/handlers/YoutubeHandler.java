@@ -51,16 +51,18 @@ public final class YoutubeHandler {
                 response.append(line);
             }
             bufReader.close();
+            System.out.println("response: " + response);
             if (response.toString().contains("\"items\": []")) {
                 sendMessage("Video not found.");
             } else {
                 int bi = response.toString().indexOf("\"title\":") + 10;
-                int ei = response.toString().indexOf("\",   ", bi) - 1;
+                int ei = response.toString().indexOf("\",   ", bi);
                 String s = response.toString().substring(bi, ei);
                 if (s.length() > 0) {
                     sendMessage(s);
                 }
             }
+            
         } catch (IOException e) {
             LOGGER.info("GetTitle.GetTitle - error opening or reading URL: " + e.toString());
             e.printStackTrace();

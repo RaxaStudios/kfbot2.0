@@ -40,7 +40,7 @@ public class ModerationHandler {
      * @param stream The outsteam to communicate to twitch
      */
     public ModerationHandler(final Datastore store, final PrintStream stream) {
-        this.store = store;
+        this.store = guiHandler.bot.getStore();
         this.outstream = stream;
     }
 
@@ -72,7 +72,7 @@ public class ModerationHandler {
             //Timestamped chat log for testing purposes
             Calendar cal = Calendar.getInstance();
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-            //sendEvent(sdf.format(cal.getTime()) + " " + username + ": " + msg);
+            sendEvent(sdf.format(cal.getTime()) + " " + username + ": " + msg);
             if (!filterCheck(msg).equals("no filter")) {
                 System.out.println(reason);
                 sendMessage(".timeout " + username + " " + timeout + " " + reason);
@@ -88,9 +88,9 @@ public class ModerationHandler {
             return;
 
         } catch (Exception e) {
+            e.printStackTrace();
             LOGGER.severe(e.toString());
         }
-        return;
     }
 
     private boolean userCheck(String username) {

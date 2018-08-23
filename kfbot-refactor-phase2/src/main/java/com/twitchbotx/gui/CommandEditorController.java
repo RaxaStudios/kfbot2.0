@@ -9,6 +9,10 @@ import com.twitchbotx.bot.Commands;
 import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -30,9 +34,7 @@ import javafx.scene.control.ToggleGroup;
  *
  * @author Raxa
  */
-
 //TODO sub tier 3 command system
-
 public class CommandEditorController implements Initializable {
 
     Datastore store = guiHandler.bot.getStore();
@@ -78,7 +80,7 @@ public class CommandEditorController implements Initializable {
     TextField newCommandInterval;
 
     @FXML
-    TextField newCommandMessage;
+    TextArea newCommandMessage;
 
     @FXML
     TextField newCommandSound;
@@ -102,11 +104,24 @@ public class CommandEditorController implements Initializable {
     Label cmdStatus;
 
     @FXML
+    Label deleteConfirmText;
+    private boolean confirmed;
+
+    @FXML
     private void dash(ActionEvent event) {
         setDimensions();
         myController.loadScreen(guiHandler.dashboardID, guiHandler.dashboardFile);
         myController.setScreen(guiHandler.dashboardID);
         myController.setId("dashboard");
+        myController.show(myController);
+    }
+
+    @FXML
+    private void repeatCommandManager(ActionEvent event) {
+        setDimensions();
+        myController.loadScreen(guiHandler.timedID, guiHandler.timedFile);
+        myController.setScreen(guiHandler.timedID);
+        myController.setId("timed");
         myController.show(myController);
     }
 
@@ -119,13 +134,23 @@ public class CommandEditorController implements Initializable {
         newValueText.setPromptText(null);
         int selected = commandList.getSelectionModel().getSelectedIndex();
         commandToEdit.setText(commandList.getItems().get(selected));
+        confirmed = false;
     }
 
     @FXML
     private void deleteCommand(ActionEvent event) {
-        System.out.println("deleteCommand");
-        //TODO popup confirmation of delete
-        // leave empty for now, force user to input in chat
+        if (confirmed) {
+            String command = "";
+            commandToEdit.selectAll();
+            commandToEdit.copy();
+            command = commandToEdit.getText();
+            store.deleteCommand(command);
+            deleteConfirmText.setText(command + " deleted");
+            refresh();
+        } else {
+            deleteConfirmText.setText("Are you sure you want delete this command?");
+            confirmed = true;
+        }
     }
 
     @FXML
@@ -166,7 +191,7 @@ public class CommandEditorController implements Initializable {
             }
             store.setUserCommandAttribute(cmd, attribute, change, true);
             if (attribute.equals("repeating")) {
-                if(change.equals("true")){
+                if (change.equals("true")) {
                     //start up the command repeat schedule
                 }
                 submitStatus.setText("Changes applied, restart bot for changes to take effect.");
@@ -177,6 +202,7 @@ public class CommandEditorController implements Initializable {
             store.editCommand(cmd, change);
             submitStatus.setText("Changes saved!");
         }
+        refresh();
     }
 
     @FXML
@@ -218,12 +244,13 @@ public class CommandEditorController implements Initializable {
         newCommandSound.selectAll();
         newCommandSound.copy();
         String sound = newCommandSound.getText();
-        boolean added = store.addCommand(cmdName, auth, cooldown, repeating, initDelay, interval, sound, msg);
+        boolean added = store.addCommand(cmdName.toLowerCase(), auth, cooldown, repeating, initDelay, interval, sound, msg);
         if (added) {
             cmdStatus.setText("Added command " + cmdName);
         } else {
             cmdStatus.setText("Command " + cmdName + " already exists!");
         }
+        refresh();
     }
 
     @FXML
@@ -353,11 +380,8 @@ public class CommandEditorController implements Initializable {
 
     }
 
-    /**
-     * Initializes the controller class.
-     */
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    private void refresh() {
+        confirmed = false;
 
         // Set up command list view 
         String[] commandName = new String[this.store.getCommands().size()];
@@ -373,6 +397,44 @@ public class CommandEditorController implements Initializable {
                 commands.add(commandName1);
             }
         }
+        commandList.setItems(commands);
+    }
+
+    /**
+     * Initializes the controller class.
+     */
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+
+        deleteConfirmText.setText("");
+        confirmed = false;
+
+        // Set up command list view 
+        List<String> cName = new ArrayList<>();
+        String[] commandName = new String[this.store.getCommands().size()];
+        for (int i = 0; i < this.store.getCommands().size(); i++) {
+            final ConfigParameters.Command command = this.store.getCommands().get(i);
+            if (!Commands.getInstance().isReservedCommand(command.name)) {
+                commandName[i] = command.name;
+                cName.add(command.name);
+            }
+        }
+        // alphabetize here
+        Collections.sort(cName);
+        for (String commandName1 : cName) {
+            if (commandName1 != null) {
+                System.out.println("Command: " + commandName1);
+                commands.add(commandName1);
+            }
+        }
+        
+        /*for (String commandName1 : commandName) {
+            if (commandName1 != null) {
+                //System.out.println("Command: " + commandName1);
+                commands.add(commandName1);
+            }
+        }*/
+        
         commandList.setItems(commands);
     }
 

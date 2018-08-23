@@ -209,6 +209,16 @@ public class LotteryHandler {
             return lottoOn;
         }
 
+        public synchronized void lottoEnable(){
+            lottoOn = true;
+            guiHandler.bot.getStore().modifyConfiguration("lottoStatus", "on");
+        }
+    
+        public synchronized void lottoDisable(){
+            lottoOn = false;
+            guiHandler.bot.getStore().modifyConfiguration("lottoStatus", "off");
+        }
+        
         public synchronized String getLottoName() {
             return keyword;
         }
@@ -366,9 +376,12 @@ public class LotteryHandler {
             }
             int ticketValue = 2;
 
+            // temporarily disallow users to enter until song system is reset
             if (prevWinner.contains(user)) {
-                sendMessage(displayName + " re-added with song: " + songListName);
-                ticketValue = 1;
+                sendMessage(displayName + ", limit is 1 win per stream");
+                return false;
+                /*sendMessage(displayName + " re-added with song: " + songListName);
+                ticketValue = 1;*/
             } else {
                 sendMessage(displayName + " added with song: " + songListName);
             }
@@ -386,7 +399,7 @@ public class LotteryHandler {
             //System.out.println("MAP stuff: " + MAP.get(user).content);
             currAdded.remove(MAP.get(user).content);
             MAP.remove(user);
-            prevWinner.add(user);
+            //prevWinner.add(user);
             currPool.remove(user);
             
             writeMap(MAP);
@@ -443,12 +456,23 @@ public class LotteryHandler {
             sendMessage("A lottery for !jd has opened, type '!song [song number]' to enter!");
         }
 
+        public synchronized void songEnable(){
+            songsOn = true;
+            guiHandler.bot.getStore().modifyConfiguration("songLottoStatus", "on");
+        }
+    
+        public synchronized void songDisable(){
+            songsOn = false;
+            guiHandler.bot.getStore().modifyConfiguration("songLottoStatus", "off");
+        }
+        
         public synchronized void songReset() {
             MAP.clear();
             writeMap(MAP);
             currPool.clear();
             currAdded.clear();
             prevAdded.clear();
+            prevWinner.clear();
             songsOn = true;
             sendMessage("Song lottery has been reset");
         }

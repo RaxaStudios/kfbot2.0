@@ -43,6 +43,7 @@ public class ScreensController extends StackPane {
             FXMLLoader loadFXML = new FXMLLoader();
             loadFXML.setLocation(getClass().getClassLoader().getResource(resource));
             Parent content = loadFXML.load();
+            System.out.println("location: " + loadFXML.getLocation());
             r = (AnchorPane) content;
             addScreen(name, r);
             return true;

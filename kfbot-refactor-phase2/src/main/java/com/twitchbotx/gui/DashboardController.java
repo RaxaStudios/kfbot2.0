@@ -8,6 +8,7 @@ package com.twitchbotx.gui;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.TwitchBotX;
 import com.twitchbotx.bot.XmlDatastore;
+import com.twitchbotx.bot.handlers.CommonUtility;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -145,8 +146,10 @@ public class DashboardController implements Initializable, ControlledScreen {
             botT.start();
             eventObL.addList("Bot connected to chat");
         } catch (NullPointerException e) {
+            CommonUtility.ERRORLOGGER.severe(e.toString());
             eventObL.addList("No instance to cancel, restart the application");
         } catch (Exception e) {
+            CommonUtility.ERRORLOGGER.severe(e.toString());
             e.printStackTrace();
             eventObL.addList("General error occured creating the bot, restart the application");
         }
@@ -170,8 +173,10 @@ public class DashboardController implements Initializable, ControlledScreen {
 
             eventObL.addList("Bot connected to chat");
         } catch (NullPointerException e) {
+            CommonUtility.ERRORLOGGER.severe(e.toString());
             eventObL.addList("No instance to cancel, restart the application");
         } catch (Exception e) {
+            CommonUtility.ERRORLOGGER.severe(e.toString());
             e.printStackTrace();
             eventObL.addList("General error occured creating the bot, restart the application");
         }
@@ -195,12 +200,13 @@ public class DashboardController implements Initializable, ControlledScreen {
         visitCount++;
     }
 
-    public void eventObLAdd(String msg) {
+   /* public void eventObLAdd(String msg) {
         eventObL.addList(msg);
         eventList.setItems(eventObL.getList());
         eventList.scrollTo(eventObL.getList().size() - 1);
-    }
+    }*/
 
+    @Override
     public void setScreenParent(ScreensController screenParent) {
         myController = screenParent;
     }

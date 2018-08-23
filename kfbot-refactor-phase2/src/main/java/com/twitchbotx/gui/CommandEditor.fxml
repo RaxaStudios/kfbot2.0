@@ -66,7 +66,6 @@
       <Label layoutX="216.0" layoutY="321.0" text="Interval:" />
       <Button layoutX="455.0" layoutY="361.0" mnemonicParsing="false" onAction="#newCommand" text="Add New Command" />
       <Label layoutX="407.0" layoutY="245.0" text="Message:" />
-      <TextField fx:id="newCommandMessage" alignment="TOP_LEFT" layoutX="407.0" layoutY="267.0" prefHeight="72.0" prefWidth="174.0" />
       <TextField fx:id="newCommandInitDelay" alignment="CENTER" layoutX="292.0" layoutY="285.0" prefHeight="25.0" prefWidth="35.0" text="0" />
       <Label layoutX="344.0" layoutY="289.0" text="seconds" />
       <RadioButton fx:id="repeatYes" layoutX="290.0" layoutY="236.0" mnemonicParsing="false" text="True">
@@ -78,9 +77,12 @@
       <Label layoutX="344.0" layoutY="321.0" text="seconds" />
       <TextField fx:id="newCommandInterval" alignment="CENTER" layoutX="272.0" layoutY="317.0" prefHeight="25.0" prefWidth="57.0" text="1800" />
       <Label fx:id="submitStatus" layoutX="465.0" layoutY="164.0" prefHeight="56.0" prefWidth="103.0" wrapText="true" />
-      <Label fx:id="cmdStatus" alignment="CENTER" contentDisplay="CENTER" layoutX="342.0" layoutY="348.0" prefHeight="45.0" prefWidth="107.0" textAlignment="CENTER" textFill="#f80707" wrapText="true" />
+      <Label fx:id="cmdStatus" alignment="CENTER" contentDisplay="CENTER" layoutX="421.0" layoutY="182.0" prefHeight="64.0" prefWidth="149.0" textAlignment="CENTER" textFill="#f80707" wrapText="true" />
       <Label layoutX="114.0" layoutY="365.0" text="Sound file (optional):" />
       <TextField fx:id="newCommandSound" layoutX="253.0" layoutY="361.0" prefHeight="25.0" prefWidth="149.0" promptText="filename.mp3" />
       <TextArea fx:id="newValueText" layoutX="302.0" layoutY="123.0" maxHeight="75.0" maxWidth="149.0" minHeight="25.0" minWidth="149.0" prefHeight="25.0" prefWidth="149.0" wrapText="true" />
+      <TextArea fx:id="newCommandMessage" layoutX="409.0" layoutY="269.0" prefHeight="82.0" prefWidth="174.0" wrapText="true" />
+      <Button layoutX="20.0" layoutY="200.0" mnemonicParsing="false" onAction="#repeatCommandManager" prefHeight="27.0" prefWidth="174.0" text="Repeating Commands" textAlignment="CENTER" wrapText="true" />
+      <Label fx:id="deleteConfirmText" layoutX="442.0" layoutY="71.0" prefHeight="50.0" prefWidth="149.0" textAlignment="CENTER" textFill="RED" wrapText="true" />
    </children>
 </AnchorPane>

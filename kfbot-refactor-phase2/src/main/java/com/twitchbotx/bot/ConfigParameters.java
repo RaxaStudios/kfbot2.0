@@ -82,7 +82,7 @@ public final class ConfigParameters {
         public String youtubeTitle;
 
         public String sqlURL;
-        
+
         public String sqlMURL;
 
         public String sqlUser;
@@ -107,23 +107,34 @@ public final class ConfigParameters {
 
         public String spoopathonStatus;
         
+        public String spoopSubValue;
+        public String spoopMinBits;
+        public String spoopBitValue;
+
         public String marathonStatus;
 
         public int maxMarathonHour;
-        
+
         public String lottoStatus;
-        
+
         public String songLottoStatus;
-        
+
         public String lottoAuth;
 
         public String lottoName;
 
+        public String subReply;
+        public String subNormalReply;
+        public String subPrimeReply;
+        public String subSingleGiftReply;
+        public String subMassGiftReply;
+        public String subNewNormalReply;
+        public String subNewPrimeReply;
+
         public String pyramidResponse;
 
         public String pings;
-        
-    
+
         @Override
         public String toString() {
             return "Configuration{"
@@ -151,10 +162,20 @@ public final class ConfigParameters {
                     + ", botWhisperToken=" + botWhisperToken
                     + ", streamlabsToken=" + streamlabsToken
                     + ", sStatus=" + spoopathonStatus
+                    + ", spoopSubValue=" + spoopSubValue
+                    + ", spoppMinBits=" + spoopMinBits
+                    + ", spoopBitValue=" + spoopBitValue
                     + ", mStatus=" + marathonStatus
                     + ", maxMarathonHour=" + maxMarathonHour
                     + ", lottoStatus=" + lottoStatus
                     + ", songLottoStatus=" + songLottoStatus
+                    + ", subReply=" + subReply
+                    + ", subNormalReply=" + subNormalReply
+                    + ", subPrimeReply=" + subPrimeReply
+                    + ", subNewNormalReply=" + subNewNormalReply
+                    + ", subNewPrimeReply=" + subNewPrimeReply
+                    + ", subSingleGiftReply=" + subSingleGiftReply
+                    + ", subMassGiftReply=" + subMassGiftReply
                     + ", pyramidResponse='" + pyramidResponse + '\''
                     + '}';
         }

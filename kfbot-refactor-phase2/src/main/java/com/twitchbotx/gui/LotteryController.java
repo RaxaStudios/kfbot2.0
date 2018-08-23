@@ -108,6 +108,7 @@ public class LotteryController implements Initializable {
             VBox vB = new VBox();
             //setPane(vB);
             queueList.setContent(vB);
+            
         }
     }
 

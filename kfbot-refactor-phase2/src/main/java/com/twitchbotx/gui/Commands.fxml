@@ -10,7 +10,7 @@
 <AnchorPane id="Commands" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.CommandsController">
     <children>
                 <Button alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" layoutX="329.0" layoutY="358.0" mnemonicParsing="false" onAction="#editCommands" prefHeight="25.0" prefWidth="155.0" text="Command Editor" textAlignment="CENTER" />
-      <Button layoutX="85.0" layoutY="358.0" mnemonicParsing="false" onAction="#dash" text="Dashboard" />
+      <Button layoutX="82.0" layoutY="358.0" mnemonicParsing="false" onAction="#dash" text="Dashboard" />
       <ScrollPane fx:id="commandList" layoutX="24.0" layoutY="23.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="323.0" prefWidth="197.0" style="-fx-background-color: eae8e8;" />
       <Label alignment="CENTER" contentDisplay="CENTER" layoutX="47.0" layoutY="2.0" prefHeight="17.0" prefWidth="144.0" text="Current Commands">
          <font>

@@ -9,14 +9,14 @@
 
 <AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.SpoopathonController">
    <children>
-      <Button layoutX="30.0" layoutY="347.0" mnemonicParsing="false" onAction="#dash" text="Dashboard" />
+      <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#dash" text="Dashboard" />
       <Label layoutX="208.0" layoutY="22.0" text="Spoopathon Manager">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <ListView fx:id="gameListView" layoutX="32.0" layoutY="103.0" prefHeight="91.0" prefWidth="200.0" />
-      <Label layoutX="86.0" layoutY="57.0" text="Current Games">
+      <ListView fx:id="gameListView" layoutX="14.0" layoutY="89.0" prefHeight="91.0" prefWidth="200.0" />
+      <Label layoutX="61.0" layoutY="57.0" text="Current Games">
          <font>
             <Font size="14.0" />
          </font>
@@ -26,31 +26,41 @@
             <Font size="14.0" />
          </font>
       </Label>
-      <Button layoutX="276.0" layoutY="140.0" mnemonicParsing="false" onAction="#selectGame" text="Select" />
-      <Button layoutX="529.0" layoutY="299.0" mnemonicParsing="false" onAction="#submitGameInfo" text="Submit" />
-      <Button layoutX="531.0" layoutY="261.0" mnemonicParsing="false" onAction="#deleteGame" text="Delete" />
-      <Button layoutX="537.0" layoutY="167.0" mnemonicParsing="false" onAction="#addPoints" text="Add" />
-      <Label layoutX="432.0" layoutY="100.0" text="Add Points" />
-      <Label layoutX="439.0" layoutY="235.0" text="Edit Info" />
-      <TextField fx:id="editGameID" alignment="CENTER" layoutX="425.0" layoutY="261.0" prefHeight="25.0" prefWidth="74.0" />
-      <TextField fx:id="editPoints" alignment="CENTER" layoutX="425.0" layoutY="299.0" prefHeight="25.0" prefWidth="74.0" />
-      <TextField fx:id="addPointsGameID" alignment="CENTER" layoutX="424.0" layoutY="131.0" prefHeight="25.0" prefWidth="74.0" />
-      <Label layoutX="360.0" layoutY="265.0" text="Game ID" />
-      <Label layoutX="367.0" layoutY="303.0" text="Points" />
-      <Label layoutX="360.0" layoutY="135.0" text="Game ID" />
-      <Label layoutX="365.0" layoutY="171.0" text="Points " />
-      <TextField fx:id="addPointsPoints" alignment="CENTER" layoutX="425.0" layoutY="167.0" prefHeight="25.0" prefWidth="74.0" />
-      <TextField fx:id="newGameID" alignment="CENTER" layoutX="104.0" layoutY="261.0" prefHeight="25.0" prefWidth="73.0" />
-      <Button layoutX="207.0" layoutY="261.0" mnemonicParsing="false" onAction="#addNewGame" text="Create" />
-      <Label layoutX="83.0" layoutY="215.0" text="Add New Game">
+      <Button layoutX="258.0" layoutY="122.0" mnemonicParsing="false" onAction="#selectGame" text="Select" />
+      <Button layoutX="529.0" layoutY="261.0" mnemonicParsing="false" onAction="#submitGameInfo" text="Submit" />
+      <Button layoutX="531.0" layoutY="220.0" mnemonicParsing="false" onAction="#deleteGame" text="Delete" />
+      <Button layoutX="537.0" layoutY="131.0" mnemonicParsing="false" onAction="#addPoints" text="Add" />
+      <Label layoutX="432.0" layoutY="82.0" text="Add Points" />
+      <Label layoutX="439.0" layoutY="188.0" text="Edit Info" />
+      <TextField fx:id="editGameID" alignment="CENTER" layoutX="426.0" layoutY="222.0" prefHeight="25.0" prefWidth="74.0" />
+      <TextField fx:id="editPoints" alignment="CENTER" layoutX="426.0" layoutY="261.0" prefHeight="25.0" prefWidth="74.0" />
+      <TextField fx:id="addPointsGameID" alignment="CENTER" layoutX="424.0" layoutY="110.0" prefHeight="25.0" prefWidth="74.0" />
+      <Label layoutX="361.0" layoutY="226.0" text="Game ID" />
+      <Label layoutX="368.0" layoutY="265.0" text="Points" />
+      <Label layoutX="361.0" layoutY="114.0" text="Game ID" />
+      <Label layoutX="366.0" layoutY="153.0" text="Points " />
+      <TextField fx:id="addPointsPoints" alignment="CENTER" layoutX="426.0" layoutY="149.0" prefHeight="25.0" prefWidth="74.0" />
+      <TextField fx:id="newGameID" alignment="CENTER" layoutX="427.0" layoutY="329.0" prefHeight="25.0" prefWidth="73.0" />
+      <Button layoutX="522.0" layoutY="329.0" mnemonicParsing="false" onAction="#addNewGame" text="Create" />
+      <Label layoutX="417.0" layoutY="304.0" text="Add New Game" />
+      <Label layoutX="353.0" layoutY="333.0" text="Game ID" />
+      <Label fx:id="loadLabel" layoutX="75.0" layoutY="126.0" text="Loading Data..." />
+      <Label fx:id="addPointsStatus" contentDisplay="CENTER" layoutX="282.0" layoutY="63.0" prefHeight="38.0" prefWidth="127.0" wrapText="true" />
+      <Label fx:id="editGameStatus" contentDisplay="CENTER" layoutX="219.0" layoutY="155.0" prefHeight="38.0" prefWidth="127.0" wrapText="true" />
+      <Label fx:id="addGameStatus" contentDisplay="CENTER" layoutX="400.0" layoutY="354.0" prefHeight="38.0" prefWidth="127.0" wrapText="true" />
+      <ListView fx:id="userListView" layoutX="14.0" layoutY="214.0" prefHeight="177.0" prefWidth="200.0" />
+      <Label layoutX="14.0" layoutY="188.0" text="Users With Points" />
+      <Button layoutX="245.0" layoutY="342.0" mnemonicParsing="false" onAction="#addVotes" text="Add Points" />
+      <TextField fx:id="usernameAddText" alignment="CENTER" layoutX="230.0" layoutY="253.0" prefHeight="25.0" prefWidth="105.0" />
+      <Label layoutX="255.0" layoutY="233.0" text="Username" />
+      <Label layoutX="263.0" layoutY="285.0" text="Votes" />
+      <TextField fx:id="votesAddText" alignment="CENTER" layoutX="230.0" layoutY="309.0" prefHeight="25.0" prefWidth="105.0" promptText="0 to remove " />
+      <Label layoutX="230.0" layoutY="205.0" text="User Point Editor">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
-      <Label layoutX="43.0" layoutY="265.0" text="Game ID" />
-      <Label fx:id="loadLabel" layoutX="91.0" layoutY="144.0" text="Loading Data..." />
-      <Label fx:id="addPointsStatus" contentDisplay="CENTER" layoutX="395.0" layoutY="196.0" prefHeight="38.0" prefWidth="127.0" wrapText="true" />
-      <Label fx:id="editGameStatus" contentDisplay="CENTER" layoutX="399.0" layoutY="341.0" prefHeight="38.0" prefWidth="127.0" wrapText="true" />
-      <Label fx:id="addGameStatus" contentDisplay="CENTER" layoutX="67.0" layoutY="293.0" prefHeight="38.0" prefWidth="127.0" wrapText="true" />
+      <Label fx:id="addVoteStatus" alignment="CENTER" contentDisplay="CENTER" layoutX="213.0" layoutY="372.0" prefHeight="20.0" prefWidth="139.0" textAlignment="CENTER" />
+      <Button layoutX="125.0" layoutY="184.0" mnemonicParsing="false" onAction="#refreshUsers" text="Refresh Users" />
    </children>
 </AnchorPane>

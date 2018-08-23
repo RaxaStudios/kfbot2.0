@@ -3,11 +3,13 @@ package com.twitchbotx.bot.handlers;
 import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.client.TwitchMessenger;
+import com.twitchbotx.gui.guiHandler;
 import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.Statement;
 
 import java.util.logging.Logger;
+import javafx.application.Platform;
 
 public final class CountHandler {
 
@@ -35,19 +37,6 @@ public final class CountHandler {
         this.messenger = new TwitchMessenger(out, store.getConfiguration().joinedChannel);
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     /*
     ** Allows for counters to be added, deleted, set, added to, and all totals calls
     **
@@ -151,5 +140,105 @@ public final class CountHandler {
             default:
                 return "No counters available";
         }
+    }
+
+    public static class SubHandler {
+
+        /**
+         * Deals with sub messages and routes a response to chat accordingly
+         *
+         * @param massGifted boolean
+         * @param subGift boolean
+         * @param subDisplayName display-name will be gifter or subscriber
+         * @param giftRecip name of recipient of a sub gift
+         * @param giftAmount number of gifted subs
+         * @param subPoints tier 1 = 1, tier 2 = 2, tier 3 = 6 int
+         * @param prime is this a prime sub?
+         * @param subMonths String
+         *
+         * check for mass sub gift, single sub gift, resub, new sub form
+         * response with appropriate names, length and tier
+         *
+         * variables: %user %months %recipient %gifts %tier
+         * @return String to send to chat
+         *
+         */
+        public static String handleSubMessage(
+                boolean massGifted,
+                boolean subGift,
+                String subDisplayName,
+                String giftRecip,
+                int giftAmount,
+                int subPoints,
+                boolean prime,
+                String subMonths) {
+            String response = "";
+            String tier = "";
+            switch (subPoints) {
+                case 1:
+                    tier = "1";
+                    break;
+                case 2:
+                    tier = "2";
+                    break;
+                case 6:
+                    tier = "3";
+                    break;
+                default:
+                    tier = "1";
+                    break;
+            }
+            //first deal with normal + Prime subs
+            if (!massGifted && !subGift) {
+                if (Integer.parseInt(subMonths) < 2) {
+                    //new subs
+                    if (prime) {
+                        // find a replace variable %user 
+                        response = guiHandler.bot.getStore().getConfiguration().subNewPrimeReply;
+                        response = response.replace("%user", subDisplayName).replace("%tier", tier);
+                        return response;
+                    } else {
+                        // find a replace variable %user %tier
+                        response = guiHandler.bot.getStore().getConfiguration().subNewNormalReply;
+                        response = response.replace("%user", subDisplayName).replace("%tier", tier);
+                        return response;
+                    }
+                } else {
+                    if (prime) {
+                        // find a replace variables %user %months
+                        response = guiHandler.bot.getStore().getConfiguration().subPrimeReply;
+                        response = response.replace("%user", subDisplayName).replace("%months", subMonths);
+                    } else {
+                        // find a replace variables %user %months %tier
+                        response = guiHandler.bot.getStore().getConfiguration().subNormalReply;
+                        response = response.replace("%user", subDisplayName).replace("%months", subMonths).replace("%tier", tier);
+                    }
+                }
+            }
+            // deal with single gifted sub
+            if (!massGifted && subGift) {
+                // find a replace variables %user %recipient %tier
+                response = guiHandler.bot.getStore().getConfiguration().subSingleGiftReply;
+                response = response.replace("%user", subDisplayName).replace("%recipient", giftRecip).replace("%tier", tier);
+            }
+            if (massGifted) {
+                // find a replace variables %user %gifts %tier
+                response = guiHandler.bot.getStore().getConfiguration().subMassGiftReply;
+                response = response.replace("%user", subDisplayName).replace("%gifts", String.valueOf(giftAmount)).replace("%tier", tier);
+            }
+
+            // bundle and send reply to messenger and event list
+            sendEvent(response);
+            return response;
+        }
+        private static void sendEvent(final String msg) {
+        String event = msg;
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                guiHandler.bot.getStore().getEventList().addList(event);
+            }
+        });
+    }
     }
 }

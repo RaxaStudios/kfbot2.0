@@ -1,15 +1,21 @@
 package com.twitchbotx.bot;
 
 //import com.twitchbotx.gui.DashboardController;
+import com.twitchbotx.bot.client.TwitchMessenger;
+import com.twitchbotx.bot.handlers.TwitchStatusHandler;
 import com.twitchbotx.gui.guiHandler;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 //import java.io.PrintStream;
 //import java.util.Timer;
 //import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javax.annotation.concurrent.GuardedBy;
@@ -28,8 +34,7 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 public final class TimerManagement {
 
-    public static ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
-    // private final PrintStream outstream;
+    static final LinkedHashMap<String, Task> LHM = new LinkedHashMap<>();
     private final Datastore store;
     private static final Logger LOGGER = Logger.getLogger(TwitchBotX.class.getSimpleName());
 
@@ -44,113 +49,141 @@ public final class TimerManagement {
         //this.outstream = stream;
     }
 
+    public synchronized LinkedHashMap<String, Task> getLHM() {
+        return LHM;
+    }
+
+    
     public volatile boolean repeat;
 
     public void setupPeriodicBroadcast() {
         for (int i = 0; i < store.getCommands().size(); i++) {
-
             final ConfigParameters.Command command = guiHandler.bot.getStore().getCommands().get(i);
-            //store.getCommands().get(i);
-            final int index = i;
             if (Boolean.parseBoolean(command.repeating)) {
-                int iDelay = Integer.parseInt(command.initialDelay);
                 int interval = Integer.parseInt(command.interval);
                 if (interval < 600) {
                     String event = "Repeating interval too short for command " + command.name;
                     Platform.runLater(() -> {
                         store.getEventList().addList(event);
                     });
-/*
-                    ses.schedule(new Runnable() {
-                        Datastore store;
-
-                        @Override
-                        public void run() {
-                            store = guiHandler.bot.getStore();
-                            int interval = Integer.parseInt(store.getCommands().get(index).interval);
-                            String content = store.getCommands().get(index).text;
-                            boolean repeat = Boolean.parseBoolean(store.getCommands().get(index).repeating);
-                            if (repeat) {
-                                System.out.println("Testing repeating: interval:" + interval + " name: " + command.name + " content: " + content);
-                                ses.schedule(this, interval, TimeUnit.SECONDS);
-                                //ses.schedule(this, 10, TimeUnit.SECONDS);
-                            } else {
-                                //TODO start new runnable series for turning commands on to repeating while bot running
-                                // end old editions of runnables to ensure no crossover
-                                // fix issue when restarting bot through GUI restart button for repeating schedule 
-                                System.out.println("Command " + command.name + " stopping repeat schedule");
-                            }
-                        }
-                    }, 0, TimeUnit.SECONDS);*/
                 } else {
-
-                    ses.schedule(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            System.out.println("Testing repeating: interval:" + command.interval + " name: " + command.name + " content: " + command.text);
-                            ses.schedule(this, Integer.parseInt(command.interval), TimeUnit.SECONDS);
-                            //ses.schedule(this, 10, TimeUnit.SECONDS);
-                        }
-                    }, 0, TimeUnit.SECONDS);
-                    ses.scheduleWithFixedDelay(new Runnable() {
-                        @Override
-                        public void run() {
-                            sendMessage(command.text);
-                        }
-                        // }, 0, 10, TimeUnit.SECONDS);
-                    }, iDelay, interval, TimeUnit.SECONDS);
-                    String event = "Starting repeating command: " + command.name;
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
+                    if (schedule(command.name)) {
+                        String event = "Started repeating command: " + command.name;
+                        Platform.runLater(() -> {
                             store.getEventList().addList(event);
-                        }
-                    });
-
+                        });
+                    } else {
+                        String event = "Failed to start repeating command: " + command.name;
+                        Platform.runLater(() -> {
+                            store.getEventList().addList(event);
+                        });
+                    };
                 }
             }
         }
     }
 
-    public void reschedule(String commandToSchedule) {
+    public boolean schedule(String commandToSchedule) {
         for (int i = 0; i < store.getCommands().size(); i++) {
-
             final ConfigParameters.Command command = guiHandler.bot.getStore().getCommands().get(i);
             if (command.name.equals(commandToSchedule)) {
-                int index = i;
                 int iDelay = Integer.parseInt(command.initialDelay);
                 int interval = Integer.parseInt(command.interval);
-                if (interval < 600) {
-                    String event = "Repeating interval too short for command " + command.name;
-                    Platform.runLater(() -> {
-                        store.getEventList().addList(event);
-                    });
-                } else {
-                    ses.schedule(new Runnable() {
-                        Datastore store;
-
-                        @Override
-                        public void run() {
-                            store = guiHandler.bot.getStore();
-                            int interval = Integer.parseInt(store.getCommands().get(index).interval);
-                            String content = store.getCommands().get(index).text;
-                            boolean repeat = Boolean.parseBoolean(store.getCommands().get(index).repeating);
-                            if (repeat) {
-                                System.out.println("Testing repeating: interval:" + interval + " name: " + command.name + " content: " + content);
-                                ses.schedule(this, interval, TimeUnit.SECONDS);
-                                //ses.schedule(this, 10, TimeUnit.SECONDS);
-                            } else {
-                                //TODO start new runnable series for turning commands on to repeating while bot running
-                                // end old editions of runnables to ensure no crossover
-                                // fix issue when restarting bot through GUI restart button for repeating schedule 
-                                System.out.println("Command " + command.name + " stopping repeat schedule");
+                try {
+                    if (getLHM().containsKey(command.name)) {
+                        System.out.println("Duplicate found");
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                guiHandler.bot.getStore().getEventList().addList("Repeating command " + command.name + " already in progress");
                             }
-                        }
-                    }, 0, TimeUnit.SECONDS);
-                    //}, iDelay, interval);
+                        });
+                        return false;
+                    } else {
+                        Task task = new Task(command.name, command.text, iDelay, interval);
+                        getLHM().put(command.name, task);
+                        task.start();
+                        return true;
+                    }
+                } catch (NullPointerException ne) {
+                    ne.printStackTrace();
                 }
+                return false;
             }
+        }
+        return false;
+    }
+
+    public boolean stop(String commandToStop) {
+        try {
+            getLHM().get(commandToStop).shutdown();
+            getLHM().remove(commandToStop);
+            return true;
+        } catch (Exception e) {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    guiHandler.bot.getStore().getEventList().addList("Repeating command " + commandToStop + " not found to stop");
+                }
+            });
+            return false;
+        }
+    }
+
+    public static class Task {
+
+        private final TwitchStatusHandler tH = new TwitchStatusHandler(guiHandler.bot.getStore());
+        private volatile boolean dead;
+        private final ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
+        private final String commandName;
+        private final String commandText;
+        private final int initialDelay;
+        private final int commandInterval;
+        TwitchMessenger tM = guiHandler.messenger;
+
+        public Task(String name, String content, int initD, int interval) {
+            commandName = name;
+            commandText = content;
+            initialDelay = initD;
+            commandInterval = interval;
+            dead = false;
+        }
+
+        public void start() {
+            Runnable runnable = () -> {
+                if (!getDead()) {
+                    // check for stream online/offline
+                    if (tH.uptime("").equals("Stream is not currently live.")) {
+                        System.out.println("Stream offline while attemping to print: " + commandName);
+                    } else {
+                        System.out.println("Text of " + commandName + ": " + commandText);
+                        tM.sendMessage(commandText);
+                    }
+                } else {
+                    System.out.println("Still alive");
+                }
+            };
+            ses.scheduleWithFixedDelay(runnable, initialDelay, commandInterval, TimeUnit.SECONDS);
+        }
+
+        private boolean getDead() {
+            return dead;
+        }
+
+        public void shutdown() {
+            System.out.println("Current shutdown thread: " + Thread.currentThread().getName());
+            System.out.println("Shutting down command: " + commandName);
+            ses.shutdown();
+            try {
+                if (!ses.awaitTermination(800, TimeUnit.MILLISECONDS)) {
+                    ses.shutdownNow();
+                    Thread.currentThread().join();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                ses.shutdownNow();
+            }
+            dead = true;
         }
     }
 
@@ -170,54 +203,19 @@ public final class TimerManagement {
         private int pongCounter = 1;
 
         public synchronized int getPong() {
+            System.out.println("Pongs sent: " + pongCounter);
             return pongCounter;
         }
 
         public synchronized void addPong() {
             pongCounter++;
+            System.out.println("Pongs +1= " + pongCounter);
         }
 
         public synchronized void resetPong() {
+            System.out.println("Pongs reset");
             pongCounter = 0;
         }
 
     }
-
-    @ThreadSafe
-    public static class repeatingCommandHandler {
-
-        public repeatingCommandHandler() {
-
-        }
-
-        public void testRPC() {
-            Runnable rTest = new Runnable() {
-                @Override
-                public void run() {
-
-                    System.out.println("Testing repeating: interval:" + 7 + " name: " + 555 + " content: " + 999);
-                    ses.schedule(this, Integer.parseInt("7"), TimeUnit.SECONDS);
-                    //ses.schedule(this, 10, TimeUnit.SECONDS);
-                }
-            };
-            List<Thread> threads = new ArrayList<>();
-            Thread rT = new Thread(rTest);
-            rT.setName("command name here");
-            threads.add(rT);
-            for (Thread tn : threads) {
-                if (tn.getName().equals("command name here")) {
-                    threads.remove(tn);
-                }
-            }
-        }
-
-    }
-
-    public class T extends Thread {
-
-        public void run() {
-            System.out.println("Test 1");
-        }
-    }
-
 }

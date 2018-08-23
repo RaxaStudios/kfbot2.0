@@ -17,12 +17,14 @@ import com.neovisionaries.ws.client.WebSocketFrame;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.client.TwitchMessenger;
 import com.twitchbotx.gui.DashboardController;
+import com.twitchbotx.gui.guiHandler;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import javafx.application.Platform;
 
 /**
  *
@@ -297,8 +299,12 @@ public class PubSubSubscriptionHandler {
                 subFormat = " at " + subTier;
             }
             eventMsg = "Subscriber Event: " + user + " subscribed " + subFormat + " " + monthFormat + " Message: " + msg;
-            DashboardController dc = new DashboardController();
-            dc.eventObLAdd(eventMsg);
+            Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                guiHandler.bot.getStore().getEventList().addList(eventMsg);
+            }
+        });
         }
     }
 }

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.settings.SubEditController">
+   <children>
+      <TextArea fx:id="message" layoutX="247.0" layoutY="179.0" prefHeight="168.0" prefWidth="331.0" wrapText="true" />
+      <Label alignment="TOP_CENTER" contentDisplay="TOP" layoutX="5.0" layoutY="47.0" prefHeight="142.0" prefWidth="235.0" style="-fx-border-color: grey;" text="Sub Events" textAlignment="CENTER" />
+      <Button layoutX="11.0" layoutY="76.0" mnemonicParsing="false" onAction="#buttonPress" text="New Non-Prime" />
+      <Button layoutX="122.0" layoutY="76.0" mnemonicParsing="false" onAction="#buttonPress" text="Non-Prime Resub" />
+      <Button layoutX="15.0" layoutY="113.0" mnemonicParsing="false" onAction="#buttonPress" text="Prime New" />
+      <Button layoutX="135.0" layoutY="114.0" mnemonicParsing="false" onAction="#buttonPress" text="Prime Resub" />
+      <Button layoutX="18.0" layoutY="154.0" mnemonicParsing="false" onAction="#buttonPress" text="Single Gift" />
+      <Button layoutX="143.0" layoutY="154.0" mnemonicParsing="false" onAction="#buttonPress" text="Mass Gift" />
+      <Label fx:id="submitStatus" alignment="CENTER" contentDisplay="CENTER" layoutX="271.0" layoutY="343.0" prefHeight="63.0" prefWidth="235.0" textAlignment="CENTER" wrapText="true" />
+      <Label fx:id="messageHeader" alignment="CENTER" contentDisplay="CENTER" layoutX="258.0" layoutY="125.0" prefHeight="27.0" prefWidth="331.0" text="Select an option" textAlignment="CENTER" wrapText="true" />
+      <Label fx:id="messageSelected" alignment="CENTER" contentDisplay="CENTER" layoutX="259.0" layoutY="88.0" prefHeight="25.0" prefWidth="331.0" textAlignment="CENTER">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label alignment="TOP_CENTER" contentDisplay="TOP" layoutX="5.0" layoutY="203.0" prefHeight="63.0" prefWidth="235.0" style="-fx-border-color: grey;" text="Bit Events" textAlignment="CENTER" />
+      <Label alignment="TOP_CENTER" contentDisplay="TOP" layoutX="5.0" layoutY="276.0" prefHeight="63.0" prefWidth="235.0" style="-fx-border-color: grey;" text="Raid Events" textAlignment="CENTER" />
+      <Button layoutX="16.0" layoutY="222.0" mnemonicParsing="false" text="Response" />
+      <Button layoutX="143.0" layoutY="222.0" mnemonicParsing="false" text="Min Amount" />
+      <Label layoutX="185.0" layoutY="1.0" text="Event Response Manager">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <ButtonBar layoutX="118.0" layoutY="355.0" prefHeight="40.0" prefWidth="200.0">
+        <buttons>
+          <Button mnemonicParsing="false" text="Button" />
+        </buttons>
+      </ButtonBar>
+   </children>
+</AnchorPane>

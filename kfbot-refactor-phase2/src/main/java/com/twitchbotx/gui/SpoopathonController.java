@@ -5,8 +5,10 @@
  */
 package com.twitchbotx.gui;
 
+import com.twitchbotx.bot.handlers.SpoopathonHandler;
 import com.twitchbotx.bot.handlers.sqlHandler;
 import java.net.URL;
+import java.util.LinkedHashMap;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,6 +32,9 @@ public class SpoopathonController implements Initializable {
     ScreensController myController = new ScreensController();
 
     private static sqlHandler gameData;
+    private static SpoopathonHandler userData;
+
+    int i = 1;
 
     @FXML
     Label loadLabel;
@@ -42,6 +47,9 @@ public class SpoopathonController implements Initializable {
 
     @FXML
     Label addGameStatus;
+
+    @FXML
+    Label addVoteStatus;
 
     @FXML
     TextField newGame;
@@ -65,8 +73,18 @@ public class SpoopathonController implements Initializable {
     TextField newGameID;
 
     @FXML
+    TextField usernameAddText;
+
+    @FXML
+    TextField votesAddText;
+
+    @FXML
     ListView gameListView;
     public static ObservableList<String> gameList = FXCollections.observableArrayList();
+
+    @FXML
+    ListView userListView;
+    public static ObservableList<String> userList = FXCollections.observableArrayList();
 
     @FXML
     private void addPoints(ActionEvent event) {
@@ -188,8 +206,10 @@ public class SpoopathonController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         gameList.clear();
+        userList.clear();
         loadLabel.setVisible(true);
         gameData = new sqlHandler(guiHandler.bot.getStore(), guiHandler.bot.getOut());
+        userData = new SpoopathonHandler();
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -209,6 +229,16 @@ public class SpoopathonController implements Initializable {
             Logger.getLogger(SpoopathonController.class.getName()).log(Level.SEVERE, null, ex);
         }
         gameListView.setItems(gameList);
+
+        // set userlist
+        SpoopathonHandler.MAP.entrySet().forEach((m) -> {
+            userList.add(m.getKey() + " : " + m.getValue());
+            System.out.println(i + " " + m.getKey());
+            i++;
+        });
+        addVoteStatus.setText("");
+        //System.out.println(userList);
+        userListView.setItems(userList);
     }
 
     guiHandler.dimensions dm = ScreensController.dm;
@@ -219,4 +249,47 @@ public class SpoopathonController implements Initializable {
         dm.setHeight(h);
         dm.setWidth(w);
     }
+
+    // begin user votes commands
+    @FXML
+    public void addVotes() {
+        addVoteStatus.setText("");
+        //grab username and votes to add
+        usernameAddText.selectAll();
+        usernameAddText.copy();
+        String user = usernameAddText.getText();
+        user = user.toLowerCase();
+        votesAddText.selectAll();
+        votesAddText.copy();
+        int votes = Integer.parseInt(votesAddText.getText());
+        if (votes == 0) {
+            if (userData.remUser(user)) {
+                addVoteStatus.setText("Removed " + user);
+            } else {
+                addVoteStatus.setText(user + " not found");
+            }
+        } else if (votes < 0) {
+            userData.remVotes(user, votes);
+            addVoteStatus.setText("Removed votes");
+        } else {
+            userData.addVotes(user, votes);
+            addVoteStatus.setText("Added points");
+        }
+
+        refreshUsers();
+    }
+
+    @FXML
+    public void refreshUsers() {
+        userList.clear();
+        SpoopathonHandler.MAP.entrySet().forEach((m) -> {
+            userList.add(m.getKey() + " : " + m.getValue());
+            // System.out.println(i + " " + m.getKey());
+            //i++;
+        });
+
+        //System.out.println(userList);
+        userListView.setItems(userList);
+    }
+
 }

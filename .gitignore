@@ -45,3 +45,21 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Hide builds and config/test files
+*.xml
+*.jar
+.iml
+.mp3
+*.bash
+\RUN.bat
+*.zip
+songLottery.map
+\sendTest
+\production test version
+\2018 UPDATE EDITION
+*.txt
+*.lck
+*.log
+*.log.1
+

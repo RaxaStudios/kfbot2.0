@@ -3,10 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.twitchbotx.gui;
+package com.twitchbotx.gui.settings;
 
 import com.twitchbotx.bot.CommandParser;
 import com.twitchbotx.bot.Datastore;
+import com.twitchbotx.gui.ScreensController;
+import com.twitchbotx.gui.ScreensController;
+import com.twitchbotx.gui.guiHandler;
+import com.twitchbotx.gui.guiHandler;
 //import com.twitchbotx.bot.handlers.LotteryHandler;
 import java.net.URL;
 import java.nio.file.Path;
@@ -15,6 +19,7 @@ import java.util.ResourceBundle;
 import javafx.application.Platform;
 //import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 //import javafx.scene.control.Button;
@@ -23,6 +28,9 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 //import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
@@ -32,55 +40,61 @@ import javafx.scene.media.MediaPlayer;
  * @author Raxa
  */
 public class ConfigurationController implements Initializable {
-    
+
     ScreensController myController = new ScreensController();
     Datastore store;
-    
+
     @FXML
     Label saveText;
-    
+
     @FXML
     TextField testMessageText;
-    
+
     @FXML
     TextField soundTestText;
-    
+
     @FXML
     RadioButton spoopEnabled;
-    
+
     @FXML
     RadioButton spoopDisabled;
-    
+
     @FXML
     RadioButton marEnabled;
-    
+
     @FXML
     RadioButton marDisabled;
-    
+
     @FXML
     RadioButton songEnabled;
-    
+
     @FXML
     RadioButton songDisabled;
-    
+
     @FXML
     RadioButton lottoEnabled;
-    
+
     @FXML
     RadioButton lottoDisabled;
-    
+
     @FXML
     ToggleGroup Spoop;
-    
+
     @FXML
     ToggleGroup Marathon;
-    
+
     @FXML
     ToggleGroup songLotto;
-    
+
     @FXML
     ToggleGroup lotto;
     
+    @FXML
+    ToggleGroup sub;
+
+    @FXML
+    AnchorPane background;
+
     @FXML
     private void dash(ActionEvent event) {
         setDimensions();
@@ -136,6 +150,18 @@ public class ConfigurationController implements Initializable {
             e.printStackTrace();
         }
     }
+
+    // Change to sub editing page
+    @FXML
+    private void goResponseEditor(ActionEvent event) {
+        setDimensions();
+        myController.loadScreen(guiHandler.respEditID, guiHandler.respEditFile);
+        myController.setScreen(guiHandler.respEditID);
+        myController.setId("RespEdit");
+        myController.show(myController);
+    }
+    
+    
     
     @FXML
     public void saveSettings() {
@@ -152,7 +178,7 @@ public class ConfigurationController implements Initializable {
         //send enabled to spoopathon here
         store.modifyConfiguration("sStatus", enabled);
         System.out.println("Spoopathon:" + enabled);
-        
+
         toggle = (RadioButton) Marathon.getSelectedToggle();
         if (toggle.getText().equals("Enabled")) {
             enabled = "on";
@@ -162,32 +188,90 @@ public class ConfigurationController implements Initializable {
         //send enabled to marathon here
         store.modifyConfiguration("mStatus", enabled);
         System.out.println("marathon:" + enabled);
-        
+
         toggle = (RadioButton) songLotto.getSelectedToggle();
         if (toggle.getText().equals("Enabled")) {
             enabled = "on";
-            CommandParser.songs.songOpen();
+            CommandParser.songs.songEnable();
         } else {
             enabled = "off";
-            CommandParser.songs.songClose();
+            CommandParser.songs.songDisable();
         }
         //send enabled to songLotto here
-        store.modifyConfiguration("songLottoStatus", enabled);       
+        store.modifyConfiguration("songLottoStatus", enabled);
         System.out.println("songLotto:" + enabled);
-        
+
         toggle = (RadioButton) lotto.getSelectedToggle();
+        if (toggle.getText().equals("Enabled")) {
+            enabled = "on";
+            CommandParser.lotto.lottoEnable();
+        } else {
+            enabled = "off";
+            CommandParser.lotto.lottoDisable();
+        }
+        //send enabled to lotto here
+        store.modifyConfiguration("lottoStatus", enabled);
+        System.out.println("lotto:" + enabled);
+
+        // set value for sub reply system(this will only stop bot from sending to chat)
+        toggle = (RadioButton) sub.getSelectedToggle();
         if (toggle.getText().equals("Enabled")) {
             enabled = "on";
         } else {
             enabled = "off";
-            CommandParser.lotto.lottoClose();
         }
-        //send enabled to lotto here
-        
-        System.out.println("lotto:" + enabled);
+        store.modifyConfiguration("subReply", enabled);
+        System.out.println("subReply:" + enabled);
 
+        
+        
         //print confirmation text
         saveText.setVisible(true);
+    }
+
+    int key = 0;
+    KeyCode left = KeyCode.LEFT;
+    KeyCode right = KeyCode.RIGHT;
+    KeyCode up = KeyCode.UP;
+    KeyCode down = KeyCode.DOWN;
+    KeyCode lastKey = up;
+
+    // begin rogue
+    public void incrementKey() {
+        key++;
+    }
+
+    @FXML
+    public void keyPressed() {
+        EventHandler<KeyEvent> keyPressed = (EventHandler<KeyEvent>) background.getOnKeyTyped();
+
+    }
+
+    public static class goRogue {
+
+        public static void begin() {
+            String message = "testing a thing";
+            send(message);
+        }
+
+        private static void send(String msg) {
+            try {
+                guiHandler.bot.getOut().println("PRIVMSG #"
+                        + guiHandler.bot.getStore().getConfiguration().joinedChannel
+                        + " "
+                        + ":"
+                        + msg);
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        guiHandler.bot.getStore().getEventList().addList("BOT WILL NO LONGER TAKE COMMANDS");
+                    }
+                });
+            } catch (Exception e) {
+                System.out.println("error occured sending test");
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -196,6 +280,7 @@ public class ConfigurationController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         store = guiHandler.bot.getStore();
+        key = 0;
         if (store.getConfiguration().lottoStatus.equals("on")) {
             lottoEnabled.setSelected(true);
         } else {
@@ -217,15 +302,21 @@ public class ConfigurationController implements Initializable {
             marDisabled.setSelected(true);
         }
         saveText.setVisible(false);
+
+        testMessageText.setOnKeyPressed((KeyEvent event) -> {
+            lastKey = event.getCode();
+            System.out.println("Pressed the " + lastKey.getName() + " key");
+        });
+
     }
-    
+
     guiHandler.dimensions dm = ScreensController.dm;
-    
+
     private void setDimensions() {
         int h = (int) guiHandler.stage.getHeight();
         int w = (int) guiHandler.stage.getWidth();
         dm.setHeight(h);
         dm.setWidth(w);
     }
-    
+
 }

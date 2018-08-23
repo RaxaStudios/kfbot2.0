@@ -82,14 +82,31 @@ public final class CommandOptionHandler {
                         Date now = calendar.getTime();
                         System.out.println("cooldown test set cdUntil:" + command.cdUntil);
                         //check for blank cdUntil
-                        Date cdTime = new Date(Long.parseLong(command.cdUntil));
+                        
+                        Long cooldown;
+                        try{
+                        cooldown = Long.parseLong(command.cdUntil);
+                        } catch(NumberFormatException nfe){
+                            cooldown = (Long) new Date(now.getTime()).getTime();
+                            System.out.println(cooldown);
+                        }
+                        
+                        Date cdTime = new Date(cooldown);
                         
                         if (now.before(cdTime)) {
                             return "";
                         }
-                        cdTime = new Date(now.getTime() + Long.parseLong(command.cooldownInSec) * 1000L);
+                        Long cooldownInSec = new Long(0);
+                        try{
+                            cooldownInSec = Long.parseLong(command.cooldownInSec);
+                        } catch(NumberFormatException ne){
+                            //set value of cooldownInSec to 0
+                            store.setUserCommandAttribute(command.name, "cooldownInSec", "0", true);
+                        }
+                        cdTime = new Date(now.getTime() + cooldownInSec * 1000L);
                         System.out.println("NAME: " + command.name + " CDTIME: " + cdTime + " CDGET: " + cdTime.getTime());
                         store.updateCooldownTimer(command.name, cdTime.getTime());
+                        
                     }
                     if (!command.sound.isEmpty()) {
                         playSound(command.sound);
