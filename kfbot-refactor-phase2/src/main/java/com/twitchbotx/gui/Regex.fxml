@@ -4,57 +4,47 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.RadioButton?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.controllers.RegexController">
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.RegexController">
    <children>
       <Button layoutX="14.0" layoutY="361.0" mnemonicParsing="false" onAction="#moderation" text="Moderation Home" />
-      <ListView fx:id="filterList" layoutX="18.0" layoutY="69.0" prefHeight="233.0" prefWidth="200.0" />
-      <Label layoutX="24.0" layoutY="41.0" text="Current Filters">
+      <ListView fx:id="filterList" layoutX="38.0" layoutY="110.0" prefHeight="233.0" prefWidth="200.0" />
+      <Label layoutX="95.0" layoutY="67.0" text="Current Filters">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <Label layoutX="14.0" layoutY="14.0" text="Regex Manager">
+      <Label layoutX="234.0" layoutY="14.0" text="Regex Manager">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <Label layoutX="380.0" layoutY="4.0" text="Edit Regex">
+      <Label layoutX="422.0" layoutY="67.0" text="Edit Regex">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <Button layoutX="518.0" layoutY="41.0" mnemonicParsing="false" onAction="#addRegex" text="Add New" />
-      <Button layoutX="518.0" layoutY="266.0" mnemonicParsing="false" onAction="#delRegex" text="Remove" />
-      <Button layoutX="524.0" layoutY="337.0" mnemonicParsing="false" onAction="#enableRegex" text="Submit" />
-      <Label layoutX="270.0" layoutY="279.0" text="Name" />
-      <Label layoutX="270.0" layoutY="324.0" text="Name" />
-      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="218.0" layoutY="84.0" prefHeight="44.0" prefWidth="54.0" text="Regex content" textAlignment="CENTER" wrapText="true" />
-      <TextField fx:id="deleteIndex" layoutX="339.0" layoutY="275.0" prefHeight="25.0" prefWidth="94.0" />
-      <TextField fx:id="editIndex" layoutX="239.0" layoutY="349.0" prefHeight="25.0" prefWidth="94.0" />
-      <Label layoutX="386.0" layoutY="25.0" text="Create" />
-      <Label layoutX="365.0" layoutY="258.0" text="Remove" />
-      <Label layoutX="359.0" layoutY="311.0" text="Enable" />
-      <Label layoutX="232.0" layoutY="53.0" text="Name" />
-      <TextField fx:id="regexName" layoutX="277.0" layoutY="49.0" />
-      <TextArea fx:id="regexText" layoutX="275.0" layoutY="82.0" prefHeight="76.0" prefWidth="302.0" wrapText="true" />
-      <Button layoutX="473.0" layoutY="209.0" mnemonicParsing="false" onAction="#editRegex" text="Submit Changes" />
-      <Button layoutX="94.0" layoutY="307.0" mnemonicParsing="false" onAction="#select" text="Select" />
-      <Label layoutX="224.0" layoutY="196.0" prefHeight="76.0" prefWidth="81.0" text="Timeout length (can be 'del' for delete over timeout)" textAlignment="CENTER" wrapText="true" />
-      <TextField fx:id="regexSeconds" alignment="CENTER" layoutX="322.0" layoutY="209.0" prefHeight="25.0" prefWidth="81.0" text="600" />
-      <Label layoutX="416.0" layoutY="213.0" text="seconds" />
-      <Label layoutX="225.0" layoutY="177.0" text="Reason" />
-      <TextField fx:id="regexReason" layoutX="288.0" layoutY="173.0" prefHeight="25.0" prefWidth="214.0" text="Caught by manually added regex" />
-      <RadioButton fx:id="enable" layoutX="408.0" layoutY="329.0" mnemonicParsing="false" text="On">
+      <Button layoutX="521.0" layoutY="135.0" mnemonicParsing="false" onAction="#addRegex" text="Add" />
+      <Button layoutX="502.0" layoutY="223.0" mnemonicParsing="false" onAction="#delRegex" text="Remove" />
+      <Button layoutX="506.0" layoutY="307.0" mnemonicParsing="false" onAction="#editRegex" text="Submit" />
+      <Label layoutX="301.0" layoutY="227.0" text="Index" />
+      <Label layoutX="301.0" layoutY="311.0" text="Index" />
+      <Label layoutX="271.0" layoutY="139.0" text="New Regex" />
+      <TextField fx:id="newRegex" layoutX="351.0" layoutY="135.0" />
+      <TextField fx:id="deleteIndex" layoutX="351.0" layoutY="223.0" prefHeight="25.0" prefWidth="65.0" />
+      <TextField fx:id="editIndex" layoutX="352.0" layoutY="310.0" prefHeight="25.0" prefWidth="65.0" />
+      <Label layoutX="405.0" layoutY="110.0" text="Create" />
+      <Label layoutX="404.0" layoutY="192.0" text="Remove" />
+      <Label layoutX="408.0" layoutY="272.0" text="Enable" />
+      <RadioButton layoutX="445.0" layoutY="302.0" mnemonicParsing="false" selected="true" text="On">
          <toggleGroup>
             <ToggleGroup fx:id="enabled" />
          </toggleGroup>
       </RadioButton>
-      <RadioButton fx:id="disable" layoutX="408.0" layoutY="354.0" mnemonicParsing="false" text="Off" toggleGroup="$enabled" />
+      <RadioButton layoutX="444.0" layoutY="327.0" mnemonicParsing="false" text="Off" />
    </children>
 </AnchorPane>

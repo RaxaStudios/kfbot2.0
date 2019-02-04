@@ -12,45 +12,38 @@ import java.util.regex.Pattern;
 
 import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
-import com.twitchbotx.gui.controllers.DashboardController;
 import com.twitchbotx.gui.guiHandler;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import javafx.application.Platform;
-import javafx.scene.control.Button;
 
 /**
  *
  * @author RaxaStudios
  */
-public class ModerationHandler implements ModerationListener{
+public class ModerationHandler {
 
     private static final Logger LOGGER = Logger.getLogger(ModerationHandler.class.getSimpleName());
 
-    private Datastore store;
+    private final PrintStream outstream;
+    private final Datastore store;
     private String reason;
     private String timeout;
+    private static final String BANNED_USERNAME = "(\\d{7}([A-z]{1})\\d{7}|\\d{14})";
 
-    
     /**
      * Constructor for the handler
      *
      * @param store The database access utility for reading/writing to the
      * database
      *
+     * @param stream The outsteam to communicate to twitch
      */
-    public ModerationHandler(Datastore store) {
+    public ModerationHandler(final Datastore store, final PrintStream stream) {
         this.store = guiHandler.bot.getStore();
+        this.outstream = stream;
     }
 
-    @Override
-    public void needUpdate(){
-        System.out.println("Resetting store");
-        this.store = guiHandler.bot.getStore();
-    }
-    
     public String filterCheck(String msg) {
         for (int i = 0; i < store.getFilters().size(); i++) {
             final ConfigParameters.Filter filter = store.getFilters().get(i);
@@ -58,7 +51,10 @@ public class ModerationHandler implements ModerationListener{
                 String filterName = filter.name;
                 reason = filter.reason;
                 timeout = filter.seconds;
-                 if (msg.equals(filterName)) {
+                if (msg.contains(filterName)) {
+                    //Use for wildcard matching, ie links
+                    return reason;
+                } else if (msg.equals(filterName)) {
                     //Exact phrase matching
                     return reason;
                 }
@@ -71,25 +67,26 @@ public class ModerationHandler implements ModerationListener{
         return reason;
     }
 
-    public void handleTool(String username, String msg, String msgId) {
+    public void handleTool(String username, String msg) {
         try {
             //Timestamped chat log for testing purposes
-            //Calendar cal = Calendar.getInstance();
-            //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-            //sendEvent(sdf.format(cal.getTime()) + " " + username + ": " + msg);
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+            sendEvent(sdf.format(cal.getTime()) + " " + username + ": " + msg);
             if (!filterCheck(msg).equals("no filter")) {
                 System.out.println(reason);
                 sendMessage(".timeout " + username + " " + timeout + " " + reason);
-                //sendEvent("timeout " + username + " " + timeout + " " + reason);
+                sendEvent("timeout " + username + " " + timeout + " " + reason);
                 return;
             } else if (userCheck(username)) {
                 sendMessage(".timeout " + username + " 600 Username caught by filter");
-                //sendEvent(".timeout " + username + " 600 Username caught by filter");
+                sendEvent(".timeout " + username + " 600 Username caught by filter");
                 return;
             } else {
-                regexCheck(username, msg, msgId);
+                regexCheck(username, msg);
             }
             return;
+
         } catch (Exception e) {
             e.printStackTrace();
             LOGGER.severe(e.toString());
@@ -97,34 +94,25 @@ public class ModerationHandler implements ModerationListener{
     }
 
     private boolean userCheck(String username) {
-        //ignore for now, future use to check usernames
-        return false;
+        final Pattern pattern = Pattern.compile(BANNED_USERNAME);
+        final Matcher matcher = pattern.matcher(username);
+        return matcher.matches();
     }
 
-    private void regexCheck(String user, String msg, String msgId) {
+    private void regexCheck(String user, String msg) {
         Pattern pattern;
         Matcher matcher;
-        boolean delete = false;
         for (int i = 0; i < store.getRegexes().size(); i++) {
             final ConfigParameters.FilterRegex filter = store.getRegexes().get(i);
-            //System.out.println("name: " + filter.name + " filter enabled: " + filter.enabled);
             if (filter.enabled) {
                 String content = filter.content;
                 reason = filter.reason;
                 timeout = filter.seconds;
-                if (filter.seconds.equals("del")) {
-                    delete = true;
-                }
                 pattern = Pattern.compile(content);
                 matcher = pattern.matcher(msg);
                 if (matcher.find()) {
-                    if (delete) {
-                        sendMessage(".delete " + msgId);
-                        //sendEvent(".delete user " + user + " message. Reason:" + reason);
-                    } else {
-                        sendMessage(".timeout " + user + " " + timeout + " " + reason);
-                       // sendEvent(".timeout " + user + " " + timeout + " " + reason);
-                    }
+                    sendMessage(".timeout " + user + " " + timeout + " " + reason);
+                    sendEvent(".timeout " + user + " " + timeout + " " + reason);
                     return;
                 }
             }
@@ -132,7 +120,12 @@ public class ModerationHandler implements ModerationListener{
     }
 
     private void sendMessage(final String msg) {
-        DashboardController.wIRC.sendMessage(msg, false);
+        final String message = msg;
+        guiHandler.bot.getOut().println("PRIVMSG #"
+                + store.getConfiguration().joinedChannel
+                + " "
+                + ":"
+                + message);
     }
 
     private void sendEvent(final String msg) {
@@ -145,4 +138,3 @@ public class ModerationHandler implements ModerationListener{
         });
     }
 }
-

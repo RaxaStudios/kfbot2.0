@@ -1,8 +1,8 @@
 package com.twitchbotx.bot.handlers;
 
+
 //import java.io.FileInputStream;
 //import java.io.InputStream;
-import com.twitchbotx.bot.CommandParser;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Logger;
@@ -13,7 +13,6 @@ import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.TwitchBotX;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 //import javax.sound.sampled.AudioInputStream;
@@ -23,6 +22,8 @@ import org.w3c.dom.DOMException;
 
 //import sun.audio.AudioPlayer;
 //import sun.audio.AudioStream;
+
+
 /**
  * This class is a command handler for most of the common commands in this bot.
  */
@@ -59,7 +60,6 @@ public final class CommandOptionHandler {
                     endOfCmd = msg.length();
                 }
                 String cmd = msg.substring(0, endOfCmd);
-                //System.out.println(command.name + " equals? " + cmd + " - " + cmd.equals(command.name));
                 if (cmd.contentEquals(command.name)) {
                     if (!checkAuthorization(cmd, username, mod, sub)) {
                         return "";
@@ -77,64 +77,49 @@ public final class CommandOptionHandler {
                     if (sendTxt.contains("%param%")) {
                         return cmd + " requires a parameter.";
                     }
-                    if (sendTxt.contains("@")){
-                        sendTxt = sendTxt.replace("@","");
-                    }
-                    //check for follow command optional %game% variable
-                    if(sendTxt.contains(("%game%")) && command.name.equals("!follow")){
-                        String user = msg.substring(endOfCmd + 1);
-                        sendTxt = sendTxt.replaceAll("%game%", CommandParser.twitchStatusHandler.getLastGame(user));
-                    }
-                    
                     if (!username.contentEquals(store.getConfiguration().joinedChannel)) {
                         Calendar calendar = Calendar.getInstance();
                         Date now = calendar.getTime();
-                        //System.out.println("cooldown test set cdUntil:" + command.cdUntil);
+                        System.out.println("cooldown test set cdUntil:" + command.cdUntil);
                         //check for blank cdUntil
-
+                        
                         Long cooldown;
-                        try {
-                            cooldown = Long.parseLong(command.cdUntil);
-                        } catch (NumberFormatException nfe) {
+                        try{
+                        cooldown = Long.parseLong(command.cdUntil);
+                        } catch(NumberFormatException nfe){
                             cooldown = (Long) new Date(now.getTime()).getTime();
-                            //System.out.println(cooldown);
-                            nfe.printStackTrace();
+                            System.out.println(cooldown);
                         }
-
+                        
                         Date cdTime = new Date(cooldown);
-
+                        
                         if (now.before(cdTime)) {
                             return "";
                         }
                         Long cooldownInSec = new Long(0);
-                        try {
+                        try{
                             cooldownInSec = Long.parseLong(command.cooldownInSec);
-                        } catch (NumberFormatException ne) {
+                        } catch(NumberFormatException ne){
                             //set value of cooldownInSec to 0
                             store.setUserCommandAttribute(command.name, "cooldownInSec", "0", true);
-                            ne.printStackTrace();
                         }
                         cdTime = new Date(now.getTime() + cooldownInSec * 1000L);
-                        // System.out.println("NAME: " + command.name + " CDTIME: " + cdTime + " CDGET: " + cdTime.getTime());
+                        System.out.println("NAME: " + command.name + " CDTIME: " + cdTime + " CDGET: " + cdTime.getTime());
                         store.updateCooldownTimer(command.name, cdTime.getTime());
-
+                        
                     }
                     if (!command.sound.isEmpty()) {
                         playSound(command.sound);
                     }
                     if (sendTxt.isEmpty()) {
-                        //System.out.println("empty returning text");
                         return "";
                     } else {
-                        //System.out.println("returning sendTxt: " + sendTxt);     
                         return sendTxt;
                     }
                 }
             } catch (DOMException | NumberFormatException e) {
                 LOGGER.severe(e.toString());
                 e.printStackTrace();
-            } catch (Exception ie) {
-                ie.printStackTrace();
             }
         }
 
@@ -212,7 +197,7 @@ public final class CommandOptionHandler {
             }
 
             final boolean edited = store.editCommand(cmd, txt);
-            //System.out.println("EDITED?: " + edited);
+            System.out.println("EDITED?: " + edited);
             if (edited) {
                 return "Command [" + cmd + "] changed to " + txt;
             }
@@ -310,8 +295,7 @@ public final class CommandOptionHandler {
 
     public boolean checkAuthorization(String userCommand, String username, boolean mod, boolean sub) {
         String auth = "";
-        int authLvl = 0;
-        //LOGGER.info("COMMAND: " + userCommand + " USERNAME: " + username + " MOD: " + mod + " SUB: " + sub);
+        LOGGER.info("COMMAND: " + userCommand + " USERNAME: " + username + " MOD: " + mod + " SUB: " + sub);
         if (username.contentEquals(store.getConfiguration().joinedChannel)) {
             return true;
         }
@@ -319,7 +303,6 @@ public final class CommandOptionHandler {
             final ConfigParameters.Command command = store.getCommands().get(i);
             if (userCommand.contentEquals(command.name)) {
                 auth = command.auth;
-                authLvl = command.authLvl;
                 break;
             }
         }
@@ -333,11 +316,6 @@ public final class CommandOptionHandler {
         }
         if (auth.toLowerCase().contains("+" + username)) {
             System.out.println("true auth");
-            return true;
-        }
-        //check for authorization level of user against any values in the command
-        if (authLvl < findAuth(username)) {
-            System.out.println("true auth with level");
             return true;
         }
         if ((auth.contains("-m")) && mod) {
@@ -369,27 +347,10 @@ public final class CommandOptionHandler {
         return false;
     }
 
-    private int findAuth(String username) {
-        int lvl = 0;
-        List<ConfigParameters.Editor> editors = store.getEditors();
-        for (ConfigParameters.Editor editor : editors) {
-            if (username.equals(editor.username)) {
-                if (String.valueOf(editor.level).equals(" ")) {
-                    lvl = 0;
-                } else {
-                    lvl = editor.level;
-                }
-            }
-        }
-        // if user is not found user is not an editor, there auth lvl 0
-        // TODO add in levels for admin, editor, mod, sub, etc
-        return lvl;
-    }
-    
     /**
      * Plays sound file based on attached .wav to certain commands within
-     * sound="" in XML. This will need to be patched out as of java 9 the
-     * sun.audio API is unavailable
+     * sound="" in XML. This will need to be patched out as of java 9 the sun.audio API
+     * is unavailable
      *
      * @param file
      */

@@ -103,13 +103,13 @@ public final class TwitchStatusHandler {
                 response.append(inputLine);
             }
 
-            //System.out.println(response);
+            System.out.println(response);
             
             int bi = response.toString().indexOf("\"created_at\":") + 14;
             int ei = response.toString().indexOf("\"", bi);
             String s = response.toString().substring(bi, ei);
             
-            //System.out.println(s);
+            System.out.println(s);
             
             DateTimeFormatter full = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss'Z'");
             DateTimeFormatter format = DateTimeFormatter.ofPattern("MMM dd, uuuu");
@@ -134,7 +134,7 @@ public final class TwitchStatusHandler {
             }
             String beginFormatted = begin.format(format);
             String gap = diffDay +" days " + diffHours + " hours " + diffMinutes +" minutes " + diffSeconds + " seconds"; 
-            //System.out.println("test formatting: milis:" + diff + " " + diffDay + "days " + diffHours + ":" + diffMinutes + ":" + diffSeconds);
+            System.out.println("test formatting: milis:" + diff + " " + diffDay + "days " + diffHours + ":" + diffMinutes + ":" + diffSeconds);
             brin.close();
             return user + " has been following for " + gap + ". Starting on " + beginFormatted + ".";
 
@@ -148,44 +148,6 @@ public final class TwitchStatusHandler {
         return "Unable to connect to Twitch server. Please try again later.";
     }
 
-    /**
-     * Find last played game for use with %game% variable, namely !follow
-     * 
-     * @param Username sent name from the param of !follow
-     * 
-     * @return String value of game
-     */
-    public String getLastGame(String username){
-        String game = "";
-        try {
-            String gameURL = store.getConfiguration().channelInfo;
-            gameURL = gameURL.replaceAll("#user", username);
-            URL url = new URL(gameURL);
-            URLConnection con = (URLConnection) url.openConnection();
-            con.setRequestProperty("Accept", "application/vnd.twitchtv.v3+json");
-            con.setRequestProperty("Authorization", store.getConfiguration().password);
-            con.setRequestProperty("Client-ID", store.getConfiguration().clientID);
-            BufferedReader brin = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            StringBuilder response = new StringBuilder();
-            String inputLine;
-            while ((inputLine = brin.readLine()) != null) {
-                response.append(inputLine);
-            }
-            brin.close();
-            
-            System.out.println("GAME RESPONSE: " + response);
-            
-            int bi = response.indexOf("\"game\"") + 8;
-            int ei = response.indexOf("\",", bi);
-            game = response.substring(bi, ei);
-            System.out.println("Game found: " + game);
-            
-        } catch(Exception ie){
-            ie.printStackTrace();
-        }
-        return game;
-    }
-    
     //TODO implement highlight system and commands to google doc system
     // mod and viewer editions
     /*   public void highlight() {

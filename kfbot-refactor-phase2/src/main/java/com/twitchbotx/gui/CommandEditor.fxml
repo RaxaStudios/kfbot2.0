@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.controllers.CommandEditorController">
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.CommandEditorController">
    <children>
       <Button layoutX="10.0" layoutY="361.0" mnemonicParsing="false" onAction="#dash" text="Dashboard" />
       <TextField fx:id="commandToEdit" layoutX="302.0" layoutY="44.0" />
@@ -84,6 +84,5 @@
       <TextArea fx:id="newCommandMessage" layoutX="409.0" layoutY="269.0" prefHeight="82.0" prefWidth="174.0" wrapText="true" />
       <Button layoutX="20.0" layoutY="200.0" mnemonicParsing="false" onAction="#repeatCommandManager" prefHeight="27.0" prefWidth="174.0" text="Repeating Commands" textAlignment="CENTER" wrapText="true" />
       <Label fx:id="deleteConfirmText" layoutX="442.0" layoutY="71.0" prefHeight="50.0" prefWidth="149.0" textAlignment="CENTER" textFill="RED" wrapText="true" />
-      <Button layoutX="517.0" layoutY="241.0" mnemonicParsing="false" onAction="#clearNewCommand" text="Clear New" />
    </children>
 </AnchorPane>

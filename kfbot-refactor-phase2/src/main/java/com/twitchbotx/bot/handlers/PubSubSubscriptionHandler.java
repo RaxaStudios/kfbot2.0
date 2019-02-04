@@ -16,7 +16,7 @@ import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.client.TwitchMessenger;
-import com.twitchbotx.gui.controllers.DashboardController;
+import com.twitchbotx.gui.DashboardController;
 import com.twitchbotx.gui.guiHandler;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -227,8 +227,8 @@ public class PubSubSubscriptionHandler {
                             }
                             sendEvent(displayName, msg, subTier, months);
 
-                            MarathonHandler mh = new MarathonHandler(store);
-                            //mh.addSub(subPoints);
+                            MarathonHandler mh = new MarathonHandler(store, outstream);
+                            mh.addSub(subPoints);
                             System.out.println("months" + months + " subPlan:" + subPlan + " points: " + points);
                         }
                     } else if (root.get("type").asText().contains("PONG")) {
@@ -274,13 +274,13 @@ public class PubSubSubscriptionHandler {
         }
 
         public void addDonationWarItem(String msg, int points) {
-            CountHandler dw = new CountHandler(store);
+            CountHandler dw = new CountHandler(store, outstream);
             //dw.addDonationPoints(msg, points);
         }
 
         public void addSubSQLPoints(String msg, int points) {
             //parse for #game, send with points to sqlHandler.java
-            sqlHandler sql = new sqlHandler(store);
+            sqlHandler sql = new sqlHandler(store, outstream);
             sql.gameSearch(msg, points);
         }
 

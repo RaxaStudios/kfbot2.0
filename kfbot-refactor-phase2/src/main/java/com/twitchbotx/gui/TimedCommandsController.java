@@ -3,14 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.twitchbotx.gui.controllers;
+package com.twitchbotx.gui;
 
 import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.TimerManagement;
 import com.twitchbotx.bot.XmlDatastore;
-import com.twitchbotx.gui.ScreensController;
-import com.twitchbotx.gui.guiHandler;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;

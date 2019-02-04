@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.twitchbotx.bot.handlers;
+package com.twitchbotx.gui;
 
 /**
  *
  * @author Raxa
  */
-public interface ModerationListener {
-    void needUpdate();
+public interface ControlledScreen {
+    public void setScreenParent(ScreensController screenPage);
 }

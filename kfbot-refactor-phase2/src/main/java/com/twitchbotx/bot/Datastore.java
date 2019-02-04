@@ -24,14 +24,6 @@ public interface Datastore {
     List<ConfigParameters.Command> getCommands();
 
     /**
-     * This method is used to get a list of features.
-     *
-     * @return
-     * A list of features
-     */
-    List<ConfigParameters.Replies> getReplies();
-    List<ConfigParameters.Alerts> getAlerts();
-    /**
      * This method is used to get a list of editors.
      *
      * @return
@@ -169,12 +161,22 @@ public interface Datastore {
      * False - A filter already exist and could not be added.
      */
     boolean addFilter(final ConfigParameters.Filter filter);
+
+    
     boolean updateFilter(final ConfigParameters.Filter filter);
+    
+    /**
+     * This method deletes an existing filter. If a filter does not exist, simply fail and do nothing.
+     *
+     * @param filterName
+     * The name of the filter to delete
+     *
+     * @return
+     * True - A filter was deleted.
+     * False - The filter was not false.
+     */
     boolean deleteFilter(final String filterName);
-    // Regex section
-    boolean addRegex(final ConfigParameters.FilterRegex regex);
-    boolean updateRegex(ConfigParameters.FilterRegex regex, String attribute);
-    boolean deleteRegex(String regexName);
+
 
     /**
      * This method updates the cooldown timer.
@@ -210,13 +212,6 @@ public interface Datastore {
                                     final String value,
                                     final boolean allowReservedCmds);
 
-    /**
-     * Use to update the values of alerts
-     * 
-     * attributes: enabled, initialDelay, interval, name, text1, text2
-     * 
-     */
-    boolean setAlertAttribute(String name, String attribute, String value);
     /**
      * This method will commit all changes to the database.
      */

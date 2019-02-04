@@ -61,14 +61,6 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </Label>
-      <Button layoutX="31.0" layoutY="298.0" mnemonicParsing="false" onAction="#goSubEditor" text="Event Response Editor" />
-      <Label layoutX="31.0" layoutY="210.0" prefHeight="74.0" prefWidth="181.0" style="-fx-border-color: grey;" />
-      <Label layoutX="35.0" layoutY="239.0" text="Event Response:" />
-      <RadioButton fx:id="subEnabled" layoutX="131.0" layoutY="222.0" mnemonicParsing="false" text="Enabled">
-         <toggleGroup>
-            <ToggleGroup fx:id="sub" />
-         </toggleGroup>
-      </RadioButton>
-      <RadioButton fx:id="subDisabled" layoutX="130.0" layoutY="256.0" mnemonicParsing="false" text="Disabled" toggleGroup="$sub" />
+      <Button layoutX="31.0" layoutY="252.0" mnemonicParsing="false" onAction="#goResponseEditor" text="Event Response Editor" />
    </children>
 </AnchorPane>

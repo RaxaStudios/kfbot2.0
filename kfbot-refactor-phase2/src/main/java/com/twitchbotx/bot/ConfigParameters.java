@@ -26,16 +26,6 @@ public final class ConfigParameters {
         public Document doc;
 
         public Element configNode;
-        
-        public Element featureNode;
-        
-        public Element replies;
-        
-        public NodeList replyNodes;
-        
-        public Element alerts;
-        
-        public NodeList alertNodes;
 
         public Element editors;
 
@@ -86,8 +76,6 @@ public final class ConfigParameters {
         public String streamerStatus;
 
         public String followage;
-        
-        public String channelInfo;
 
         public String youtubeApi;
 
@@ -96,10 +84,6 @@ public final class ConfigParameters {
         public String sqlURL;
 
         public String sqlMURL;
-        
-        public String sqlOverlay;
-        
-        public String sqlCounter;
 
         public String sqlUser;
 
@@ -146,16 +130,9 @@ public final class ConfigParameters {
         public String subMassGiftReply;
         public String subNewNormalReply;
         public String subNewPrimeReply;
-        public String bitReply;
-        public String bitMessage;
-        public String bitReplyMin;
-        public String raidReply;
-        public String raidMessage;
-        public String raidReplyMin;
 
         public String pyramidResponse;
-        public String currentCount;
-        public String countText;
+
         public String pings;
 
         @Override
@@ -170,7 +147,6 @@ public final class ConfigParameters {
                     + ", pubSub='" + pubSub + '\''
                     + ", streamerStatus='" + streamerStatus + '\''
                     + ", followage='" + followage + '\''
-                    + ", channelInfo=" + channelInfo + '\''
                     + ", youtubeApi='" + youtubeApi + '\''
                     + ", youtubeTitle='" + youtubeTitle + '\''
                     + ", onlineCheckTimer=" + onlineCheckTimer
@@ -178,8 +154,6 @@ public final class ConfigParameters {
                     + ", numCounters=" + numCounters
                     + ", sqlURL=" + sqlURL
                     + ", sqlMURL=" + sqlMURL
-                    + ", sqlOverlay=" + sqlOverlay
-                    + ", sqlCounter=" + sqlCounter
                     + ", sqlUser=" + sqlUser
                     + ", sqlPass=" + sqlPass
                     + ", channelID=" + channelID
@@ -202,59 +176,11 @@ public final class ConfigParameters {
                     + ", subNewPrimeReply=" + subNewPrimeReply
                     + ", subSingleGiftReply=" + subSingleGiftReply
                     + ", subMassGiftReply=" + subMassGiftReply
-                    + ", bitReply=" + bitReply
-                    + ", bitMessage=" + bitMessage
-                    + ", bitReplyMin=" + bitReplyMin
-                    + ", raidReply=" + raidReply
-                    + ", raidMessage=" + raidMessage
-                    + ", raidReplyMin=" + raidReplyMin
                     + ", pyramidResponse='" + pyramidResponse + '\''
-                    + ", currentCount='" + currentCount + '\''
-                    + ", countText='" + countText + '\''
                     + '}';
         }
     }
 
-    /**
-     * Container for sub/bit/raid replies and social media alerts
-     * expandable for future use
-     */
-    public final static class Replies {
-        public String name;
-        public String text;
-        public String type;
-        @Override
-        public String toString() {
-            return "Reply{"
-                    + "name='" + name + "\'"
-                    + ", text='" + text + "\'"
-                    + ", type='" + type + "\'"
-                    + "}";
-        }
-    }
-    public final static class Alerts {
-        public String name;
-        public boolean enabled;
-        public int interval;
-        public int initialDelay;
-        public String text1;
-        public String text2;
-        public String textContent;
-        
-        @Override
-        public String toString() {
-            return "Alert{"
-                    + "name='" + name + '\''
-                    + ", enabled='" + enabled + '\''
-                    + ", interval='" + interval + '\''
-                    + ", initialDelay='" + initialDelay + '\''
-                    + ", text1='" + text1 + '\''
-                    + ", text2='" + text2 + '\''
-                    + ", textContent='" + textContent + '\''
-                    + '}';
-        }
-    }
-    
     /*
      * Represent editor levels
      * per user basis
@@ -270,7 +196,7 @@ public final class ConfigParameters {
         public String toString() {
             return "Editor{"
                     + "username='" + username + '\''
-                    + ", level='" + level + '\''
+                    + ", level=" + level
                     + '}';
         }
     }
@@ -282,8 +208,6 @@ public final class ConfigParameters {
 
         // A long string that signifies who has the credentials to use this command
         public String auth;
-        // Integer system to help with future admin/editor roles
-        public int authLvl;
 
         // A command name
         public String name;
@@ -315,7 +239,6 @@ public final class ConfigParameters {
         @Override
         public String toString() {
             return "Command{"
-                    + "authLvl=" + authLvl +'\''
                     + "auth='" + auth + '\''
                     + ", name='" + name + '\''
                     + ", cdUntil='" + cdUntil + '\''
@@ -397,8 +320,6 @@ public final class ConfigParameters {
 
     public final static class FilterRegex {
 
-        public String name;
-        
         public boolean enabled;
 
         public String content;
@@ -410,7 +331,6 @@ public final class ConfigParameters {
         @Override
         public String toString() {
             return "FilterRegex{"
-                    + "name-'" + name + '\''
                     + "enabled='" + enabled + '\''
                     + ", content='" + content + '\''
                     + ", reason='" + reason + '\''
@@ -454,13 +374,6 @@ public final class ConfigParameters {
         LOGGER.info("Completed reading the XML file");
 
         elements.configNode = (Element) elements.doc.getElementsByTagName("config").item(0);
-        
-        elements.featureNode = (Element) elements.doc.getElementsByTagName("features").item(0);
-        elements.replies = (Element) elements.doc.getElementsByTagName("replies").item(0);
-        elements.replyNodes = elements.replies.getElementsByTagName("reply");
-        elements.alerts = (Element) elements.doc.getElementsByTagName("alerts").item(0);
-        elements.alertNodes = elements.alerts.getElementsByTagName("socialText");
-        
         elements.editors = (Element) elements.doc.getElementsByTagName("editors").item(0);
         elements.editorNodes = elements.editors.getElementsByTagName("editor");
         elements.commands = (Element) elements.doc.getElementsByTagName("commands").item(0);

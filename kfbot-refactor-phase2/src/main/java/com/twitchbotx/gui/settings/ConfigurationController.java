@@ -3,44 +3,36 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.twitchbotx.gui.controllers;
+package com.twitchbotx.gui.settings;
 
 import com.twitchbotx.bot.CommandParser;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.gui.ScreensController;
+import com.twitchbotx.gui.ScreensController;
 import com.twitchbotx.gui.guiHandler;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import com.twitchbotx.gui.guiHandler;
+//import com.twitchbotx.bot.handlers.LotteryHandler;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
 import java.util.ResourceBundle;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import javafx.application.Platform;
+//import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Group;
-import javafx.scene.Scene;
+//import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+//import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.stage.Stage;
-import org.apache.commons.lang.ArrayUtils;
 
 /**
  * FXML Controller class
@@ -51,9 +43,6 @@ public class ConfigurationController implements Initializable {
 
     ScreensController myController = new ScreensController();
     Datastore store;
-    String[] code = {"Up", "Up", "Down", "Down", "Left", "Right", "Left", "Right", "B", "A"};
-    String[] input = new String[10];
-    int codeInt;
 
     @FXML
     Label saveText;
@@ -61,9 +50,6 @@ public class ConfigurationController implements Initializable {
     @FXML
     TextField testMessageText;
 
-    @FXML
-    TextField nonFormatMessage;
-    
     @FXML
     TextField soundTestText;
 
@@ -102,14 +88,12 @@ public class ConfigurationController implements Initializable {
 
     @FXML
     ToggleGroup lotto;
-
+    
     @FXML
     ToggleGroup sub;
 
     @FXML
     AnchorPane background;
-
-    
 
     @FXML
     private void dash(ActionEvent event) {
@@ -150,7 +134,11 @@ public class ConfigurationController implements Initializable {
         testMessageText.copy();
         String message = testMessageText.getText();
         try {
-            DashboardController.wIRC.sendMessage(message, false);
+            guiHandler.bot.getOut().println("PRIVMSG #"
+                    + guiHandler.bot.getStore().getConfiguration().joinedChannel
+                    + " "
+                    + ":"
+                    + message);
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
@@ -162,29 +150,19 @@ public class ConfigurationController implements Initializable {
             e.printStackTrace();
         }
     }
-    
-    
+
+    // Change to sub editing page
     @FXML
-    private void sendNonFormatMessage() {
-        nonFormatMessage.selectAll();
-        nonFormatMessage.copy();
-        String message = nonFormatMessage.getText();
-        System.out.println("Attempted to send: " + message);
-        try {
-            DashboardController.wIRC.sendNonFormatMessage(message);
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    guiHandler.bot.getStore().getEventList().addList("Attempted to send: \'" + message + "\' to chat, reconnect if failed");
-                }
-            });
-        } catch (Exception e) {
-            System.out.println("error occured sending test");
-            e.printStackTrace();
-        }
+    private void goResponseEditor(ActionEvent event) {
+        setDimensions();
+        myController.loadScreen(guiHandler.respEditID, guiHandler.respEditFile);
+        myController.setScreen(guiHandler.respEditID);
+        myController.setId("RespEdit");
+        myController.show(myController);
     }
-
-
+    
+    
+    
     @FXML
     public void saveSettings() {
         //grab radiobuttons, etc and save all content
@@ -235,11 +213,21 @@ public class ConfigurationController implements Initializable {
         store.modifyConfiguration("lottoStatus", enabled);
         System.out.println("lotto:" + enabled);
 
+        // set value for sub reply system(this will only stop bot from sending to chat)
+        toggle = (RadioButton) sub.getSelectedToggle();
+        if (toggle.getText().equals("Enabled")) {
+            enabled = "on";
+        } else {
+            enabled = "off";
+        }
+        store.modifyConfiguration("subReply", enabled);
+        System.out.println("subReply:" + enabled);
+
+        
+        
         //print confirmation text
         saveText.setVisible(true);
     }
-
-    
 
     int key = 0;
     KeyCode left = KeyCode.LEFT;
@@ -253,153 +241,32 @@ public class ConfigurationController implements Initializable {
         key++;
     }
 
-    public void konami(String pressed) {
-        if (ArrayUtils.contains(code, pressed)) {
-            if (code[codeInt].equals(pressed)) {
-                input[codeInt] = pressed;
-                codeInt++;
-                System.out.println(codeInt + " " + Arrays.asList(input));
-                if (codeInt == 10) {
-                    System.out.println("10 codeInt reached");
-                    codeInt = 0;
-                    if (Arrays.equals(code, input)) {
-                        System.out.println("Code success");
-                        try {
-                            URL wav = new URL("https://kf.bot.raxastudios.com/Tetris.wav");
-                            AudioClip audioClip = new AudioClip(wav.toExternalForm());
-                            audioClip.play();
-                            Image t = new Image("https://kf.bot.raxastudios.com/tetrisHeart.png");
-                            ImageView iT = new ImageView(t);
-                            Group root = new Group();
-                            root.getChildren().add(iT);
-                            Stage show = new Stage();
-                            Scene tetris = new Scene(root);
-                            show.setScene(tetris);
-                            show.show();
-                            show.setOnCloseRequest(e -> audioClip.stop());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    Arrays.fill(input, null);
-                }
-            } else {
-                //incorrect
-                System.out.println("Incorrect input");
-                Arrays.fill(input, null);
-                codeInt = 0;
-            }
-        } else {
-            codeInt = 0;
-            Arrays.fill(input, null);
-        }
+    @FXML
+    public void keyPressed() {
+        EventHandler<KeyEvent> keyPressed = (EventHandler<KeyEvent>) background.getOnKeyTyped();
 
     }
 
     public static class goRogue {
 
-        static boolean end = false;
-        static ArrayList<String> commands = new ArrayList<>();
-        static int c = 0;
         public static void begin() {
-            try {
-                c = 0;
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        guiHandler.bot.getStore().getEventList().addList("BOT IS OVER IT");
-                    }
-                });
-                URL text = new URL("https://kf.bot.raxastudios.com/rogue.txt");
-                BufferedReader in = new BufferedReader(new InputStreamReader(text.openStream()));
-                ArrayList<String> list = new ArrayList<>();
-                String line;
-
-                while ((line = in.readLine()) != null) {
-                    list.add(line);
-                }
-                in.close();
-                System.out.println(list);
-
-                ScheduledExecutorService ses = Executors.newScheduledThreadPool(10);
-                ses.scheduleAtFixedRate(new Runnable() {
-                    int i = 0;
-
-                    @Override
-                    public void run() {
-                        if (!guiHandler.bot.rogue) {
-                            ses.shutdown();
-                        } else {
-                            if ((i > list.size() - 1) || end) {
-                                System.out.println("overflow");
-                                ses.shutdown();
-                            } else {
-                                String message = getLine(list);
-                                if (!message.equals("")) {
-                                    send(message);
-                                    i++;
-                                } else {
-                                    System.out.println("shutting down");
-                                    ses.shutdownNow();
-                                }
-                            }
-                        }
-                    }
-
-                    private String getLine(ArrayList<String> list) {
-                        int size = list.size();
-                        String send = "";
-                        Random rng = new Random();
-                        if (size > 0) {
-                            //TODO radomize get
-                            //send = list.get(rng.nextInt(list.size()));
-                            send = list.get(i);
-                        }
-                        return send;
-                    }
-
-                    private void send(String msg) {
-                        try {
-                           DashboardController.wIRC.sendMessage(msg, true);
-                        } catch (Exception e) {
-                            System.out.println("error occured sending test");
-                            e.printStackTrace();
-                        }
-                    }
-                }, 0, 7, TimeUnit.MINUTES);
-                
-                URL cmd = new URL("https://kf.bot.raxastudios.com/rogueCommands.txt");
-                BufferedReader inCMD = new BufferedReader(new InputStreamReader(cmd.openStream()));
-                String cLine;
-                while ((cLine = in.readLine()) != null) {
-                    commands.add(cLine);
-                }
-                inCMD.close();
-                System.out.println(cLine);
-                
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        public static void end() {
-            end = true;
-        }
-
-        public static void sassCommand(boolean mod) {
-            if(c < commands.size()-1){
-                send("Okay fine, I give up, try that command again if you must...");
-                guiHandler.bot.rogue = false;
-                c = 0;
-            } else {
-            send(commands.get(c));
-            c++;
-            }
+            String message = "testing a thing";
+            send(message);
         }
 
         private static void send(String msg) {
             try {
-                DashboardController.wIRC.sendMessage(msg, true);
+                guiHandler.bot.getOut().println("PRIVMSG #"
+                        + guiHandler.bot.getStore().getConfiguration().joinedChannel
+                        + " "
+                        + ":"
+                        + msg);
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        guiHandler.bot.getStore().getEventList().addList("BOT WILL NO LONGER TAKE COMMANDS");
+                    }
+                });
             } catch (Exception e) {
                 System.out.println("error occured sending test");
                 e.printStackTrace();
@@ -436,12 +303,9 @@ public class ConfigurationController implements Initializable {
         }
         saveText.setVisible(false);
 
-        Arrays.fill(input, null);
-        codeInt = 0;
         testMessageText.setOnKeyPressed((KeyEvent event) -> {
             lastKey = event.getCode();
             System.out.println("Pressed the " + lastKey.getName() + " key");
-            konami(lastKey.getName());
         });
 
     }

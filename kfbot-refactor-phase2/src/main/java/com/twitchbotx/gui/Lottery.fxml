@@ -4,106 +4,44 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.controllers.LotteryController">
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.LotteryController">
    <children>
-      <TabPane prefHeight="402.0" prefWidth="603.0" tabClosingPolicy="UNAVAILABLE">
-        <tabs>
-          <Tab text="Regular Lottery">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <RadioButton fx:id="subRadioButton" layoutX="299.0" layoutY="313.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="98.0" text="Sub Only" />
-                        <Button layoutX="60.0" layoutY="339.0" mnemonicParsing="false" onAction="#showQueue" prefHeight="25.0" prefWidth="115.0" text="Show/Update" />
-                        <ScrollPane fx:id="queueList" layoutX="14.0" layoutY="27.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="306.0" prefWidth="232.0" />
-                        <Label layoutX="47.0" layoutY="2.0" prefHeight="25.0" prefWidth="108.0" text="Current Queue" textAlignment="JUSTIFY">
-                           <font>
-                              <Font name="System Bold" size="14.0" />
-                           </font>
-                        </Label>
-                        <Button layoutX="256.0" layoutY="77.0" mnemonicParsing="false" onAction="#clearQueue" prefHeight="25.0" prefWidth="108.0" text="Clear Queue" />
-                        <Button layoutX="283.0" layoutY="36.0" mnemonicParsing="false" onAction="#closeQueue" prefHeight="25.0" prefWidth="55.0" text="Close" />
-                        <Button fx:id="addUserButton" layoutX="487.0" layoutY="159.0" mnemonicParsing="false" onAction="#addUser" prefHeight="25.0" prefWidth="75.0" text="Add User" />
-                        <TextField fx:id="addUserTextField" layoutX="272.0" layoutY="158.0" style="-fx-border-color: grey;" />
-                        <Button fx:id="popButton" layoutX="461.0" layoutY="209.0" mnemonicParsing="false" onAction="#popUser" prefHeight="25.0" prefWidth="108.0" text="Draw Winner" />
-                        <Label alignment="CENTER" layoutX="324.0" layoutY="184.0" prefHeight="25.0" prefWidth="46.0" text="Winner" textAlignment="RIGHT" wrapText="true" />
-                        <Label alignment="CENTER" contentDisplay="CENTER" layoutX="310.0" layoutY="137.0" prefHeight="17.0" prefWidth="74.0" text="Username" />
-                        <Button layoutX="461.0" layoutY="270.0" mnemonicParsing="false" onAction="#openQueue" prefHeight="25.0" prefWidth="108.0" text="Open Lottery" />
-                        <Label alignment="CENTER" layoutX="324.0" layoutY="245.0" text="Keyword" />
-                        <Label layoutX="334.0" layoutY="296.0" text="Auth" />
-                        <TextField fx:id="keywordText" layoutX="272.0" layoutY="269.0" prefHeight="27.0" prefWidth="151.0" style="-fx-border-color: grey;" />
-                        <Label fx:id="qStatus" alignment="CENTER" layoutX="384.0" layoutY="73.0" prefHeight="58.0" prefWidth="186.0" style="-fx-border-color: grey; -fx-background-color: white;" wrapText="true" />
-                        <Label alignment="CENTER" layoutX="449.0" layoutY="18.0" text="Lotto Status" underline="true">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="winnerText" alignment="CENTER" layoutX="272.0" layoutY="209.0" prefHeight="25.0" prefWidth="151.0" style="-fx-border-color: grey; -fx-background-color: white;" />
-                        <RadioButton fx:id="lottoEnabled" layoutX="391.0" layoutY="49.0" mnemonicParsing="false" text="Enabled">
-                           <toggleGroup>
-                              <ToggleGroup fx:id="lottoGroup" />
-                           </toggleGroup>
-                        </RadioButton>
-                        <RadioButton fx:id="lottoDisabled" layoutX="482.0" layoutY="49.0" mnemonicParsing="false" text="Disabled" toggleGroup="$lottoGroup" />
-                     </children>
-                  </AnchorPane>
-            </content>
-          </Tab>
-          <Tab text="Song Lottery">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <ScrollPane fx:id="songQueueList" layoutX="348.0" layoutY="43.0" prefHeight="288.0" prefWidth="248.0" />
-                        <Button layoutX="242.0" layoutY="281.0" mnemonicParsing="false" onAction="#drawSongWinner" text="Draw Winner" />
-                        <Label alignment="CENTER" layoutX="138.0" layoutY="251.0" text="Winner" />
-                        <Label alignment="CENTER" layoutX="8.0" layoutY="285.0" text="Username" />
-                        <Label alignment="CENTER" layoutX="4.0" layoutY="326.0" text="Song Name" />
-                        <TextField fx:id="usernameSong" layoutX="82.0" layoutY="173.0" style="-fx-border-color: grey;" />
-                        <TextField fx:id="songName" layoutX="82.0" layoutY="209.0" prefHeight="27.0" prefWidth="151.0" style="-fx-border-color: grey;" />
-                        <Button layoutX="252.0" layoutY="188.0" mnemonicParsing="false" onAction="#addSongUser" text="Add User" />
-                        <Button layoutX="486.0" layoutY="334.0" mnemonicParsing="false" onAction="#showSongQueue" prefHeight="25.0" prefWidth="110.0" text="Show/Update" />
-                        <Label layoutX="69.0" layoutY="4.0" text="Song Lotto Status" underline="true">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="songStatusWindow" alignment="CENTER" contentDisplay="CENTER" layoutX="29.0" layoutY="59.0" prefHeight="89.0" prefWidth="190.0" style="-fx-border-color: grey; -fx-background-color: white;" wrapText="true" />
-                        <Label fx:id="songWinnerName" alignment="CENTER" contentDisplay="CENTER" layoutX="82.0" layoutY="279.0" prefHeight="27.0" prefWidth="151.0" style="-fx-background-color: white; -fx-border-color: grey;" />
-                        <Button layoutX="241.0" layoutY="59.0" mnemonicParsing="false" onAction="#openSongLotto" text="Open Lottery" />
-                        <Button layoutX="348.0" layoutY="334.0" mnemonicParsing="false" onAction="#clearSongQueue" text="Clear Queue" />
-                        <Label layoutX="421.0" layoutY="13.0" text="Current Queue">
-                           <font>
-                              <Font name="System Bold" size="14.0" />
-                           </font>
-                        </Label>
-                        <Button layoutX="241.0" layoutY="123.0" mnemonicParsing="false" onAction="#closeSongLotto" text="Close Lottery" />
-                        <Label layoutX="4.0" layoutY="214.0" text="Song Name" />
-                        <Label layoutX="8.0" layoutY="178.0" text="Username" />
-                        <Label layoutX="133.0" layoutY="149.0" text="Add User" />
-                        <Label fx:id="winnerSong" alignment="CENTER" contentDisplay="CENTER" layoutX="82.0" layoutY="321.0" prefHeight="27.0" prefWidth="151.0" style="-fx-background-color: white; -fx-border-color: grey;" textAlignment="CENTER" />
-                        <RadioButton fx:id="songEnabled" layoutX="26.0" layoutY="35.0" mnemonicParsing="false" text="Enabled">
-                           <toggleGroup>
-                              <ToggleGroup fx:id="songLottoGroup" />
-                           </toggleGroup>
-                        </RadioButton>
-                        <RadioButton fx:id="songDisabled" layoutX="134.0" layoutY="35.0" mnemonicParsing="false" text="Disabled" toggleGroup="$songLottoGroup" />
-                     </children>
-                  </AnchorPane>
-            </content>
-          </Tab>
-        </tabs>
-      </TabPane>
-      <Label layoutX="450.0" layoutY="-8.0" prefHeight="45.0" prefWidth="142.0" text="Lottery Manager" wrapText="true">
+      <Button layoutX="404.0" layoutY="355.0" mnemonicParsing="false" onAction="#showQueue" prefHeight="25.0" prefWidth="115.0" text="Show/Update" />
+      <ScrollPane fx:id="queueList" layoutX="345.0" layoutY="41.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="306.0" prefWidth="232.0" />
+      <Label layoutX="407.0" layoutY="5.0" prefHeight="25.0" prefWidth="108.0" text="Current Queue" textAlignment="JUSTIFY">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Button layoutX="221.0" layoutY="88.0" mnemonicParsing="false" onAction="#clearQueue" prefHeight="25.0" prefWidth="108.0" text="Clear Queue" />
+      <Button layoutX="246.0" layoutY="47.0" mnemonicParsing="false" onAction="#closeQueue" prefHeight="25.0" prefWidth="55.0" text="Close" />
+      <Button layoutX="68.0" layoutY="355.0" mnemonicParsing="false" onAction="#goToDashboard" text="Dashboard" />
+      <Label layoutX="197.0" layoutY="-7.0" prefHeight="50.0" prefWidth="142.0" text="Lottery Manager" wrapText="true">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <Button layoutX="351.0" layoutY="1.0" mnemonicParsing="false" onAction="#goToDashboard" text="Dashboard" />
+      <Button fx:id="addUserButton" layoutX="236.0" layoutY="161.0" mnemonicParsing="false" onAction="#addUser" prefHeight="25.0" prefWidth="75.0" text="Add User" />
+      <TextField fx:id="addUserTextField" layoutX="31.0" layoutY="160.0" style="-fx-border-color: grey;" />
+      <Button fx:id="popButton" layoutX="219.0" layoutY="221.0" mnemonicParsing="false" onAction="#popUser" prefHeight="25.0" prefWidth="108.0" text="Draw Winner" />
+      <Label alignment="CENTER" layoutX="86.0" layoutY="200.0" prefHeight="25.0" prefWidth="46.0" text="Winner" textAlignment="RIGHT" wrapText="true" />
+      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="72.0" layoutY="139.0" prefHeight="17.0" prefWidth="74.0" text="Username" />
+      <Button layoutX="221.0" layoutY="288.0" mnemonicParsing="false" onAction="#openQueue" prefHeight="25.0" prefWidth="108.0" text="Open Lottery" />
+      <Label fx:id="winnerText" alignment="CENTER" layoutX="31.0" layoutY="221.0" prefHeight="25.0" prefWidth="151.0" style="-fx-border-color: grey; -fx-background-color: white;" />
+      <Label alignment="CENTER" layoutX="83.0" layoutY="258.0" text="Keyword" />
+      <Label layoutX="79.0" layoutY="300.0" text="Auth" />
+      <TextField fx:id="keywordText" layoutX="34.0" layoutY="275.0" prefHeight="27.0" prefWidth="151.0" style="-fx-border-color: grey;" />
+      <RadioButton fx:id="subRadioButton" layoutX="57.0" layoutY="317.0" mnemonicParsing="false" text="Sub Only" />
+      <Label fx:id="qStatus" alignment="CENTER" layoutX="20.0" layoutY="59.0" prefHeight="58.0" prefWidth="186.0" style="-fx-border-color: grey; -fx-background-color: white;" wrapText="true" />
+      <Label alignment="CENTER" layoutX="72.0" layoutY="31.0" text="Lotto Status" underline="true">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Button layoutX="227.0" layoutY="355.0" mnemonicParsing="false" onAction="#songLotto" prefHeight="25.0" prefWidth="108.0" text="Song Lottery" />
    </children>
 </AnchorPane>

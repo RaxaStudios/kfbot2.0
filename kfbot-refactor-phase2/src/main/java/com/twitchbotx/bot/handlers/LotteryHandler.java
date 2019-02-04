@@ -7,7 +7,6 @@ package com.twitchbotx.bot.handlers;
 
 import com.twitchbotx.bot.CommandParser;
 import com.twitchbotx.bot.Datastore;
-import com.twitchbotx.gui.controllers.DashboardController;
 //import com.twitchbotx.gui.LotteryController;
 import com.twitchbotx.gui.guiHandler;
 import java.io.FileInputStream;
@@ -52,7 +51,7 @@ public class LotteryHandler {
         @GuardedBy("this")
         private final Random RNG = new Random();
         @GuardedBy("this")
-        private LinkedHashMap<String, Entrant<Integer, String>> MAP = new LinkedHashMap<>();
+        private final LinkedHashMap<String, Entrant<Integer, String>> MAP = new LinkedHashMap<>();
         @GuardedBy("this")
         private int size = MAP.size();
         @GuardedBy("this")
@@ -70,21 +69,6 @@ public class LotteryHandler {
 
         public synchronized LinkedHashMap<String, Entrant<Integer, String>> getMap() {
             return this.MAP;
-        }
-
-        public synchronized void setMap(LinkedHashMap<String, Entrant<Integer, String>> map) {
-            this.MAP = map;
-            writeMap(MAP);
-        }
-
-        public synchronized void writeMap(LinkedHashMap<String, Entrant<Integer, String>> map) {
-            try {
-                FileOutputStream fout = new FileOutputStream("Lottery.map");
-                ObjectOutputStream oos = new ObjectOutputStream(fout);
-                oos.writeObject(map);
-            } catch (IOException ie) {
-                sendEvent("Error occurred trying to write lottery to file");
-            }
         }
 
         public synchronized List<String> getCurr() {
@@ -225,57 +209,29 @@ public class LotteryHandler {
             return lottoOn;
         }
 
-        public synchronized void lottoEnable() {
+        public synchronized void lottoEnable(){
             lottoOn = true;
             guiHandler.bot.getStore().modifyConfiguration("lottoStatus", "on");
         }
-
-        public synchronized void lottoDisable() {
+    
+        public synchronized void lottoDisable(){
             lottoOn = false;
             guiHandler.bot.getStore().modifyConfiguration("lottoStatus", "off");
         }
-
+        
         public synchronized String getLottoName() {
             return keyword;
         }
 
-        private void sendMessage(final String msg) {
-            DashboardController.wIRC.sendMessage(msg, true);
-        }
-
-        private void sendEvent(final String msg) {
-            String event = msg;
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    guiHandler.bot.getStore().getEventList().addList(event);
-                }
-            });
-        }
-
-        public synchronized LinkedHashMap<String, Entrant<Integer, String>> getMapFromFile() {
-            try {
-                Path location = Paths.get("");
-                Path lResolved = location.resolve("Lottery.map");
-                //System.out.println(lResolved.toAbsolutePath());
-                FileInputStream fin = new FileInputStream(lResolved.toString());
-                ObjectInputStream ois = new ObjectInputStream(fin);
-                LinkedHashMap<String, Entrant<Integer, String>> m1 = (LinkedHashMap<String, Entrant<Integer, String>>) ois.readObject();
-                m1.entrySet().forEach((m) -> {
-                    currPool.add(m.getKey());
-                });
-                setMap(m1);
-                System.out.println("Successfully set regular lottery from file");
-                sendEvent("Successfully set regular lottery from file");
-                //printMap();
-                return m1;
-            } catch (IOException ie) {
-                sendEvent("Map lottery file not found");
-                ie.printStackTrace();
-            } catch (Exception e) {
-                sendEvent("Error occurred trying to get existing regular lottery");
+        private void sendMessage(String msg) {
+            final String message = "/me > " + msg;
+            if (!message.equals("/me > ")) {
+                guiHandler.bot.getOut().println("PRIVMSG #"
+                        + guiHandler.bot.getStore().getConfiguration().joinedChannel
+                        + " "
+                        + ":"
+                        + message);
             }
-            return null;
         }
 
     }
@@ -415,19 +371,20 @@ public class LotteryHandler {
                 sendMessage("@" + displayName + ", that song has already been played today, please choose a new song!");
                 return false;
             } else {
-                // temporarily disallow users to enter until song system is reset
-                if (prevWinner.contains(user)) {
-                    sendMessage(displayName + ", limit is 1 win per stream");
-                    return false;
-                    /*sendMessage(displayName + " re-added with song: " + songListName);
-                ticketValue = 1;*/
-                } else {
-                    sendMessage(displayName + " added with song: " + songListName);
-                    currPool.add(user);
-                    currAdded.add(songListName);
-                }
+                currPool.add(user);
+                currAdded.add(songListName);
             }
             int ticketValue = 2;
+
+            // temporarily disallow users to enter until song system is reset
+            if (prevWinner.contains(user)) {
+                sendMessage(displayName + ", limit is 1 win per stream");
+                return false;
+                /*sendMessage(displayName + " re-added with song: " + songListName);
+                ticketValue = 1;*/
+            } else {
+                sendMessage(displayName + " added with song: " + songListName);
+            }
 
             MAP.put(user, new Entrant(songListName));
             MAP.get(user).addTicket(ticketValue);
@@ -444,7 +401,7 @@ public class LotteryHandler {
             MAP.remove(user);
             //prevWinner.add(user);
             currPool.remove(user);
-
+            
             writeMap(MAP);
             sendMessage(user + " removed the song lottery");
         }
@@ -499,16 +456,16 @@ public class LotteryHandler {
             sendMessage("A lottery for !jd has opened, type '!song [song number]' to enter!");
         }
 
-        public synchronized void songEnable() {
+        public synchronized void songEnable(){
             songsOn = true;
             guiHandler.bot.getStore().modifyConfiguration("songLottoStatus", "on");
         }
-
-        public synchronized void songDisable() {
+    
+        public synchronized void songDisable(){
             songsOn = false;
             guiHandler.bot.getStore().modifyConfiguration("songLottoStatus", "off");
         }
-
+        
         public synchronized void songReset() {
             MAP.clear();
             writeMap(MAP);
@@ -531,7 +488,14 @@ public class LotteryHandler {
         }
 
         private void sendMessage(final String msg) {
-            DashboardController.wIRC.sendMessage(msg, true);
+            final String message = "/me > " + msg;
+            if (!message.equals("/me > ")) {
+                guiHandler.bot.getOut().println("PRIVMSG #"
+                        + guiHandler.bot.getStore().getConfiguration().joinedChannel
+                        + " "
+                        + ":"
+                        + message);
+            }
         }
 
         private void sendEvent(final String msg) {
@@ -592,7 +556,14 @@ public class LotteryHandler {
      * @param msg The message to be sent out to the channel
      */
     private void sendMessage(final String msg) {
-        DashboardController.wIRC.sendMessage(msg, true);
+        final String message = "/me > " + msg;
+        if (!message.equals("/me > ")) {
+            guiHandler.bot.getOut().println("PRIVMSG #"
+                    + store.getConfiguration().joinedChannel
+                    + " "
+                    + ":"
+                    + message);
+        }
     }
 
 }
