@@ -3,10 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.twitchbotx.gui;
+package com.twitchbotx.gui.controllers;
 
 import com.twitchbotx.bot.CommandParser;
 import com.twitchbotx.bot.handlers.LotteryHandler;
+import com.twitchbotx.gui.ScreensController;
+import com.twitchbotx.gui.guiHandler;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

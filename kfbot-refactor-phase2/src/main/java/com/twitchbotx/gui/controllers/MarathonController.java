@@ -3,11 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.twitchbotx.gui;
+package com.twitchbotx.gui.controllers;
 
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.handlers.MarathonHandler;
 import com.twitchbotx.bot.handlers.sqlHandler;
+import com.twitchbotx.gui.ScreensController;
+import com.twitchbotx.gui.guiHandler;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -18,11 +20,16 @@ import java.sql.Statement;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
 
 /**
  * FXML Controller class
@@ -42,7 +49,7 @@ public class MarathonController implements Initializable {
 
     static Statement stmt = null;
 
-    private final MarathonHandler mHandler = new MarathonHandler(guiHandler.bot.getStore(), guiHandler.bot.getOut());
+    private final MarathonHandler mHandler = new MarathonHandler(guiHandler.bot.getStore());
 
     @FXML
     TextField addPointsText;
@@ -76,6 +83,9 @@ public class MarathonController implements Initializable {
 
     @FXML
     TextField setMinuteValue;
+    
+    @FXML
+    TextField maxHour;
 
     @FXML
     Label currentBaseTime;
@@ -97,6 +107,16 @@ public class MarathonController implements Initializable {
     
     @FXML
     Label currentTotalTime;
+    
+    @FXML
+    RadioButton marEnabled;
+
+    @FXML
+    RadioButton marDisabled;
+    
+    @FXML
+    ToggleGroup Marathon;
+    
 
         @FXML
     private void submitSubPoint(ActionEvent event){
@@ -171,6 +191,16 @@ public class MarathonController implements Initializable {
         mHandler.setMinValue(msg);
     }
 
+    @FXML
+    private void setMaxHour(){
+        String hr = "";
+        maxHour.selectAll();
+        maxHour.copy();
+        hr = maxHour.getText();
+        store.modifyConfiguration("maxMarathonHour", hr);
+        
+    }
+    
     @FXML
     private void addMinutes(ActionEvent event) {
         String msg = "";
@@ -359,8 +389,50 @@ public class MarathonController implements Initializable {
         SQLUSER = store.getConfiguration().sqlUser;
         SQLPASS = store.getConfiguration().sqlPass;
         SQLURL = store.getConfiguration().sqlMURL;
+        
+        //initialize enable/disable buttons
+        setRadios();
+        addListener(Marathon, "mStatus");
     }
 
+    private void setRadios(){
+        if (store.getConfiguration().marathonStatus.equals("on")) {
+            marEnabled.setSelected(true);
+        } else {
+            marDisabled.setSelected(true);
+        }
+    }
+    
+    /**
+     * adds a listener to the radio button toggle group instant change in on/off
+     * status for group
+     * @param ToggleGroup to listen to
+     * @param String config name associated with XML value
+     */
+    private void addListener(ToggleGroup group, String name ) {
+        group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+            public void changed(ObservableValue<? extends Toggle> ob,
+                    Toggle o, Toggle n) {
+
+                RadioButton rb = (RadioButton) group.getSelectedToggle();
+
+                if (rb != null) {
+                    String s = rb.getText();
+                    String enabled;
+                    if (s.equals("Enabled")) {
+                        enabled = "on";
+                    } else {
+                        enabled = "off";
+                    }
+                    store.modifyConfiguration(name, enabled);
+                    System.out.println(name + ":" + enabled);
+                }
+            }
+
+        });
+    }
+    
+    
     guiHandler.dimensions dm = ScreensController.dm;
 
     private void setDimensions() {

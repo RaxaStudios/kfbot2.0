@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.controllers.AlertResponseController">
+   <children>
+      <TabPane layoutY="5.0" prefHeight="388.0" prefWidth="592.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab text="  Subscriptions  ">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <RadioButton fx:id="subEnabled" layoutX="311.0" layoutY="104.0" mnemonicParsing="false" text="Enabled">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="Sub" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="subDisabled" layoutX="459.0" layoutY="104.0" mnemonicParsing="false" text="Disabled" toggleGroup="$Sub" />
+                        <Button layoutX="504.0" layoutY="333.0" mnemonicParsing="false" onAction="#submitSubChanges" prefHeight="25.0" prefWidth="74.0" text="Submit" />
+                        <Button layoutX="12.0" layoutY="331.0" mnemonicParsing="false" onAction="#goDash" text="Dashboard" />
+                        <Button layoutX="142.0" layoutY="331.0" mnemonicParsing="false" onAction="#goFeature" text="Features" />
+                        <Label alignment="TOP_CENTER" contentDisplay="TOP" layoutX="13.0" layoutY="14.0" prefHeight="295.0" prefWidth="235.0" style="-fx-border-color: grey;" text="Sub Events" textAlignment="CENTER" />
+                        <Button layoutX="79.0" layoutY="62.0" mnemonicParsing="false" onAction="#buttonSubPress" text="New Non-Prime" />
+                        <Button layoutX="75.0" layoutY="100.0" mnemonicParsing="false" onAction="#buttonSubPress" text="Non-Prime Resub" />
+                        <Button layoutX="93.0" layoutY="148.0" mnemonicParsing="false" onAction="#buttonSubPress" text="Prime New" />
+                        <Button layoutX="89.0" layoutY="186.0" mnemonicParsing="false" onAction="#buttonSubPress" text="Prime Resub" />
+                        <Button layoutX="95.0" layoutY="267.0" mnemonicParsing="false" onAction="#buttonSubPress" text="Single Gift" />
+                        <Button layoutX="97.0" layoutY="230.0" mnemonicParsing="false" onAction="#buttonSubPress" text="Mass Gift" />
+                        <TextArea fx:id="messageSub" layoutX="265.0" layoutY="140.0" prefHeight="168.0" prefWidth="316.0" wrapText="true" />
+                        <Label fx:id="messageSubSelected" alignment="CENTER" contentDisplay="CENTER" layoutX="258.0" layoutY="24.0" prefHeight="25.0" prefWidth="331.0" textAlignment="CENTER">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="submitSubStatus" alignment="CENTER" contentDisplay="CENTER" layoutX="265.0" layoutY="292.0" prefHeight="63.0" prefWidth="235.0" textAlignment="CENTER" wrapText="true" />
+                        <Label fx:id="messageSubHeader" alignment="CENTER" contentDisplay="CENTER" layoutX="258.0" layoutY="61.0" prefHeight="27.0" prefWidth="331.0" text="Select an option" textAlignment="CENTER" wrapText="true" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+            <Tab text="    Bits     ">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <RadioButton fx:id="bitEnabled" layoutX="296.0" layoutY="111.0" mnemonicParsing="false" text="Enabled">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="Bit" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="bitDisabled" layoutX="471.0" layoutY="111.0" mnemonicParsing="false" text="Disabled" toggleGroup="$Bit" />
+                        <Button layoutX="504.0" layoutY="333.0" mnemonicParsing="false" onAction="#submitBitChanges" prefHeight="25.0" prefWidth="74.0" text="Submit" />
+                        <Button layoutX="12.0" layoutY="331.0" mnemonicParsing="false" onAction="#goDash" text="Dashboard" />
+                        <Button layoutX="142.0" layoutY="331.0" mnemonicParsing="false" onAction="#goFeature" text="Features" />
+                        <TextArea fx:id="messageBit" layoutX="247.0" layoutY="147.0" prefHeight="168.0" prefWidth="331.0" wrapText="true" />
+                        <Label fx:id="submitBitStatus" alignment="CENTER" contentDisplay="CENTER" layoutX="266.0" layoutY="307.0" prefHeight="63.0" prefWidth="235.0" textAlignment="CENTER" wrapText="true" />
+                        <Label fx:id="messageBitHeader" alignment="CENTER" contentDisplay="CENTER" layoutX="247.0" layoutY="68.0" prefHeight="27.0" prefWidth="331.0" text="Select an option" textAlignment="CENTER" wrapText="true" />
+                        <Label fx:id="messageBitSelected" alignment="CENTER" contentDisplay="CENTER" layoutX="247.0" layoutY="28.0" prefHeight="25.0" prefWidth="331.0" textAlignment="CENTER">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Label>
+                        <Label alignment="TOP_CENTER" contentDisplay="TOP" layoutX="6.0" layoutY="14.0" prefHeight="302.0" prefWidth="235.0" style="-fx-border-color: grey;" text="Bit Events" textAlignment="CENTER" />
+                        <Button layoutX="40.0" layoutY="40.0" mnemonicParsing="false" onAction="#buttonBitPress" text="1 - 499" />
+                        <Button layoutX="148.0" layoutY="40.0" mnemonicParsing="false" onAction="#buttonBitPress" text="500 - 999" />
+                        <Button layoutX="24.0" layoutY="81.0" mnemonicParsing="false" onAction="#buttonBitPress" text="1,000 - 4,999" />
+                        <Button layoutX="139.0" layoutY="81.0" mnemonicParsing="false" onAction="#buttonBitPress" text="5,000 - 9,999" />
+                        <Button layoutX="36.0" layoutY="121.0" mnemonicParsing="false" onAction="#buttonBitPress" text="10,000+" />
+                        <Button layoutX="133.0" layoutY="258.0" mnemonicParsing="false" onAction="#submitBitSettings" prefHeight="45.0" prefWidth="97.0" text="Submit Min/Usage" textAlignment="CENTER" wrapText="true" />
+                        <Label layoutX="34.0" layoutY="194.0" prefHeight="37.0" prefWidth="60.0" text="Min Enabled :" textAlignment="CENTER" wrapText="true" />
+                        <TextField fx:id="minBitEnabled" layoutX="145.0" layoutY="208.0" prefHeight="25.0" prefWidth="74.0" />
+                        <Label layoutX="12.0" layoutY="220.0" prefHeight="76.0" prefWidth="108.0" text="(If under min is cheered no response in chat)" textAlignment="CENTER" wrapText="true" />
+                        <Button layoutX="158.0" layoutY="121.0" mnemonicParsing="false" onAction="#buttonBitPress" prefHeight="25.0" prefWidth="47.0" text="All" />
+                        <RadioButton fx:id="usageBitAll" layoutX="145.0" layoutY="165.0" mnemonicParsing="false" text="Use All">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="usageBit" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="usageBitSpecific" layoutX="22.0" layoutY="165.0" mnemonicParsing="false" text="Use Specific " toggleGroup="$usageBit" />
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
+          <Tab text="     Raids     ">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <RadioButton fx:id="raidEnabled" layoutX="296.0" layoutY="116.0" mnemonicParsing="false" text="Enabled">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="Raid" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="raidDisabled" layoutX="468.0" layoutY="116.0" mnemonicParsing="false" text="Disabled" toggleGroup="$Raid" />
+                        <Button layoutX="504.0" layoutY="333.0" mnemonicParsing="false" onAction="#submitRaidChanges" prefHeight="25.0" prefWidth="74.0" text="Submit" />
+                        <Button layoutX="12.0" layoutY="331.0" mnemonicParsing="false" onAction="#goDash" text="Dashboard" />
+                        <Button layoutX="142.0" layoutY="331.0" mnemonicParsing="false" onAction="#goFeature" text="Features" />
+                        <Label alignment="TOP_CENTER" contentDisplay="TOP" layoutX="7.0" layoutY="14.0" prefHeight="302.0" prefWidth="235.0" style="-fx-border-color: grey;" text="Raid Events (Amounts in viewers)" textAlignment="CENTER" />
+                        <Button layoutX="41.0" layoutY="39.0" mnemonicParsing="false" onAction="#buttonRaidPress" text="0 - 49" />
+                        <Button layoutX="146.0" layoutY="39.0" mnemonicParsing="false" onAction="#buttonRaidPress" text="50 - 99" />
+                        <Button layoutX="31.0" layoutY="80.0" mnemonicParsing="false" onAction="#buttonRaidPress" text="100 - 149" />
+                        <Button layoutX="139.0" layoutY="80.0" mnemonicParsing="false" onAction="#buttonRaidPress" text="150 - 200" />
+                        <Button layoutX="149.0" layoutY="124.0" mnemonicParsing="false" onAction="#buttonRaidPress" text="500 +" />
+                        <Button layoutX="31.0" layoutY="120.0" mnemonicParsing="false" onAction="#buttonRaidPress" text="200 - 499" />
+                        <Label layoutX="12.0" layoutY="215.0" text="Min Enabled (Viewers) :" />
+                        <TextField fx:id="minRaidEnabled" layoutX="150.0" layoutY="211.0" prefHeight="25.0" prefWidth="72.0" />
+                        <Button layoutX="142.0" layoutY="249.0" mnemonicParsing="false" onAction="#submitRaidSettings" prefHeight="54.0" prefWidth="88.0" text="Submit Min/Usage" textAlignment="CENTER" wrapText="true" />
+                        <Label layoutX="12.0" layoutY="236.0" prefHeight="80.0" prefWidth="124.0" text="(If under min viewers no response in chat)" textAlignment="CENTER" wrapText="true" />
+                        <Button layoutX="41.0" layoutY="173.0" mnemonicParsing="false" onAction="#buttonRaidPress" prefHeight="25.0" prefWidth="47.0" text="All" />
+                        <RadioButton fx:id="usageRaidAll" layoutX="129.0" layoutY="157.0" mnemonicParsing="false" text="Use All">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="usageRaid" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="usageRaidSpecific" layoutX="129.0" layoutY="185.0" mnemonicParsing="false" text="Use Specific " toggleGroup="$usageRaid" />
+                        <TextArea fx:id="messageRaid" layoutX="247.0" layoutY="148.0" prefHeight="168.0" prefWidth="331.0" wrapText="true" />
+                        <Label fx:id="submitStatus2" alignment="CENTER" contentDisplay="CENTER" layoutX="266.0" layoutY="300.0" prefHeight="63.0" prefWidth="235.0" textAlignment="CENTER" wrapText="true" />
+                        <Label fx:id="messageRaidHeader" alignment="CENTER" contentDisplay="CENTER" layoutX="242.0" layoutY="79.0" prefHeight="27.0" prefWidth="331.0" text="Select an option" textAlignment="CENTER" wrapText="true" />
+                        <Label fx:id="messageRaidSelected" alignment="CENTER" contentDisplay="CENTER" layoutX="242.0" layoutY="33.0" prefHeight="25.0" prefWidth="331.0" textAlignment="CENTER">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+      <Label layoutX="380.0" layoutY="5.0" text="Alert Response Manager">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

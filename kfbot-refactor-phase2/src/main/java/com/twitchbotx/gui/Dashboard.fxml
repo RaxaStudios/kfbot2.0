@@ -6,23 +6,19 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="Dashboard" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.DashboardController">
+<AnchorPane id="Dashboard" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.controllers.DashboardController">
    <children>
-    <Button layoutX="64.0" layoutY="265.0" mnemonicParsing="false" onAction="#startBot" prefHeight="25.0" prefWidth="89.0" text="Start Bot" />
-    <Button layoutX="64.0" layoutY="349.0" mnemonicParsing="false" onAction="#close" prefHeight="25.0" prefWidth="89.0" text="Part Bot" />
-      <Button layoutX="64.0" layoutY="307.0" mnemonicParsing="false" onAction="#restartBot" prefHeight="25.0" prefWidth="89.0" text="Restart Bot" />
-    <Button fx:id="dashboard" layoutX="217.0" layoutY="349.0" mnemonicParsing="false" onAction="#configuration" prefHeight="25.0" prefWidth="126.0" text="Settings" />
-    <Button layoutX="406.0" layoutY="265.0" mnemonicParsing="false" onAction="#lottery" prefHeight="25.0" prefWidth="126.0" text="Lottery" />
-    <Button alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" layoutX="217.0" layoutY="307.0" mnemonicParsing="false" onAction="#moderation" prefHeight="25.0" prefWidth="126.0" text="Moderation" textAlignment="CENTER" />
-    <Button layoutX="217.0" layoutY="265.0" mnemonicParsing="false" onAction="#commands" prefHeight="25.0" prefWidth="126.0" text="Commands" />
-      <Label alignment="CENTER" layoutX="246.0" layoutY="3.0" prefHeight="25.0" prefWidth="108.0" text="Dashboard">
+    <Button layoutX="34.0" layoutY="309.0" mnemonicParsing="false" onAction="#startBot" prefHeight="25.0" prefWidth="126.0" text="Start Bot" />
+      <Button layoutX="34.0" layoutY="350.0" mnemonicParsing="false" onAction="#restartBot" prefHeight="25.0" prefWidth="126.0" text="Restart Bot" />
+    <Button fx:id="dashboard" layoutX="444.0" layoutY="350.0" mnemonicParsing="false" onAction="#configuration" prefHeight="25.0" prefWidth="126.0" text="Settings" />
+    <Button alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" layoutX="237.0" layoutY="350.0" mnemonicParsing="false" onAction="#moderation" prefHeight="25.0" prefWidth="126.0" text="Moderation" textAlignment="CENTER" />
+    <Button layoutX="237.0" layoutY="309.0" mnemonicParsing="false" onAction="#commands" prefHeight="25.0" prefWidth="126.0" text="Commands" />
+      <Label alignment="CENTER" layoutX="246.0" layoutY="16.0" prefHeight="25.0" prefWidth="108.0" text="Dashboard">
          <font>
             <Font size="20.0" />
          </font>
       </Label>
-      <Button layoutX="406.0" layoutY="307.0" mnemonicParsing="false" onAction="#spoopathon" prefHeight="25.0" prefWidth="126.0" text="Spoopathon" />
-      <Button layoutX="406.0" layoutY="349.0" mnemonicParsing="false" onAction="#marathon" prefHeight="25.0" prefWidth="126.0" text="Marathon" />
-      <ListView fx:id="eventList" layoutX="34.0" layoutY="54.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="200.0" prefWidth="532.0" style="-fx-border-color: grey;" />
-      <Label layoutX="34.0" layoutY="33.0" text="Event Viewer" />
+      <ListView fx:id="eventList" layoutX="34.0" layoutY="54.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="232.0" prefWidth="532.0" style="-fx-border-color: grey;" />
+      <Button layoutX="444.0" layoutY="309.0" mnemonicParsing="false" onAction="#features" prefHeight="25.0" prefWidth="126.0" text="Features" />
    </children>
 </AnchorPane>

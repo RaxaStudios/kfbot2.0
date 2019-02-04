@@ -4,7 +4,6 @@ import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.client.TwitchMessenger;
 import com.twitchbotx.gui.guiHandler;
-import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.Statement;
 
@@ -27,14 +26,11 @@ public final class CountHandler {
     int minutes = 0;
     int hours = 12;
 
-    private final TwitchMessenger messenger;
-
-    public CountHandler(final Datastore store, final PrintStream out) {
+    public CountHandler(final Datastore store) {
         this.store = store;
         this.SQLURL = store.getConfiguration().sqlURL;
         this.USER = store.getConfiguration().sqlUser;
         this.PASS = store.getConfiguration().sqlPass;
-        this.messenger = new TwitchMessenger(out, store.getConfiguration().joinedChannel);
     }
 
     /*

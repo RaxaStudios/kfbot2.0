@@ -8,7 +8,7 @@ package com.twitchbotx.bot.handlers;
 import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.client.TwitchMessenger;
-import com.twitchbotx.gui.DashboardController;
+import com.twitchbotx.gui.controllers.DashboardController;
 import com.twitchbotx.gui.guiHandler;
 import java.io.File;
 import java.io.PrintStream;
@@ -33,7 +33,7 @@ import org.apache.commons.io.FileUtils;
  *
  * @author Raxa
  *
- * 
+ *
  *
  * use this over FTP handler with php on website see SpotifyReader ->
  * ServerHandler.java for current version
@@ -43,13 +43,14 @@ public class sqlHandler {
 
     //SQL database
     String SQLURL;
+    String SQLOverlay;
     String USER;
     String PASS;
-    TwitchMessenger messenger;
     Connection con = null;
     Statement stmt = null;
     String sqlStatement = "";
 
+    
     private static final Logger LOGGER = Logger.getLogger(sqlHandler.class.getSimpleName());
 
     private Datastore store;
@@ -58,13 +59,12 @@ public class sqlHandler {
     private String gameID;
     private String gamePoints;
 
-    public sqlHandler(final Datastore store,
-            final PrintStream stream) {
+    public sqlHandler(final Datastore store) {
         this.store = store;
         this.SQLURL = store.getConfiguration().sqlURL;
         this.USER = store.getConfiguration().sqlUser;
         this.PASS = store.getConfiguration().sqlPass;
-        this.messenger = new TwitchMessenger(stream, store.getConfiguration().joinedChannel);
+        // this.messenger = new TwitchMessenger(stream, store.getConfiguration().joinedChannel);
         this.gameID = "";
         this.gameName = "";
         this.gamePoints = "";
@@ -102,8 +102,8 @@ public class sqlHandler {
         try {
             //reset auto_increment value using maxid + 1
             ResultSet rs = add.executeQuery("SELECT * FROM bot ORDER BY gameID DESC");
-            while(rs.next()){
-            value = rs.getInt("gameID");
+            while (rs.next()) {
+                value = rs.getInt("gameID");
             }
             System.out.println("value sql autoadd:" + value);
             sqlStatementAI = "ALTER TABLE bot AUTO_INCREMENT=" + value;
@@ -115,7 +115,7 @@ public class sqlHandler {
             LOGGER.severe(e.toString());
             e.printStackTrace();
         }
-        messenger.sendMessage(gameToAdd + " added to options");
+        sendMessage(gameToAdd + " added to options");
         closeConnection();
         sendEvent("Spoopathon Event: " + gameToAdd + " added to options");
         return true;
@@ -132,7 +132,7 @@ public class sqlHandler {
         } catch (SQLException e) {
             LOGGER.severe(e.toString());
         }
-        messenger.sendMessage(gameToDelete + " deleted from options");
+        sendMessage(gameToDelete + " deleted from options");
         closeConnection();
         sendEvent("Spoopathon Event: " + gameToDelete + " deleted from options");
         return true;
@@ -148,7 +148,7 @@ public class sqlHandler {
         } catch (SQLException e) {
             LOGGER.severe(e.toString());
         }
-        messenger.sendMessage("Renamed " + oldName + " to " + newName);
+        sendMessage("Renamed " + oldName + " to " + newName);
         closeConnection();
         return true;
     }
@@ -163,7 +163,7 @@ public class sqlHandler {
         } catch (SQLException e) {
             LOGGER.severe(e.toString());
         }
-        messenger.sendMessage("Set " + game + " to " + newPoints);
+        sendMessage("Set " + game + " to " + newPoints);
         closeConnection();
         sendEvent("Spoopathon Event: " + game + " set to " + newPoints);
         return true;
@@ -233,9 +233,12 @@ public class sqlHandler {
     }
 
     /**
-     * 
-     * @param msg !addPoints [gameId] [points]
+     *
+     * @param msg !s-addPoints [gameId] [points]
      * @return boolean success
+     *
+     * to be updated for alternate command input ie just !addPoints [game]
+     * [points]
      */
     public boolean addPoints(String msg) {
         String enabled = this.store.getConfiguration().spoopathonStatus;
@@ -261,15 +264,15 @@ public class sqlHandler {
                 amount += points;
                 sqlStatement = "UPDATE bot SET Points=" + amount + " WHERE Game=\'" + game + "\'";
                 addPoints.execute(sqlStatement);
-                messenger.sendMessage(points + " added to " + game);
+                sendMessage(points + " added to " + game);
                 sendEvent("Spoopathon Event: " + points + " added to  " + game);
                 closeConnection();
                 return true;
             } catch (IllegalArgumentException il) {
-                messenger.sendMessage("Syntax: !s-addPoints [gameID] [points]");
+                sendMessage("Syntax: !s-addPoints [gameID] [points]");
                 return false;
             } catch (SQLException sql) {
-                messenger.sendMessage("Syntax: !s-addPoints [gameID] [points]");
+                sendMessage("Syntax: !s-addPoints [gameID] [points]");
                 LOGGER.severe(sql.toString());
                 return false;
             }
@@ -328,7 +331,7 @@ public class sqlHandler {
             while (sv.next()) {
                 for (int i = 1; i <= svcols; i++) {
                     if (i > 1) {
-                        sb.append(":");
+                        sb.append(": ");
                     }
                     format++;
                     if ((format % 2) == 0) {
@@ -338,7 +341,7 @@ public class sqlHandler {
                     }
                 }
             }
-            messenger.sendMessage(wording + " " + sb);
+            sendMessage(wording + " " + sb);
             closeConnection();
         } catch (Exception e) {
             e.printStackTrace();
@@ -366,7 +369,7 @@ public class sqlHandler {
                     }
                 }
                 if (gameCount > 1) {
-                    messenger.sendMessage("Multiple games found in message");
+                    sendMessage("Multiple games found in message");
                 } else {
                     String findPoints = "SELECT Points FROM bot WHERE Game=\'" + tGame + "\'";
                     try {
@@ -378,7 +381,7 @@ public class sqlHandler {
                         amount += points;
                         sqlStatement = "UPDATE bot SET Points=" + amount + " WHERE Game=\'" + tGame + "\'";
                         gamePoints.execute(sqlStatement);
-                        messenger.sendMessage(points + " added to " + tGame);
+                        sendMessage(points + " added to " + tGame);
                         closeConnection();
                     } catch (IllegalArgumentException il) {
                         //messenger.sendMessage("Syntax: !s-addPoints [gameID] [points]");
@@ -403,15 +406,71 @@ public class sqlHandler {
         String status = msg.substring(msg.indexOf(" ") + 1, msg.length());
         if (status.equals("on") || status.equals("off")) {
             store.modifyConfiguration("sStatus", status);
-            messenger.sendMessage("Spoopathon system set to " + status);
+            sendMessage("Spoopathon system set to " + status);
         } else {
-            messenger.sendMessage("Syntax: !s-status [on|off]");
+            sendMessage("Syntax: !s-status [on|off]");
         }
 
     }
 
+  /*
+    begin counter section
+    */
+    public boolean setCountValue(int value){
+        Statement setCount = connectCounter();
+        
+        sqlStatement = "UPDATE botCount SET value=\'" + value + "\' WHERE 1";
+        try {
+            setCount.executeUpdate(sqlStatement);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            LOGGER.severe(e.toString());
+        }
+        closeCounterConnection();
+        return true;
+    }
     
+    public boolean setCountText(String txt){
+        System.out.println("execute print A");
+        Statement setText = connectCounter();
+        
+        sqlStatement = "UPDATE botCount SET text=\'" + txt + "\' WHERE 1";
+        System.out.println("execute print");
+        try {
+            setText.executeUpdate(sqlStatement);
+            System.out.println("execute print 2");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            LOGGER.severe(e.toString());
+        }
+        closeCounterConnection();
+        return true;
+    }
     
+    Statement connectCounter() {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            con = DriverManager.getConnection(store.getConfiguration().sqlCounter, USER, PASS);
+            stmt = con.createStatement();
+            return stmt;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    void closeCounterConnection() {
+        try {
+            con.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(sqlHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void sendMessage(final String msg) {
+        DashboardController.wIRC.sendMessage(msg, true);
+    }
+
     private void sendEvent(final String msg) {
         String event = msg;
         Platform.runLater(new Runnable() {

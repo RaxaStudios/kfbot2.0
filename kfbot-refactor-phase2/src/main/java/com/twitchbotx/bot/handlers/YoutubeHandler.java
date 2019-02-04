@@ -2,11 +2,12 @@ package com.twitchbotx.bot.handlers;
 
 //import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
+import com.twitchbotx.gui.controllers.DashboardController;
+import com.twitchbotx.gui.guiHandler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.logging.Logger;
@@ -19,15 +20,12 @@ import java.util.logging.Logger;
  */
 public final class YoutubeHandler {
     
-    private final PrintStream outstream;
     private static final Logger LOGGER = Logger.getLogger(YoutubeHandler.class.getSimpleName());
     private final Datastore store;
 
 
-    public YoutubeHandler(final Datastore store,
-            final PrintStream stream) {
+    public YoutubeHandler(final Datastore store) {
         this.store = store;
-        this.outstream = stream;
     }
 
     /**
@@ -106,12 +104,7 @@ public final class YoutubeHandler {
      * @param msg The message to be sent out to the channel
      */
     private void sendMessage(final String msg) {
-        final String message = "/me > " + msg;
-        outstream.println("PRIVMSG #"
-                + store.getConfiguration().joinedChannel
-                + " "
-                + ":"
-                + message);
+       DashboardController.wIRC.sendMessage(msg, true);
     }
 
 }

@@ -3,13 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.twitchbotx.gui;
+package com.twitchbotx.gui.controllers;
 
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.TwitchBotX;
+import com.twitchbotx.bot.WSClass;
 import com.twitchbotx.bot.XmlDatastore;
 import com.twitchbotx.bot.handlers.CommonUtility;
+import com.twitchbotx.gui.ScreensController;
+import com.twitchbotx.gui.guiHandler;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.embed.swing.JFXPanel;
@@ -22,18 +26,19 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 
-
 /**
  * FXML Controller class
  *
  * @author Raxa
  */
-public class DashboardController implements Initializable, ControlledScreen {
+public class DashboardController implements Initializable{
 
     ScreensController myController = new ScreensController();
     guiHandler.dimensions dm = ScreensController.dm;
     TwitchBotX bot;
     Datastore store;
+
+    public static WSClass wIRC;
 
     static int visitCount = 0;
 
@@ -65,12 +70,6 @@ public class DashboardController implements Initializable, ControlledScreen {
     private static final int JFXPANEL_HEIGHT_INT = 400;
 
     @FXML
-    private void close(ActionEvent event) throws IOException {
-        guiHandler.bot.cancel(); //stop running bot
-        eventObL.addList("Bot has left channel");
-    }
-
-    @FXML
     private void commands(ActionEvent event) {
         setDimensions();
         myController.loadScreen(guiHandler.commandsID, guiHandler.commandsFile);
@@ -98,29 +97,11 @@ public class DashboardController implements Initializable, ControlledScreen {
     }
 
     @FXML
-    private void lottery(ActionEvent event) {
+    private void features(ActionEvent event) {
         setDimensions();
-        myController.loadScreen(guiHandler.lotteryID, guiHandler.lotteryFile);
-        myController.setScreen(guiHandler.lotteryID);
-        myController.setId("lottery");
-        myController.show(myController);
-    }
-
-    @FXML
-    private void spoopathon(ActionEvent event) {
-        setDimensions();
-        myController.loadScreen(guiHandler.spoopathonID, guiHandler.spoopathonFile);
-        myController.setScreen(guiHandler.spoopathonID);
-        myController.setId("spoopathon");
-        myController.show(myController);
-    }
-
-    @FXML
-    private void marathon(ActionEvent event) {
-        setDimensions();
-        myController.loadScreen(guiHandler.marathonID, guiHandler.marathonFile);
-        myController.setScreen(guiHandler.marathonID);
-        myController.setId("marathon");
+        myController.loadScreen(guiHandler.featuresID, guiHandler.featuresFile);
+        myController.setScreen(guiHandler.featuresID);
+        myController.setId("features");
         myController.show(myController);
     }
 
@@ -129,18 +110,26 @@ public class DashboardController implements Initializable, ControlledScreen {
         Thread botT;
         try {
             eventObL.addList("Starting bot");
-            try {
-                store.getBot().cancel();
-            } catch (NullPointerException ne) {
-                //ignore
-            }
-            store.getBot().createBot();
-
-            store.getBot().start(false);
             botT = new Thread() {
                 @Override
                 public void run() {
-                    store.getBot().beginReadingMessages();
+                    //open websocket connection
+                    try {
+                        wIRC = new WSClass(
+                                new URI("wss://irc-ws.chat.twitch.tv"),
+                                store.getConfiguration().joinedChannel,
+                                store.getConfiguration().account,
+                                store.getConfiguration().password,
+                                store);
+
+                        if (!wIRC.connectWSS(false)) {
+                            throw new Exception("Error when connecting to Twitch.");
+                        } else {
+                            guiHandler.bot.start(false);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             };
             botT.start();
@@ -157,29 +146,7 @@ public class DashboardController implements Initializable, ControlledScreen {
 
     @FXML
     private void restartBot(ActionEvent event) {
-        Thread botT;
-        try {
-            eventObL.addList("Restarting bot");
-            store.getBot().cancel();
-            store.getBot().createBot();
-            store.getBot().start(true);
-            botT = new Thread() {
-                @Override
-                public void run() {
-                    store.getBot().beginReadingMessages();
-                }
-            };
-            botT.start();
-
-            eventObL.addList("Bot connected to chat");
-        } catch (NullPointerException e) {
-            CommonUtility.ERRORLOGGER.severe(e.toString());
-            eventObL.addList("No instance to cancel, restart the application");
-        } catch (Exception e) {
-            CommonUtility.ERRORLOGGER.severe(e.toString());
-            e.printStackTrace();
-            eventObL.addList("General error occured creating the bot, restart the application");
-        }
+      DashboardController.wIRC.close();
     }
 
     public Scene getScene() throws IOException {
@@ -200,22 +167,18 @@ public class DashboardController implements Initializable, ControlledScreen {
         visitCount++;
     }
 
-   /* public void eventObLAdd(String msg) {
+    /* public void eventObLAdd(String msg) {
         eventObL.addList(msg);
         eventList.setItems(eventObL.getList());
         eventList.scrollTo(eventObL.getList().size() - 1);
     }*/
 
-    @Override
-    public void setScreenParent(ScreensController screenParent) {
-        myController = screenParent;
-    }
 
     private void setDimensions() {
-       int h = (int) guiHandler.stage.getHeight();
-       int w = (int) guiHandler.stage.getWidth();
-       dm.setHeight(h);
-       dm.setWidth(w);
+        int h = (int) guiHandler.stage.getHeight();
+        int w = (int) guiHandler.stage.getWidth();
+        dm.setHeight(h);
+        dm.setWidth(w);
     }
 
 }

@@ -3,16 +3,21 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.twitchbotx.gui;
+package com.twitchbotx.gui.controllers;
 
+import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.handlers.SpoopathonHandler;
 import com.twitchbotx.bot.handlers.sqlHandler;
+import com.twitchbotx.gui.ScreensController;
+import com.twitchbotx.gui.guiHandler;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -20,7 +25,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
 
 /**
  * FXML Controller class
@@ -30,9 +38,10 @@ import javafx.scene.control.TextField;
 public class SpoopathonController implements Initializable {
 
     ScreensController myController = new ScreensController();
-
+    Datastore store;
     private static sqlHandler gameData;
-    private static SpoopathonHandler userData;
+    private final static SpoopathonHandler userData = new SpoopathonHandler();
+    int unspent = 0;
 
     int i = 1;
 
@@ -50,6 +59,18 @@ public class SpoopathonController implements Initializable {
 
     @FXML
     Label addVoteStatus;
+
+    @FXML
+    Label unspentPoints;
+    
+    @FXML
+    Label saveText;
+    
+    @FXML
+    TextField subValue;
+
+    @FXML
+    TextField bitValue;
 
     @FXML
     TextField newGame;
@@ -79,6 +100,15 @@ public class SpoopathonController implements Initializable {
     TextField votesAddText;
 
     @FXML
+    ToggleGroup Spoop;
+
+    @FXML
+    RadioButton spoopEnabled;
+
+    @FXML
+    RadioButton spoopDisabled;
+
+    @FXML
     ListView gameListView;
     public static ObservableList<String> gameList = FXCollections.observableArrayList();
 
@@ -94,7 +124,7 @@ public class SpoopathonController implements Initializable {
         addPointsPoints.copy();
         addPointsPoints.selectAll();
         String points = addPointsPoints.getText();
-        if (gameData.addPoints("!addPoints " + gameID + " " + points)) {
+        if (gameData.addPoints("!s-addPoints " + gameID + " " + points)) {
             refreshList();
             addPointsStatus.setText(points + " points added to " + gameID);
         } else {
@@ -109,7 +139,7 @@ public class SpoopathonController implements Initializable {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                gameData = new sqlHandler(guiHandler.bot.getStore(), guiHandler.bot.getOut());
+                gameData = new sqlHandler(guiHandler.bot.getStore());
                 try {
                     for (int i = 0; i < gameData.getSize(); i++) {
                         gameList.add(gameData.getData(i + 1));
@@ -205,40 +235,66 @@ public class SpoopathonController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        store = guiHandler.bot.getStore();
         gameList.clear();
         userList.clear();
         loadLabel.setVisible(true);
-        gameData = new sqlHandler(guiHandler.bot.getStore(), guiHandler.bot.getOut());
-        userData = new SpoopathonHandler();
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    for (int i = 0; i < gameData.getSize(); i++) {
-                        gameList.add(gameData.getData(i + 1));
-                    }
-                } catch (IllegalStateException ie) {
-                    //ignore
-                }
-                loadLabel.setVisible(false);
-            }
-        });
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(SpoopathonController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        gameListView.setItems(gameList);
-
-        // set userlist
+        // TODO set on load, need faster way to do this
+        // set userlist and total unspent points
+        unspent = 0;
         SpoopathonHandler.MAP.entrySet().forEach((m) -> {
             userList.add(m.getKey() + " : " + m.getValue());
             System.out.println(i + " " + m.getKey());
+            unspent = unspent + m.getValue();
             i++;
         });
+        unspentPoints.setText("Total Unspent Points: " + String.valueOf(unspent));
         addVoteStatus.setText("");
         //System.out.println(userList);
         userListView.setItems(userList);
+
+        // initialize enable/disable radio buttons and listeners
+        setRadios();
+        addListener(Spoop, "sStatus");
+    }
+
+    private void setRadios() {
+        if (store.getConfiguration().spoopathonStatus.equals("on")) {
+            Spoop.selectToggle(spoopEnabled);
+        } else {
+            Spoop.selectToggle(spoopDisabled);
+        }
+    }
+
+    /**
+     * adds a listener to the radio button toggle group instant change in on/off
+     * status for group
+     *
+     * @param ToggleGroup to listen to
+     * @param String config name associated with XML value
+     */
+    private void addListener(ToggleGroup group, String name) {
+        group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+            public void changed(ObservableValue<? extends Toggle> ob,
+                    Toggle o, Toggle n) {
+                
+                RadioButton rb = (RadioButton) group.getSelectedToggle();
+                System.out.println("Test print");
+                if (rb != null) {
+                    String s = rb.getText();
+                    
+                    String enabled;
+                    if (s.equals("Enabled")) {
+                        enabled = "on";
+                    } else {
+                        enabled = "off";
+                    }
+                    store.modifyConfiguration(name, enabled);
+                    System.out.println(name + ":" + enabled);
+                }
+            }
+
+        });
     }
 
     guiHandler.dimensions dm = ScreensController.dm;
@@ -257,22 +313,24 @@ public class SpoopathonController implements Initializable {
         //grab username and votes to add
         usernameAddText.selectAll();
         usernameAddText.copy();
-        String user = usernameAddText.getText();
-        user = user.toLowerCase();
+        String userUpper = usernameAddText.getText();
+        userUpper = userUpper.replace(" ", "");
+        String userLower = userUpper.toLowerCase();
         votesAddText.selectAll();
         votesAddText.copy();
         int votes = Integer.parseInt(votesAddText.getText());
+        System.out.println("user spoop: " + userUpper + " votes: " + votes);
         if (votes == 0) {
-            if (userData.remUser(user)) {
-                addVoteStatus.setText("Removed " + user);
+            if (userData.remUser(userLower)) {
+                addVoteStatus.setText("Removed " + userUpper);
             } else {
-                addVoteStatus.setText(user + " not found");
+                addVoteStatus.setText(userUpper + " not found");
             }
         } else if (votes < 0) {
-            userData.remVotes(user, votes);
+            userData.remVotes(userUpper, votes, false);
             addVoteStatus.setText("Removed votes");
         } else {
-            userData.addVotes(user, votes);
+            userData.addVotes(userUpper, userLower, votes, false);
             addVoteStatus.setText("Added points");
         }
 
@@ -282,14 +340,43 @@ public class SpoopathonController implements Initializable {
     @FXML
     public void refreshUsers() {
         userList.clear();
+        unspent = 0;
         SpoopathonHandler.MAP.entrySet().forEach((m) -> {
             userList.add(m.getKey() + " : " + m.getValue());
+            unspent = unspent + m.getValue();
             // System.out.println(i + " " + m.getKey());
             //i++;
         });
-
+        unspentPoints.setText("Total Unspent Points: " + String.valueOf(unspent));
         //System.out.println(userList);
         userListView.setItems(userList);
     }
 
+    @FXML
+    public void clearUsers() {
+        userList.clear();
+        userListView.setItems(userList);
+        SpoopathonHandler.clearMap();
+    }
+
+    
+    
+    // spoopathon value settings
+    @FXML
+    public void submitSpoop() {
+        subValue.selectAll();
+        subValue.copy();
+        String subPoint = subValue.getText();
+        bitValue.selectAll();
+        bitValue.copy();
+        String bitPoint = bitValue.getText();
+        if (subPoint.equals("") || subPoint.equals(null) || bitValue.equals("") || bitValue.equals(null)) {
+            saveText.setText("Values blank");
+        } else {
+            store.modifyConfiguration("spoopSubValue", subPoint);
+            store.modifyConfiguration("spoopBitValue", bitPoint);
+            saveText.setText("Values updated");
+        }
+    }
+    
 }

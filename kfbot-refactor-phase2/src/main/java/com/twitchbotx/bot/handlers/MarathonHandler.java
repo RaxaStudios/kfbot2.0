@@ -8,6 +8,7 @@ package com.twitchbotx.bot.handlers;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.TwitchBotX;
 import com.twitchbotx.bot.client.TwitchMessenger;
+import com.twitchbotx.gui.controllers.DashboardController;
 import com.twitchbotx.gui.guiHandler;
 import java.io.PrintStream;
 import java.sql.Connection;
@@ -17,6 +18,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 
 /**
  *
@@ -39,10 +41,10 @@ public class MarathonHandler {
     int minutes = 0;
     int hours = 12;
     int bitPool = 0;
-    TwitchMessenger messenger;
+    //TwitchMessenger messenger;
 
-    public MarathonHandler(Datastore store, final PrintStream out) {
-        this.messenger = new TwitchMessenger(out, store.getConfiguration().joinedChannel);
+    public MarathonHandler(Datastore store) {
+        //this.messenger = new TwitchMessenger(out, store.getConfiguration().joinedChannel);
     }
 
     public void addPoints(String msg) {
@@ -55,10 +57,15 @@ public class MarathonHandler {
          */
         int sep = msg.indexOf(" ");
         int amt = new Integer(msg.substring(sep + 1));
+        boolean update = false;
+        if (amt == 0) {
+            update = true;
+        }
         int pointHours = 0;
         int pointMins = 0;
+        int preMins = 0;
         //get point value, add amt, update point value directly
-        String getP = "SELECT points, baseHour FROM kfTimer";
+        String getP = "SELECT points, baseHour, minutes FROM kfTimer";
         int currentPoints = 0;
         int baseHour = 0;
         try {
@@ -69,6 +76,7 @@ public class MarathonHandler {
             while (ap.next()) {
                 currentPoints = ap.getInt("points");
                 baseHour = ap.getInt("baseHour");
+                preMins = ap.getInt("minutes");
             }
             con.close();
         } catch (Exception e) {
@@ -87,6 +95,8 @@ public class MarathonHandler {
                 pointMins = 0;
             }
         }
+        //find change in minutes
+        int deltaMins = pointMins - preMins;
         System.out.println(pointHours + " " + pointMins);
         //get base hour and add to hours prior to update
         //take max hour setting from configuration 
@@ -94,7 +104,8 @@ public class MarathonHandler {
         int maxHour = store.getConfiguration().maxMarathonHour;
         if (pointHours > (maxHour - 1)) {
             pointHours = maxHour;
-            minutes = 0;
+            pointMins = 0;
+            deltaMins = 999;
         }
 
         //begin update sql point value
@@ -109,10 +120,22 @@ public class MarathonHandler {
             e.printStackTrace();
         }
         System.out.println(addP);
+        if (update) {
+            sendEvent("Updating marathon timer");
+        } else {
+            if (deltaMins > 0 && deltaMins != 999) {
+                sendEvent("Added " + deltaMins + " minutes to marathon");
+                sendMessage("Added " + deltaMins + " minutes to marathon");
+            } else if (deltaMins == 999) {
+                sendEvent("Maximum hour reached");
+            } else {
+                sendEvent("Error occurred adding minutes to marathon");
+            }
+        }
     }
 
     //sub addition system -> addPoints
-    public void addSub(int subPoints) {
+    public void addSub(int subPoints, boolean massGift, boolean gifted, int giftAmount) {
         //convert sub points to regular points
         //TODO utilize the setting made available in marathon controller for this
         //hard coded for 4/27 marathon 1 sub point = 5 minutes = (200points/1minute)*5 = 1000 points
@@ -140,7 +163,13 @@ public class MarathonHandler {
 
         int pointsToAdd = 0;
         int minutesToAdd = 0;
-        minutesToAdd = subPoints * subPointValue; // 1 sub point * minute value
+        // adjust for  sub gifts/mass gifts
+        if (massGift) {
+            minutesToAdd = subPoints * subPointValue * giftAmount;
+        } else {
+            minutesToAdd = subPoints * subPointValue;
+        }
+        // 1 sub point * minute value
         pointsToAdd = minutesToAdd * 60; //convert minutes to seconds, 1 point = 1 sec
         addPoints("!addPoints " + pointsToAdd);
 
@@ -153,7 +182,6 @@ public class MarathonHandler {
         //hard coded for 4/27 marathon $2 = 1 minute = 200points
 
         //dollar value comes in as $10.00 = 10
-        
         //get value of dollar from sql
         //$ amount and how many minutes equal 
         int dollarValue = 0;
@@ -224,7 +252,7 @@ public class MarathonHandler {
                     }
                 }
             }
-            messenger.sendMessage("Total marathon time: " + amount);
+            sendMessage("Total marathon time: " + amount);
             con.close();
         } catch (IllegalArgumentException il) {
             System.out.println("Syntax: !s-addPoints [gameID] [points]");
@@ -246,7 +274,7 @@ public class MarathonHandler {
 
             stmt.executeUpdate(resetTimer);
             con.close();
-            messenger.sendMessage("Marathon timer reset and started!");
+            sendMessage("Marathon timer reset and started!");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -275,7 +303,7 @@ public class MarathonHandler {
             stmt.executeUpdate(setT);
             con.close();
             addPoints("!addPoints 0");
-            messenger.sendMessage("Time set to: " + hour + ":" + minute + ":" + second);
+            sendMessage("Time set to: " + hour + ":" + minute + ":" + second);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -333,7 +361,7 @@ public class MarathonHandler {
             stmt.executeUpdate(setM);
             con.close();
             addPoints("!addPoints 0");
-            messenger.sendMessage("Marathon base time set to " + amt);
+            sendMessage("Marathon base time set to " + amt);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -351,9 +379,23 @@ public class MarathonHandler {
             stmt.executeUpdate(setM);
             con.close();
             addPoints("!addPoints 0");
-            messenger.sendMessage("Point/Minute value set to " + amt);
+            sendMessage("Point/Minute value set to " + amt);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void sendEvent(final String msg) {
+        String event = msg;
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                store.getEventList().addList(event);
+            }
+        });
+    }
+
+    private void sendMessage(final String msg) {
+        DashboardController.wIRC.sendMessage(msg, true);
     }
 }

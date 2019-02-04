@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.twitchbotx.gui;
+package com.twitchbotx.gui.controllers;
 
 import com.twitchbotx.bot.*;
+import com.twitchbotx.gui.ScreensController;
+import com.twitchbotx.gui.guiHandler;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,14 +29,12 @@ import javafx.scene.text.TextAlignment;
  *
  * @author Raxa
  */
-public class CommandsController implements ControlledScreen {
+public class CommandsController  {
 
     private Datastore store;
     final ConfigParameters configuration = new ConfigParameters();
 
     ScreensController myController = new ScreensController();
-
-    private String commandNameTemp;
 
     @FXML
     private Button commands;
@@ -89,10 +89,6 @@ public class CommandsController implements ControlledScreen {
         }
     }
 
-    @Override
-    public void setScreenParent(ScreensController screenParent) {
-        myController = screenParent;
-    }
 
     @FXML
     private void dash(ActionEvent event) {
@@ -154,12 +150,10 @@ public class CommandsController implements ControlledScreen {
                 nameD.setFont(Font.font("", FontWeight.BOLD, 12));
                 authD.setFont(Font.font("", FontWeight.BOLD, 12));
                 vB.getChildren().addAll(name, nameD, auth, authD, disabled, repeating, interval, initialDelay, cooldown, sound, message, messageD);
-                commandNameTemp = commandConfig.name;
             };
         }
         commandInfo.getChildren().clear();
         commandInfo.getChildren().add(vB);
-        // myController.setScreen(guiHandler.dashboardID);
     }
 
     guiHandler.dimensions dm = ScreensController.dm;

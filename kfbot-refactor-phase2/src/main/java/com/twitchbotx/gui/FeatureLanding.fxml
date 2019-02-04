@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.controllers.FeatureLandingController">
+   <children>
+      <Button layoutX="23.0" layoutY="354.0" mnemonicParsing="false" onAction="#goDash" text="Dashboard" />
+      <Button layoutX="72.0" layoutY="143.0" mnemonicParsing="false" onAction="#lottery" text="Lotteries" />
+      <Button layoutX="256.0" layoutY="103.0" mnemonicParsing="false" onAction="#alerts" text="Alert Responses" />
+      <Button layoutX="254.0" layoutY="252.0" mnemonicParsing="false" onAction="#onScreen" text="On Screen Alerts" />
+      <Button layoutX="454.0" layoutY="217.0" mnemonicParsing="false" onAction="#marathon" text="Marathon" />
+      <Button layoutX="268.0" layoutY="179.0" mnemonicParsing="false" onAction="#tipFeature" text="Tip Feature" />
+      <Button layoutX="447.0" layoutY="143.0" mnemonicParsing="false" onAction="#spoopathon" text="Spoopathon" />
+      <Button layoutX="71.0" layoutY="217.0" mnemonicParsing="false" onAction="#poll" text="Chat Poll" />
+      <Label layoutX="232.0" layoutY="14.0" text="Feature Landing">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Button layoutX="265.0" layoutY="329.0" mnemonicParsing="false" onAction="#countThing" text="Count Thing" />
+   </children>
+</AnchorPane>

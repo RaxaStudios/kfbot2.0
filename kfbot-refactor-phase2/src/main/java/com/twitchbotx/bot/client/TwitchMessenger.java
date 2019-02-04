@@ -1,5 +1,6 @@
 package com.twitchbotx.bot.client;
 
+import com.twitchbotx.gui.controllers.DashboardController;
 import com.twitchbotx.gui.guiHandler;
 import java.io.PrintStream;
 
@@ -23,14 +24,10 @@ public final class TwitchMessenger {
      *
      * @param msg The message to be sent out to the channel.
      */
-    public void sendWhisper(final String msg) {
+     public void sendWhisper(final String msg) {
         if (!msg.isEmpty()) {
             final String message = msg;
-            guiHandler.bot.getOut().println("PRIVMSG #"
-                    + channel
-                    + " "
-                    + ":"
-                    + message);
+           DashboardController.wIRC.sendMessage(message, false);
         }
     }
 
@@ -43,13 +40,10 @@ public final class TwitchMessenger {
      * @param msg The message to be sent out to the channel
      */
     public void sendMessage(final String msg) {
+         DashboardController.wIRC.sendMessage(msg, true);
         if (!msg.isEmpty()) {
             final String message = "/me > " + msg;
-            guiHandler.bot.getOut().println("PRIVMSG #"
-                    + channel
-                    + " "
-                    + ":"
-                    + message);
+            DashboardController.wIRC.sendMessage(message, true);
         }
     }
     
@@ -59,7 +53,7 @@ public final class TwitchMessenger {
      *
      * @param msg The message to be sent out to the channel
      */
-    public void sendEditorMessage(final String msg) {
+   /* public void sendEditorMessage(final String msg) {
         String botChannel = guiHandler.bot.getStore().getConfiguration().account;
         if (!msg.isEmpty()) {
             final String message = "/me > " + msg;
@@ -69,5 +63,5 @@ public final class TwitchMessenger {
                     + ":"
                     + message);
         }
-    }
+    }*/
 }
