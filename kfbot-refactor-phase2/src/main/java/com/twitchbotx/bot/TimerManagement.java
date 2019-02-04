@@ -3,6 +3,7 @@ package com.twitchbotx.bot;
 //import com.twitchbotx.gui.DashboardController;
 import com.twitchbotx.bot.client.TwitchMessenger;
 import com.twitchbotx.bot.handlers.TwitchStatusHandler;
+import com.twitchbotx.gui.controllers.DashboardController;
 import com.twitchbotx.gui.guiHandler;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -12,6 +13,7 @@ import java.util.concurrent.ExecutorService;
 //import java.util.Timer;
 //import java.util.TimerTask;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
@@ -120,6 +122,7 @@ public final class TimerManagement {
             getLHM().remove(commandToStop);
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
@@ -135,11 +138,11 @@ public final class TimerManagement {
         private final TwitchStatusHandler tH = new TwitchStatusHandler(guiHandler.bot.getStore());
         private volatile boolean dead;
         private final ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
+        private Future f;
         private final String commandName;
         private final String commandText;
         private final int initialDelay;
         private final int commandInterval;
-        TwitchMessenger tM = guiHandler.messenger;
 
         public Task(String name, String content, int initD, int interval) {
             commandName = name;
@@ -151,19 +154,24 @@ public final class TimerManagement {
 
         public void start() {
             Runnable runnable = () -> {
+                
                 if (!getDead()) {
                     // check for stream online/offline
                     if (tH.uptime("").equals("Stream is not currently live.")) {
                         System.out.println("Stream offline while attemping to print: " + commandName);
                     } else {
                         System.out.println("Text of " + commandName + ": " + commandText);
-                        tM.sendMessage(commandText);
+                        DashboardController.wIRC.sendMessage(commandText, true);
                     }
                 } else {
-                    System.out.println("Still alive");
+                    this.shutdown();
+                    
+                   // System.out.println("Still alive");
                 }
+                
             };
-            ses.scheduleWithFixedDelay(runnable, initialDelay, commandInterval, TimeUnit.SECONDS);
+            f = ses.scheduleWithFixedDelay(runnable, initialDelay, commandInterval, TimeUnit.SECONDS);
+            //f.cancel(true);
         }
 
         private boolean getDead() {
@@ -174,6 +182,7 @@ public final class TimerManagement {
             System.out.println("Current shutdown thread: " + Thread.currentThread().getName());
             System.out.println("Shutting down command: " + commandName);
             ses.shutdown();
+            f.cancel(true);
             try {
                 if (!ses.awaitTermination(800, TimeUnit.MILLISECONDS)) {
                     ses.shutdownNow();
@@ -187,14 +196,6 @@ public final class TimerManagement {
         }
     }
 
-    private void sendMessage(final String msg) {
-        final String sendMessage = "/me > " + msg;
-        guiHandler.bot.getOut().println("PRIVMSG #"
-                + store.getConfiguration().joinedChannel
-                + " "
-                + ":"
-                + sendMessage);
-    }
 
     @ThreadSafe
     public static class pongHandler {

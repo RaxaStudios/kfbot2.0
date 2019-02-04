@@ -3,11 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.twitchbotx.gui;
+package com.twitchbotx.gui.controllers;
 
 import com.twitchbotx.bot.Commands;
 import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
+import com.twitchbotx.gui.ScreensController;
+import com.twitchbotx.gui.guiHandler;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -251,6 +253,15 @@ public class CommandEditorController implements Initializable {
             cmdStatus.setText("Command " + cmdName + " already exists!");
         }
         refresh();
+    }
+    
+    @FXML
+    public void clearNewCommand(){
+        newCommandName.setText("");
+        newCommandAuth.setText("");
+        newCommandCooldown.setText("");
+        newCommandSound.setText("");
+        newCommandMessage.setText("");
     }
 
     @FXML

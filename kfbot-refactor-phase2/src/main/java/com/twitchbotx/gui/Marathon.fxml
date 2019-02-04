@@ -2,11 +2,13 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.MarathonController">
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.controllers.MarathonController">
    <children>
       <Button layoutX="18.0" layoutY="361.0" mnemonicParsing="false" onAction="#dash" text="Dashboard" />
       <Label layoutX="218.0" layoutY="14.0" text="Marathon Manager">
@@ -65,5 +67,15 @@
       <Label layoutX="213.0" layoutY="218.0" text="minute(s)" />
       <TextField fx:id="setDollarText" alignment="CENTER" layoutX="101.0" layoutY="214.0" prefHeight="25.0" prefWidth="43.0" text="2" />
       <Label layoutX="153.0" layoutY="218.0" text="=" />
+      <Label layoutX="116.0" layoutY="365.0" text="Max Hour" />
+      <TextField fx:id="maxHour" layoutX="186.0" layoutY="361.0" prefHeight="25.0" prefWidth="50.0" />
+      <Label layoutX="248.0" layoutY="365.0" text="hours" />
+      <Button layoutX="292.0" layoutY="361.0" mnemonicParsing="false" onAction="#setMaxHour" text="Submit" />
+      <RadioButton fx:id="marEnabled" layoutX="12.0" layoutY="31.0" mnemonicParsing="false" text="Enabled">
+         <toggleGroup>
+            <ToggleGroup fx:id="Marathon" />
+         </toggleGroup>
+      </RadioButton>
+      <RadioButton fx:id="marDisabled" layoutX="110.0" layoutY="33.0" mnemonicParsing="false" text="Disabled" toggleGroup="$Marathon" />
    </children>
 </AnchorPane>

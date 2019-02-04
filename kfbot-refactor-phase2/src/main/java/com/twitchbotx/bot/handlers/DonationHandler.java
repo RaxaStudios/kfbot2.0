@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.bot.client.TwitchMessenger;
-import com.twitchbotx.gui.DashboardController;
+import com.twitchbotx.gui.controllers.DashboardController;
 import com.twitchbotx.gui.guiHandler;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -27,15 +27,11 @@ public class DonationHandler implements Runnable {
 
     private static String accessToken;
     private final Datastore store;
-    private final PrintStream outstream;
-    private final TwitchMessenger messenger;
     private String temp = "";
     private int tempCount = 0;
 
-    public DonationHandler(final Datastore store, final PrintStream outstream) {
+    public DonationHandler(final Datastore store) {
         this.store = store;
-        this.outstream = outstream;
-        this.messenger = new TwitchMessenger(outstream, store.getConfiguration().joinedChannel);
         this.accessToken = store.getConfiguration().streamlabsToken;
     }
 
@@ -101,15 +97,15 @@ public class DonationHandler implements Runnable {
                 //System.out.println("spoop enabled: " + spoopEnabled);
                 //System.out.println("marathon enabled: " + marathonEnabled);
                 if (marathonEnabled.equals("on")) {
-                    MarathonHandler mh = new MarathonHandler(store, outstream);
+                    //MarathonHandler mh = new MarathonHandler(store);
                     //sends w/out decimal ie $10.00 = 10
-                    mh.addDollars(am);
+                    //mh.addDollars(am);
                     sendEvent(username, msg, am);
                 }
                 if (spoopEnabled.equals("on")) {
                     if (!msg.contains("#")) {
-                        System.out.println("Whisper sent here from donation handler .w Raxa "+ username + " donated $" + am + " for spoopathon with no #, message: \"" + msg + "\"");
-                        messenger.sendWhisper("/w Raxa " + username + " donated $" + am + " for spoopathon with no #, message: \"" + msg + "\"");
+                        //System.out.println("Whisper sent here from donation handler .w Raxa "+ username + " donated $" + am + " for spoopathon with no #, message: \"" + msg + "\"");
+                        //messenger.sendWhisper("/w Raxa " + username + " donated $" + am + " for spoopathon with no #, message: \"" + msg + "\"");
                     } else {
                         addSubSQLPoints(msg, am);
                     }
@@ -123,7 +119,7 @@ public class DonationHandler implements Runnable {
 
     public void addSubSQLPoints(String msg, int points) {
         //parse for #game, send with points to sqlHandler.java
-        sqlHandler sql = new sqlHandler(store, outstream);
+        sqlHandler sql = new sqlHandler(store);
         sql.gameSearch(msg, points);
     }
 

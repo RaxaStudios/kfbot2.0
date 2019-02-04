@@ -3,11 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.twitchbotx.gui.settings;
+package com.twitchbotx.gui.controllers;
 
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.gui.ScreensController;
 import com.twitchbotx.gui.ScreensController;
+import com.twitchbotx.gui.ScreensController;
+import com.twitchbotx.gui.guiHandler;
 import com.twitchbotx.gui.guiHandler;
 import com.twitchbotx.gui.guiHandler;
 import java.net.URL;
@@ -63,6 +65,8 @@ public class SubEditController implements Initializable {
      */
     @FXML
     public void buttonPress(ActionEvent event) {
+        
+        /// TODO anonymous sub gift option?
         Datastore store = guiHandler.bot.getStore();
         String text = "";
         String header = "";
@@ -106,7 +110,7 @@ public class SubEditController implements Initializable {
     }
 
     @FXML
-    public void dash() {
+    public void goDash() {
         setDimensions();
         myController.loadScreen(guiHandler.dashboardID, guiHandler.dashboardFile);
         myController.setScreen(guiHandler.dashboardID);
@@ -114,6 +118,16 @@ public class SubEditController implements Initializable {
         myController.show(myController);
     }
 
+    // Change to sub editing page
+    @FXML
+    private void goResponse(ActionEvent event) {
+        setDimensions();
+        myController.loadScreen(guiHandler.respEditID, guiHandler.respEditFile);
+        myController.setScreen(guiHandler.respEditID);
+        myController.setId("RespEdit");
+        myController.show(myController);
+    }
+    
     /**
      * Initializes the controller class.
      */

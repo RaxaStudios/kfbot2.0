@@ -8,67 +8,62 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" fx:id="background" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.ConfigurationController">
+<AnchorPane id="AnchorPane" fx:id="background" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.controllers.ConfigurationController">
    <children>
-      <Label layoutX="370.0" layoutY="273.0" prefHeight="74.0" prefWidth="181.0" style="-fx-border-color: grey;" />
-      <Label layoutX="370.0" layoutY="54.0" prefHeight="74.0" prefWidth="181.0" style="-fx-border-color: grey;" />
-      <Label layoutX="370.0" layoutY="201.0" prefHeight="74.0" prefWidth="181.0" style="-fx-border-color: grey;" />
-      <Label layoutX="370.0" layoutY="127.0" prefHeight="74.0" prefWidth="181.0" style="-fx-border-color: grey;" />
-      <Button layoutX="31.0" layoutY="360.0" mnemonicParsing="false" onAction="#dash" text="Dashboard" />
-      <Label layoutX="225.0" layoutY="14.0" text="Settings Manager">
+      <Label layoutX="393.0" layoutY="55.0" prefHeight="74.0" prefWidth="181.0" style="-fx-border-color: grey;" />
+      <Label layoutX="393.0" layoutY="202.0" prefHeight="74.0" prefWidth="181.0" style="-fx-border-color: grey;" />
+      <Label layoutX="393.0" layoutY="274.0" prefHeight="74.0" prefWidth="181.0" style="-fx-border-color: grey;" />
+      <Label layoutX="27.0" layoutY="55.0" prefHeight="293.0" prefWidth="366.0" style="-fx-border-color: grey;" />
+      <Label layoutX="393.0" layoutY="128.0" prefHeight="74.0" prefWidth="181.0" style="-fx-border-color: grey;" />
+      <Button layoutX="54.0" layoutY="361.0" mnemonicParsing="false" onAction="#dash" text="Dashboard" />
+      <Label layoutX="230.0" layoutY="14.0" text="Settings Manager">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <Button layoutX="220.0" layoutY="170.0" mnemonicParsing="false" onAction="#playTestSound" text="Play" />
-      <TextField fx:id="soundTestText" layoutX="31.0" layoutY="170.0" promptText="filename (test.mp3)" />
-      <Label layoutX="40.0" layoutY="145.0" text="Test Sound (mp3 or wav)" />
-      <Label layoutX="35.0" layoutY="65.0" text="Send test message to chat" />
-      <Button layoutX="218.0" layoutY="94.0" mnemonicParsing="false" onAction="#sendTestMessage" text="Send" />
-      <TextField fx:id="testMessageText" layoutX="31.0" layoutY="94.0" text="Testing 123 ABC" />
-      <Label layoutX="418.0" layoutY="33.0" text="Feature Settings" />
-      <RadioButton fx:id="spoopEnabled" layoutX="466.0" layoutY="65.0" mnemonicParsing="false" text="Enabled">
+      <Button layoutX="280.0" layoutY="194.0" mnemonicParsing="false" onAction="#playTestSound" text="Play" />
+      <TextField fx:id="soundTestText" layoutX="74.0" layoutY="194.0" promptText="filename (test.mp3)" />
+      <Label layoutX="81.0" layoutY="166.0" text="Test Sound (mp3 or wav)" />
+      <Label layoutX="80.0" layoutY="84.0" text="Send test message to chat" />
+      <Button layoutX="279.0" layoutY="106.0" mnemonicParsing="false" onAction="#sendTestMessage" text="Send" />
+      <TextField fx:id="testMessageText" layoutX="76.0" layoutY="106.0" text="Testing 123 ABC" />
+      <Label layoutX="441.0" layoutY="34.0" text="Feature Settings" />
+      <RadioButton fx:id="spoopEnabled" layoutX="489.0" layoutY="66.0" mnemonicParsing="false" text="Enabled">
          <toggleGroup>
             <ToggleGroup fx:id="Spoop" />
          </toggleGroup>
       </RadioButton>
-      <RadioButton fx:id="marEnabled" layoutX="466.0" layoutY="142.0" mnemonicParsing="false" text="Enabled">
+      <RadioButton fx:id="marEnabled" layoutX="489.0" layoutY="143.0" mnemonicParsing="false" text="Enabled">
          <toggleGroup>
             <ToggleGroup fx:id="Marathon" />
          </toggleGroup>
       </RadioButton>
-      <RadioButton fx:id="spoopDisabled" layoutX="466.0" layoutY="98.0" mnemonicParsing="false" text="Disabled" toggleGroup="$Spoop" />
-      <RadioButton fx:id="marDisabled" layoutX="467.0" layoutY="174.0" mnemonicParsing="false" text="Disabled" toggleGroup="$Marathon" />
-      <Label layoutX="378.0" layoutY="82.0" text="Spoopathon:" />
-      <Label layoutX="390.0" layoutY="153.0" text="Marathon:" />
-      <Button layoutX="416.0" layoutY="360.0" mnemonicParsing="false" onAction="#saveSettings" text="Save Changes" />
-      <Label layoutX="397.0" layoutY="230.0" text="Lottery:" />
-      <Label layoutX="378.0" layoutY="302.0" text="Song Lottery:" />
-      <RadioButton fx:id="lottoEnabled" layoutX="467.0" layoutY="213.0" mnemonicParsing="false" text="Enabled">
+      <RadioButton fx:id="spoopDisabled" layoutX="489.0" layoutY="99.0" mnemonicParsing="false" text="Disabled" toggleGroup="$Spoop" />
+      <RadioButton fx:id="marDisabled" layoutX="490.0" layoutY="175.0" mnemonicParsing="false" text="Disabled" toggleGroup="$Marathon" />
+      <Label layoutX="401.0" layoutY="83.0" text="Spoopathon:" />
+      <Label layoutX="413.0" layoutY="154.0" text="Marathon:" />
+      <Button layoutX="439.0" layoutY="361.0" mnemonicParsing="false" onAction="#saveSettings" text="Save Changes" />
+      <Label layoutX="420.0" layoutY="231.0" text="Lottery:" />
+      <Label layoutX="401.0" layoutY="303.0" text="Song Lottery:" />
+      <RadioButton fx:id="lottoEnabled" layoutX="490.0" layoutY="214.0" mnemonicParsing="false" text="Enabled">
          <toggleGroup>
             <ToggleGroup fx:id="lotto" />
          </toggleGroup>
       </RadioButton>
-      <RadioButton fx:id="lottoDisabled" layoutX="468.0" layoutY="247.0" mnemonicParsing="false" text="Disabled" toggleGroup="$lotto" />
-      <RadioButton fx:id="songEnabled" layoutX="468.0" layoutY="286.0" mnemonicParsing="false" text="Enabled">
+      <RadioButton fx:id="lottoDisabled" layoutX="491.0" layoutY="248.0" mnemonicParsing="false" text="Disabled" toggleGroup="$lotto" />
+      <RadioButton fx:id="songEnabled" layoutX="491.0" layoutY="287.0" mnemonicParsing="false" text="Enabled">
          <toggleGroup>
             <ToggleGroup fx:id="songLotto" />
          </toggleGroup>
       </RadioButton>
-      <RadioButton fx:id="songDisabled" layoutX="470.0" layoutY="319.0" mnemonicParsing="false" text="Disabled" toggleGroup="$songLotto" />
-      <Label fx:id="saveText" layoutX="255.0" layoutY="345.0" prefHeight="59.0" prefWidth="156.0" text="changes saved" visible="false">
+      <RadioButton fx:id="songDisabled" layoutX="493.0" layoutY="320.0" mnemonicParsing="false" text="Disabled" toggleGroup="$songLotto" />
+      <Label fx:id="saveText" layoutX="278.0" layoutY="346.0" prefHeight="59.0" prefWidth="156.0" text="changes saved" visible="false">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Label>
-      <Button layoutX="31.0" layoutY="298.0" mnemonicParsing="false" onAction="#goSubEditor" text="Event Response Editor" />
-      <Label layoutX="31.0" layoutY="210.0" prefHeight="74.0" prefWidth="181.0" style="-fx-border-color: grey;" />
-      <Label layoutX="35.0" layoutY="239.0" text="Event Response:" />
-      <RadioButton fx:id="subEnabled" layoutX="131.0" layoutY="222.0" mnemonicParsing="false" text="Enabled">
-         <toggleGroup>
-            <ToggleGroup fx:id="sub" />
-         </toggleGroup>
-      </RadioButton>
-      <RadioButton fx:id="subDisabled" layoutX="130.0" layoutY="256.0" mnemonicParsing="false" text="Disabled" toggleGroup="$sub" />
+      <Label layoutX="68.0" layoutY="249.0" text="Send Non-formatted message" />
+      <TextField fx:id="nonFormatMessage" layoutX="74.0" layoutY="279.0" text="PRIVMSG #channel :message" />
+      <Button layoutX="277.0" layoutY="279.0" mnemonicParsing="false" onAction="#sendNonFormatMessage" text="Send" />
    </children>
 </AnchorPane>

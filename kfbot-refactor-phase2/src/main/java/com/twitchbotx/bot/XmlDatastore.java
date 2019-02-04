@@ -72,6 +72,8 @@ public final class XmlDatastore implements Datastore {
         configuration.streamerStatus = this.elements.configNode.getElementsByTagName("streamerStatus").item(0).getTextContent();
 
         configuration.followage = this.elements.configNode.getElementsByTagName("followage").item(0).getTextContent();
+        
+        configuration.channelInfo = this.elements.configNode.getElementsByTagName("channelInfo").item(0).getTextContent();
 
         configuration.youtubeApi = this.elements.configNode.getElementsByTagName("youtubeAPI").item(0).getTextContent();
 
@@ -84,7 +86,7 @@ public final class XmlDatastore implements Datastore {
         configuration.numCounters = Integer.parseInt(this.elements.configNode.getElementsByTagName("numberOfCounters").item(0).getTextContent());
 
         configuration.subReply = this.elements.configNode.getElementsByTagName("subReply").item(0).getTextContent();
-        
+
         configuration.subNormalReply = this.elements.configNode.getElementsByTagName("subNormalReply").item(0).getTextContent();
 
         configuration.subPrimeReply = this.elements.configNode.getElementsByTagName("subPrimeReply").item(0).getTextContent();
@@ -97,11 +99,31 @@ public final class XmlDatastore implements Datastore {
 
         configuration.subMassGiftReply = this.elements.configNode.getElementsByTagName("subMassGiftReply").item(0).getTextContent();
 
+        configuration.bitReply = this.elements.configNode.getElementsByTagName("bitReply").item(0).getTextContent();
+
+        configuration.bitMessage = this.elements.configNode.getElementsByTagName("bitMessage").item(0).getTextContent();
+
+        configuration.bitReplyMin = this.elements.configNode.getElementsByTagName("bitReplyMin").item(0).getTextContent();
+
+        configuration.raidReply = this.elements.configNode.getElementsByTagName("raidReply").item(0).getTextContent();
+
+        configuration.raidMessage = this.elements.configNode.getElementsByTagName("raidMessage").item(0).getTextContent();
+
+        configuration.raidReplyMin = this.elements.configNode.getElementsByTagName("raidReplyMin").item(0).getTextContent();
+
+        configuration.spoopSubValue = this.elements.configNode.getElementsByTagName("spoopSubValue").item(0).getTextContent();
+
+        configuration.spoopBitValue = this.elements.configNode.getElementsByTagName("spoopBitValue").item(0).getTextContent();
+
         configuration.pyramidResponse = this.elements.configNode.getElementsByTagName("pyramidResponse").item(0).getTextContent();
 
         configuration.sqlURL = this.elements.configNode.getElementsByTagName("sqlURL").item(0).getTextContent();
 
         configuration.sqlMURL = this.elements.configNode.getElementsByTagName("sqlMURL").item(0).getTextContent();
+
+        configuration.sqlOverlay = this.elements.configNode.getElementsByTagName("sqlOverlay").item(0).getTextContent();
+        
+        configuration.sqlCounter = this.elements.configNode.getElementsByTagName("sqlCounter").item(0).getTextContent();
 
         configuration.sqlUser = this.elements.configNode.getElementsByTagName("sqlUser").item(0).getTextContent();
 
@@ -126,8 +148,46 @@ public final class XmlDatastore implements Datastore {
         configuration.lottoStatus = this.elements.configNode.getElementsByTagName("lottoStatus").item(0).getTextContent();
 
         configuration.songLottoStatus = this.elements.configNode.getElementsByTagName("songLottoStatus").item(0).getTextContent();
+        
+        configuration.currentCount = this.elements.configNode.getElementsByTagName("currentCount").item(0).getTextContent();
+        
+        configuration.countText = this.elements.configNode.getElementsByTagName("countText").item(0).getTextContent();
 
         return configuration;
+    }
+
+    @Override
+    public List<ConfigParameters.Replies> getReplies() {
+        final List<ConfigParameters.Replies> replies = new ArrayList<>();
+        for (int i = 0; i < this.elements.replyNodes.getLength(); i++) {
+            Node n = this.elements.replyNodes.item(i);
+            Element e = (Element) n;
+            final ConfigParameters.Replies reply = new ConfigParameters.Replies();
+            reply.name = e.getAttribute("name");
+            reply.text = e.getTextContent();
+            reply.type = e.getAttribute("type");
+            replies.add(reply);
+        }
+        return replies;
+    }
+
+    @Override
+    public List<ConfigParameters.Alerts> getAlerts() {
+        final List<ConfigParameters.Alerts> alerts = new ArrayList<>();
+        for (int i = 0; i < this.elements.alertNodes.getLength(); i++) {
+            Node n = this.elements.alertNodes.item(i);
+            Element e = (Element) n;
+            final ConfigParameters.Alerts alert = new ConfigParameters.Alerts();
+            alert.name = e.getAttribute("name");
+            alert.enabled = Boolean.parseBoolean(e.getAttribute("enabled"));
+            alert.interval = Integer.parseInt(e.getAttribute("interval"));
+            alert.initialDelay = Integer.parseInt(e.getAttribute("initialDelay"));
+            alert.text1 = e.getAttribute("text1");
+            alert.text2 = e.getAttribute("text2");
+            alert.textContent = e.getTextContent();
+            alerts.add(alert);
+        }
+        return alerts;
     }
 
     @Override
@@ -153,6 +213,7 @@ public final class XmlDatastore implements Datastore {
             Element e = (Element) n;
 
             final ConfigParameters.Command command = new ConfigParameters.Command();
+            command.authLvl = Integer.parseInt(e.getAttribute("authLvl").replace(" ",""));
             command.auth = e.getAttribute("auth");
             command.name = e.getAttribute("name");
             command.disabled = Boolean.parseBoolean(e.getAttribute("disabled"));
@@ -194,6 +255,7 @@ public final class XmlDatastore implements Datastore {
             Element e = (Element) n;
 
             final ConfigParameters.FilterRegex filter = new ConfigParameters.FilterRegex();
+            filter.name = e.getAttribute("name");
             filter.content = e.getAttribute("content");
             filter.reason = e.getAttribute("reason");
             filter.enabled = Boolean.parseBoolean(e.getAttribute("enabled"));
@@ -341,6 +403,7 @@ public final class XmlDatastore implements Datastore {
         newNode.appendChild(this.elements.doc.createTextNode(msg));
         newNode.setAttribute("name", command.toLowerCase());
         newNode.setAttribute("auth", auth);
+        newNode.setAttribute("authLvl", "100 ");
         newNode.setAttribute("repeating", repeating);
         newNode.setAttribute("initialDelay", initDelay);
         newNode.setAttribute("interval", interval);
@@ -366,6 +429,7 @@ public final class XmlDatastore implements Datastore {
         newNode.appendChild(this.elements.doc.createTextNode(text));
         newNode.setAttribute("name", command.toLowerCase());
         newNode.setAttribute("auth", "");
+        newNode.setAttribute("authLvl", "0 ");
         newNode.setAttribute("repeating", "false");
         newNode.setAttribute("initialDelay", "0");
         newNode.setAttribute("interval", "0");
@@ -542,6 +606,78 @@ public final class XmlDatastore implements Datastore {
     }
 
     @Override
+    public boolean addRegex(ConfigParameters.FilterRegex regex) {
+
+        for (int i = 0; i < this.elements.regexNodes.getLength(); i++) {
+            final Node n = this.elements.regexNodes.item(i);
+            final Element e = (Element) n;
+            if (regex.name.contentEquals(e.getAttribute("name"))) {
+                // if names match with any other regex's get out
+                return false;
+            }
+        }
+        Element newNode = this.elements.doc.createElement("filterRegex");
+        newNode.setAttribute("name", regex.name);
+        newNode.setAttribute("reason", regex.reason);
+        if (regex.enabled) {
+            newNode.setAttribute("enabled", "true");
+        } else {
+            newNode.setAttribute("enabled", "false");
+        }
+        newNode.setAttribute("seconds", regex.seconds);
+        newNode.setAttribute("content", regex.content);
+        this.elements.regex.appendChild(newNode);
+        commit();
+        return true;
+    }
+
+    @Override
+    public boolean updateRegex(ConfigParameters.FilterRegex regex, String attribute) {
+
+        for (int i = 0; i < this.elements.regexNodes.getLength(); i++) {
+            final Node n = this.elements.regexNodes.item(i);
+            final Element e = (Element) n;
+            if (regex.name.contentEquals(e.getAttribute("name"))) {
+                if (attribute.equals("")) {
+                    e.setAttribute("content", regex.content);
+                    e.setAttribute("seconds", regex.seconds);
+                    e.setAttribute("reason", regex.reason);
+                    e.setAttribute("enabled", String.valueOf(regex.enabled));
+                } else if (attribute.equalsIgnoreCase("content")) {
+                    e.setAttribute("content", regex.content);
+                } else if (attribute.equalsIgnoreCase("seconds")) {
+                    //using "del" as the seconds value denotes using .delete
+                    e.setAttribute("seconds", regex.seconds);
+                } else if (attribute.equalsIgnoreCase("reason")) {
+                    e.setAttribute("reason", regex.reason);
+                } else if (attribute.equalsIgnoreCase("enabled")) {
+                    e.setAttribute("enabled", String.valueOf(regex.enabled));
+                } else {
+                    // if attribute is anything that we're not looking for, return false and prompt retry
+                    return false;
+                }
+                commit();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean deleteRegex(String name) {
+        for (int i = 0; i < this.elements.regexNodes.getLength(); i++) {
+            final Node n = this.elements.regexNodes.item(i);
+            final Element e = (Element) n;
+            if (name.contentEquals(e.getAttribute("name"))) {
+                this.elements.regex.removeChild(n);
+                commit();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public void updateCooldownTimer(final String command, long cooldownUntil) {
         System.out.println(command + " " + cooldownUntil);
         for (int i = 0; i < this.elements.commandNodes.getLength(); i++) {
@@ -567,6 +703,20 @@ public final class XmlDatastore implements Datastore {
         } catch (TransformerException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean setAlertAttribute(String name, String attribute, String value) {
+        for (int i = 0; i < this.elements.alertNodes.getLength(); i++) {
+            Node n = this.elements.alertNodes.item(i);
+            Element e = (Element) n;
+            if (name.equals(e.getAttribute("name"))) {
+                e.setAttribute(attribute, value);
+                commit();
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

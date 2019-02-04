@@ -6,6 +6,8 @@
 package com.twitchbotx.gui;
 
 import eu.mihosoft.scaledfx.ScalableContentPane;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
@@ -40,10 +42,15 @@ public class ScreensController extends StackPane {
     public boolean loadScreen(String name, String resource) {
         AnchorPane r = null;
         try {
+            Path fxmlFile = Paths.get("");
+            Path fxmlResolved = fxmlFile.resolve(resource);
             FXMLLoader loadFXML = new FXMLLoader();
-            loadFXML.setLocation(getClass().getClassLoader().getResource(resource));
+            loadFXML.setLocation(getClass().getClassLoader().getResource(fxmlResolved.toString()));
+            //loadFXML.setLocation(getClass().getClassLoader().getResource(resource));
+            System.out.println("location: " + fxmlResolved.toString());
+            System.out.println(resource);
             Parent content = loadFXML.load();
-            System.out.println("location: " + loadFXML.getLocation());
+            
             r = (AnchorPane) content;
             addScreen(name, r);
             return true;
