@@ -220,7 +220,8 @@ public final class CountHandler {
                 response = response.replace("%user", subDisplayName).replace("%tier", tier);
             } 
 
-            // new sub
+            // new sub 
+            // subMonths can come from Twitch as either 0 or 1
             else if (Integer.parseInt(subMonths) < 2) {
                 // find and replace variable %user %tier
                 response = guiHandler.bot.getStore().getConfiguration().subNewNormalReply;
