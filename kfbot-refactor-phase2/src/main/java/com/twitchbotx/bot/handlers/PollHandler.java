@@ -5,8 +5,6 @@
  */
 package com.twitchbotx.bot.handlers;
 
-import com.twitchbotx.bot.CommandParser;
-import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.gui.controllers.DashboardController;
 import com.twitchbotx.gui.controllers.PollFeatureController;
 import com.twitchbotx.gui.guiHandler;

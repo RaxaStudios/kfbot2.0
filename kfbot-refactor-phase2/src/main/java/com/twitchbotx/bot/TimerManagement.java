@@ -1,28 +1,18 @@
 package com.twitchbotx.bot;
 
-//import com.twitchbotx.gui.DashboardController;
-import com.twitchbotx.bot.client.TwitchMessenger;
+
 import com.twitchbotx.bot.handlers.TwitchStatusHandler;
 import com.twitchbotx.gui.controllers.DashboardController;
 import com.twitchbotx.gui.guiHandler;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-//import java.io.PrintStream;
-//import java.util.Timer;
-//import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
-//import org.w3c.dom.Element;
 
 /*
 ** Roughly 15 minute intervals between command sendMessage, 
@@ -38,7 +28,6 @@ public final class TimerManagement {
 
     static final LinkedHashMap<String, Task> LHM = new LinkedHashMap<>();
     private final Datastore store;
-    private static final Logger LOGGER = Logger.getLogger(TwitchBotX.class.getSimpleName());
 
     /*
 ** This takes the information parsed in the start of the program under 

@@ -6,21 +6,14 @@
 package com.twitchbotx.gui.controllers;
 
 import com.twitchbotx.bot.*;
-import com.twitchbotx.bot.client.TwitchMessenger;
 import com.twitchbotx.bot.handlers.*;
 import com.twitchbotx.gui.ScreensController;
 import com.twitchbotx.gui.guiHandler;
-import java.io.PrintStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -38,8 +31,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
-//import javax.annotation.concurrent.GuardedBy;
 
 /**
  * FXML Controller class

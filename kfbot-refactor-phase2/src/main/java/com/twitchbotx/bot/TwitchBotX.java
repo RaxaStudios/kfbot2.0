@@ -1,25 +1,9 @@
 package com.twitchbotx.bot;
 
-//import com.twitchbotx.bot.ConfigParameters.Elements;
-import com.twitchbotx.bot.TimerManagement.Task;
+
 import com.twitchbotx.bot.handlers.CommonUtility;
 import com.twitchbotx.bot.handlers.DonationHandler;
-import com.twitchbotx.bot.handlers.PubSubBitsHandler;
-import com.twitchbotx.bot.handlers.PubSubSubscriptionHandler;
-import com.twitchbotx.bot.handlers.WhisperHandler;
 import com.twitchbotx.gui.controllers.DashboardController;
-import static com.twitchbotx.gui.controllers.DashboardController.eventObL;
-import com.twitchbotx.gui.guiHandler;
-//import com.twitchbotx.gui.SpoopathonController;
-//import com.twitchbotx.gui.guiHandler;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.net.Socket;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -33,16 +17,11 @@ import java.util.logging.Logger;
 public final class TwitchBotX {
 
     private Logger LOGGER;
-    private static volatile boolean cancelled = false;
     private final Datastore store;
-    private String dataIn;
     private int reconCount = 0;
     private DashboardController dc;
-    private ScheduledExecutorService sPP;
-    private ScheduledExecutorService timedManagement;
     public TimerManagement timers;
     public static TimerManagement.pongHandler pH = new TimerManagement.pongHandler();
-    private final ConfigParameters configuration = new ConfigParameters();
     public boolean rogue;
 
     public TwitchBotX(Datastore getStore) {
