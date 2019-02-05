@@ -1,7 +1,6 @@
 package com.twitchbotx.bot.client;
 
 import com.twitchbotx.gui.controllers.DashboardController;
-import com.twitchbotx.gui.guiHandler;
 import java.io.PrintStream;
 
 /**

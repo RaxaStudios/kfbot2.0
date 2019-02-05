@@ -7,26 +7,16 @@ package com.twitchbotx.bot.handlers;
 
 import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
-import com.twitchbotx.bot.client.TwitchMessenger;
 import com.twitchbotx.gui.controllers.DashboardController;
 import com.twitchbotx.gui.guiHandler;
 import java.io.File;
-import java.io.PrintStream;
 import java.net.URL;
 import java.sql.*;
 import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
-//import javax.xml.transform.OutputKeys;
-//import javax.xml.transform.Transformer;
-//import javax.xml.transform.TransformerException;
-//import javax.xml.transform.TransformerFactory;
-//import javax.xml.transform.dom.DOMSource;
-//import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.DOMException;
-//import org.w3c.dom.Element;
-//import org.w3c.dom.Node;
 import org.apache.commons.io.FileUtils;
 
 /**

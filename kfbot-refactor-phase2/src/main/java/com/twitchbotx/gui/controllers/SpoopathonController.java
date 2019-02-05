@@ -11,7 +11,6 @@ import com.twitchbotx.bot.handlers.sqlHandler;
 import com.twitchbotx.gui.ScreensController;
 import com.twitchbotx.gui.guiHandler;
 import java.net.URL;
-import java.util.LinkedHashMap;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;

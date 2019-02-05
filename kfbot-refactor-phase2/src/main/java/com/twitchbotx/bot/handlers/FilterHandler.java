@@ -1,12 +1,10 @@
 package com.twitchbotx.bot.handlers;
 
-import com.twitchbotx.bot.CommandParser;
+
 import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
 import java.util.ArrayList;
 import java.util.List;
-//import org.w3c.dom.Element;
-//import org.w3c.dom.Node;
 
 import java.util.logging.Logger;
 

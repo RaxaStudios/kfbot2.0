@@ -7,10 +7,6 @@ package com.twitchbotx.gui.controllers;
 
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.gui.ScreensController;
-import com.twitchbotx.gui.ScreensController;
-import com.twitchbotx.gui.ScreensController;
-import com.twitchbotx.gui.guiHandler;
-import com.twitchbotx.gui.guiHandler;
 import com.twitchbotx.gui.guiHandler;
 import java.net.URL;
 import java.util.ResourceBundle;

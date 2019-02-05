@@ -7,17 +7,13 @@ package com.twitchbotx.gui.controllers;
 
 import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
-import com.twitchbotx.bot.handlers.sqlHandler;
 import com.twitchbotx.gui.ScreensController;
 import com.twitchbotx.gui.guiHandler;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

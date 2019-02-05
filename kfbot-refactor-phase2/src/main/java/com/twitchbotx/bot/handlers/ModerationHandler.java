@@ -5,7 +5,6 @@
  */
 package com.twitchbotx.bot.handlers;
 
-import java.io.PrintStream;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,12 +13,9 @@ import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.gui.controllers.DashboardController;
 import com.twitchbotx.gui.guiHandler;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import javafx.application.Platform;
-import javafx.scene.control.Button;
 
 /**
  *

@@ -6,10 +6,7 @@
 package com.twitchbotx.bot.handlers;
 
 import com.twitchbotx.bot.Datastore;
-import com.twitchbotx.bot.client.TwitchMessenger;
 import com.twitchbotx.gui.controllers.DashboardController;
-import com.twitchbotx.gui.guiHandler;
-import java.io.PrintStream;
 
 /**
  *

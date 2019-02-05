@@ -1,6 +1,6 @@
 package com.twitchbotx.bot;
 
-import com.twitchbotx.bot.client.TwitchMessenger;
+
 import com.twitchbotx.bot.handlers.*;
 import com.twitchbotx.gui.controllers.ConfigurationController;
 import com.twitchbotx.gui.controllers.DashboardController;

@@ -16,13 +16,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-//import javax.sound.sampled.AudioInputStream;
-//import javax.sound.sampled.AudioSystem;
-//import javax.sound.sampled.Clip;
 import org.w3c.dom.DOMException;
 
-//import sun.audio.AudioPlayer;
-//import sun.audio.AudioStream;
 /**
  * This class is a command handler for most of the common commands in this bot.
  */

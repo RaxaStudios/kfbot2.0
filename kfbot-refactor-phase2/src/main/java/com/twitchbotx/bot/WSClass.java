@@ -6,7 +6,6 @@
 package com.twitchbotx.bot;
 
 import com.twitchbotx.gui.controllers.DashboardController;
-import com.twitchbotx.gui.guiHandler;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URI;
