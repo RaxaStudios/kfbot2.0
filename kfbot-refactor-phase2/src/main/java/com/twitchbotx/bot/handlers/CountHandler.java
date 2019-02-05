@@ -227,7 +227,7 @@ public final class CountHandler {
                 response = response.replace("%user", subDisplayName).replace("%tier", tier);
             } 
 
-            // prime sub
+            // prime resub
             else if (prime) {
                 // find and replace variables %user %months
                 response = guiHandler.bot.getStore().getConfiguration().subPrimeReply;
