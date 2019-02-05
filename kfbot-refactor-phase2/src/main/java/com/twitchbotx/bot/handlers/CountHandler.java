@@ -191,7 +191,7 @@ public final class CountHandler {
             boolean massGift,
             boolean singleGift,
             String subDisplayName,
-            String giftRecip,
+            String giftRecipient,
             int giftAmount,
             int subPoints,
             boolean prime,
@@ -219,34 +219,22 @@ public final class CountHandler {
             // deal with mass gift sub
             switch (subType) {
                 case MASSGIFT:
-                    // find a replace variables %user %gifts %tier
-                    response = guiHandler.bot.getStore().getConfiguration().subMassGiftReply;
-                    response = response.replace("%user", subDisplayName).replace("%gifts", String.valueOf(giftAmount)).replace("%tier", tier);
+                    response = massGiftMessage(subDisplayName, giftAmount, tier);
                     break;
                 case SINGLEGIFT:
-                    // find a replace variables %user %recipient %tier
-                    response = guiHandler.bot.getStore().getConfiguration().subSingleGiftReply;
-                    response = response.replace("%user", subDisplayName).replace("%recipient", giftRecip).replace("%tier", tier);
+                    response = singleGiftMessage(subDisplayName, giftRecipient, tier);
                     break;
                 case NEWPRIMESUB:
-                    // find and replace variable %user %tier
-                    response = guiHandler.bot.getStore().getConfiguration().subNewPrimeReply;
-                    response = response.replace("%user", subDisplayName).replace("%tier", tier);
+                    response = newPrimeSubMessage(subDisplayName, tier);
                     break;
                 case NEWSUB:
-                    // find and replace variable %user %tier
-                    response = guiHandler.bot.getStore().getConfiguration().subNewNormalReply;
-                    response = response.replace("%user", subDisplayName).replace("%tier", tier);
+                    response = newSubMessage(subDisplayName, tier);
                     break;
                 case PRIMERESUB:
-                    // find and replace variables %user %months
-                    response = guiHandler.bot.getStore().getConfiguration().subPrimeReply;
-                    response = response.replace("%user", subDisplayName).replace("%months", subMonths);
+                    response = primeResubMessage(subDisplayName, subMonths)
                     break;
                 case RESUB:
-                    // find and replace variables %user %months %tier
-                    response = guiHandler.bot.getStore().getConfiguration().subNormalReply;
-                    response = response.replace("%user", subDisplayName).replace("%months", subMonths).replace("%tier", tier);
+                    response = resubMessage(subDisplayName, subMonths, tier)
                     break;
                 default:
                     // TODO: Log error because something has gone horribly wrong
@@ -257,6 +245,36 @@ public final class CountHandler {
             // bundle and send reply to messenger and event list
             sendEvent(response);
             return response;
+        }
+
+        private static String massGiftMessage(String subDisplayName, int giftAmount, String tier) {
+            String template = guiHandler.bot.getStore().getConfiguration().subMassGiftReply;
+            return template.replace("%user", subDisplayName).replace("%gifts", String.valueOf(giftAmount)).replace("%tier", tier);
+        }
+
+        private static String singleGiftMessage(String subDisplayName, String giftRecipient, String tier) {
+            String template = guiHandler.bot.getStore().getConfiguration().subSingleGiftReply;
+            return template.replace("%user", subDisplayName).replace("%recipient", giftRecipient).replace("%tier", tier);
+        }
+
+        private static String newPrimeSubMessage(String subDisplayName, String tier) {
+            String template = guiHandler.bot.getStore().getConfiguration().subNewPrimeReply;
+            return template.replace("%user", subDisplayName).replace("%tier", tier);
+        }
+
+        private static String newSubMessage(String subDisplayName, String tier) {
+            String template = guiHandler.bot.getStore().getConfiguration().subNewNormalReply;
+            return template.replace("%user", subDisplayName).replace("%tier", tier);
+        }
+
+        private static String primeResubMessage(String subDisplayName, String subMonths) {
+            String template = guiHandler.bot.getStore().getConfiguration().subPrimeReply;
+            return template.replace("%user", subDisplayName).replace("%months", subMonths);
+        }
+
+        private static String resubMessage(String subDisplayName, String subMonths) {
+            String template = guiHandler.bot.getStore().getConfiguration().subNormalReply;
+            return template.replace("%user", subDisplayName).replace("%months", subMonths).replace("%tier", tier);
         }
 
         private static void sendEvent(final String msg) {
