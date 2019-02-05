@@ -141,31 +141,63 @@ public final class CountHandler {
     public static class SubHandler {
 
         // TODO: Place in appropriate higher level
-        public enum SubType{MASSGIFT, SINGLEGIFT, NEWPRIMESUB, NEWSUB, PRIMERESUB, RESUB}
+        public enum SubType {
+            MASSGIFT {
+                @Override
+                public String getTemplate() {
+                    return guiHandler.bot.getStore().getConfiguration().subMassGiftReply;
+                }
+            },
+            SINGLEGIFT {
+                @Override
+                public String getTemplate() {
+                    return guiHandler.bot.getStore().getConfiguration().subSingleGiftReply;
+                }
+            },
+            NEWPRIMESUB {
+                @Override
+                public String getTemplate() {
+                    return guiHandler.bot.getStore().getConfiguration().subNewPrimeReply;
+                }
+            },
+            NEWSUB {
+                @Override
+                public String getTemplate() {
+                    return guiHandler.bot.getStore().getConfiguration().subNewNormalReply;
+                }
+            },
+            PRIMERESUB {
+                @Override
+                public String getTemplate() {
+                    return guiHandler.bot.getStore().getConfiguration().subPrimeReply;
+                }
+            },
+            RESUB {
+                @Override
+                public String getTemplate() {
+                    return guiHandler.bot.getStore().getConfiguration().subNormalReply;
+                }
+            };
 
-        // TODO: The returned value should be one of the parameters passed in to handleSubMessage
-        private static SubType assessSubType(boolean massGift, boolean singleGift, String subMonths, boolean prime) {
-            if (massGift) {
-                return SubType.MASSGIFT;
+            public String buildMessage(
+                String subDisplayName,
+                String tier,
+                String subMonths,
+                String giftRecipient,
+                int giftAmount
+            ) {
+                String message = this.getTemplate();
+                
+                message = message.replace("%user", subDisplayName);
+                message = message.replace("%tier", tier);
+                message = message.replace("%months", subMonths);
+                message = message.replace("%recipient", giftRecipient);
+                message = message.replace("%gifts", String.valueOf(giftAmount));
+
+                return message;
             }
 
-            if (singleGift) {
-                return SubType.SINGLEGIFT;
-            }
-
-            if (Integer.parseInt(subMonths) < 2 && prime) {
-                return SubType.NEWPRIMESUB;
-            }
-
-            if (Integer.parseInt(subMonths) < 2) {
-                return SubType.NEWSUB;
-            }
-
-            if (prime) {
-                return SubType.PRIMERESUB;
-            }
-
-            return SubType.RESUB;
+            public abstract String getTemplate();
         }
 
         /**
@@ -191,68 +223,15 @@ public final class CountHandler {
             boolean massGift,
             boolean singleGift,
             String subDisplayName,
-            String giftRecip,
+            String giftRecipient,
             int giftAmount,
             int subPoints,
             boolean prime,
-            String subMonths)
-        {
-            String tier = "";
-            switch (subPoints) {
-                case 1:
-                    tier = "1";
-                    break;
-                case 2:
-                    tier = "2";
-                    break;
-                case 6:
-                    tier = "3";
-                    break;
-                default:
-                    tier = "1";
-                    break;
-            }
-
-            String response = "";
+            String subMonths
+        ) {
+            String tier = assessTier(subPoints);
             SubType subType = assessSubType(massGift, singleGift, subMonths, prime);
-
-            // deal with mass gift sub
-            switch (subType) {
-                case MASSGIFT:
-                    // find a replace variables %user %gifts %tier
-                    response = guiHandler.bot.getStore().getConfiguration().subMassGiftReply;
-                    response = response.replace("%user", subDisplayName).replace("%gifts", String.valueOf(giftAmount)).replace("%tier", tier);
-                    break;
-                case SINGLEGIFT:
-                    // find a replace variables %user %recipient %tier
-                    response = guiHandler.bot.getStore().getConfiguration().subSingleGiftReply;
-                    response = response.replace("%user", subDisplayName).replace("%recipient", giftRecip).replace("%tier", tier);
-                    break;
-                case NEWPRIMESUB:
-                    // find and replace variable %user %tier
-                    response = guiHandler.bot.getStore().getConfiguration().subNewPrimeReply;
-                    response = response.replace("%user", subDisplayName).replace("%tier", tier);
-                    break;
-                case NEWSUB:
-                    // find and replace variable %user %tier
-                    response = guiHandler.bot.getStore().getConfiguration().subNewNormalReply;
-                    response = response.replace("%user", subDisplayName).replace("%tier", tier);
-                    break;
-                case PRIMERESUB:
-                    // find and replace variables %user %months
-                    response = guiHandler.bot.getStore().getConfiguration().subPrimeReply;
-                    response = response.replace("%user", subDisplayName).replace("%months", subMonths);
-                    break;
-                case RESUB:
-                    // find and replace variables %user %months %tier
-                    response = guiHandler.bot.getStore().getConfiguration().subNormalReply;
-                    response = response.replace("%user", subDisplayName).replace("%months", subMonths).replace("%tier", tier);
-                    break;
-                default:
-                    // TODO: Log error because something has gone horribly wrong
-                    response = "";
-                    break;
-            }
+            String response = subType.buildMessage(subDisplayName, tier, subMonths, giftRecipient, giftAmount);
 
             // bundle and send reply to messenger and event list
             sendEvent(response);
@@ -268,6 +247,47 @@ public final class CountHandler {
                     guiHandler.bot.getStore().getEventList().addList(event);
                 }
             });
+        }
+
+        // TODO: Move method higher up
+        // The returned value should be one of the parameters passed in to handleSubMessage
+        private static String assessTier(int subPoints) {
+            switch (subPoints) {
+                case 1:
+                    return "1";
+                case 2:
+                    return "2";
+                case 6:
+                    return "3";
+                default:
+                    return "1";
+            }
+        }
+
+        // TODO: Move method higher up
+        // The returned value should be one of the parameters passed in to handleSubMessage
+        private static SubType assessSubType(boolean massGift, boolean singleGift, String subMonths, boolean prime) {
+            if (massGift) {
+                return SubType.MASSGIFT;
+            }
+
+            if (singleGift) {
+                return SubType.SINGLEGIFT;
+            }
+
+            if (Integer.parseInt(subMonths) < 2 && prime) {
+                return SubType.NEWPRIMESUB;
+            }
+
+            if (Integer.parseInt(subMonths) < 2) {
+                return SubType.NEWSUB;
+            }
+
+            if (prime) {
+                return SubType.PRIMERESUB;
+            }
+
+            return SubType.RESUB;
         }
     }
 }
