@@ -160,15 +160,15 @@ public final class CountHandler {
          *
          */
         public static String handleSubMessage(
-                boolean massGifted,
-                boolean subGift,
-                String subDisplayName,
-                String giftRecip,
-                int giftAmount,
-                int subPoints,
-                boolean prime,
-                String subMonths) {
-            String response = "";
+            boolean massGifted,
+            boolean subGift,
+            String subDisplayName,
+            String giftRecip,
+            int giftAmount,
+            int subPoints,
+            boolean prime,
+            String subMonths)
+        {
             String tier = "";
             switch (subPoints) {
                 case 1:
@@ -184,57 +184,78 @@ public final class CountHandler {
                     tier = "1";
                     break;
             }
-            //first deal with normal + Prime subs
-            if (!massGifted && !subGift) {
-                if (Integer.parseInt(subMonths) < 2) {
-                    //new subs
-                    if (prime) {
-                        // find a replace variable %user 
-                        response = guiHandler.bot.getStore().getConfiguration().subNewPrimeReply;
-                        response = response.replace("%user", subDisplayName).replace("%tier", tier);
-                        return response;
-                    } else {
-                        // find a replace variable %user %tier
-                        response = guiHandler.bot.getStore().getConfiguration().subNewNormalReply;
-                        response = response.replace("%user", subDisplayName).replace("%tier", tier);
-                        return response;
-                    }
-                } else {
-                    if (prime) {
-                        // find a replace variables %user %months
-                        response = guiHandler.bot.getStore().getConfiguration().subPrimeReply;
-                        response = response.replace("%user", subDisplayName).replace("%months", subMonths);
-                    } else {
-                        // find a replace variables %user %months %tier
-                        response = guiHandler.bot.getStore().getConfiguration().subNormalReply;
-                        response = response.replace("%user", subDisplayName).replace("%months", subMonths).replace("%tier", tier);
-                    }
-                }
-            }
-            // deal with single gifted sub
-            if (!massGifted && subGift) {
-                // find a replace variables %user %recipient %tier
-                response = guiHandler.bot.getStore().getConfiguration().subSingleGiftReply;
-                response = response.replace("%user", subDisplayName).replace("%recipient", giftRecip).replace("%tier", tier);
-            }
+
+            String response = "";
+
+            // deal with mass gift sub
             if (massGifted) {
                 // find a replace variables %user %gifts %tier
                 response = guiHandler.bot.getStore().getConfiguration().subMassGiftReply;
                 response = response.replace("%user", subDisplayName).replace("%gifts", String.valueOf(giftAmount)).replace("%tier", tier);
+                
+                // bundle and send reply to messenger and event list
+                sendEvent(response);
+                return response;
+            }
+
+            // massGifted can only be false if it reaches this point
+
+            // deal with single gifted sub
+            if (subGift) {
+                // find a replace variables %user %recipient %tier
+                response = guiHandler.bot.getStore().getConfiguration().subSingleGiftReply;
+                response = response.replace("%user", subDisplayName).replace("%recipient", giftRecip).replace("%tier", tier);
+                
+                // bundle and send reply to messenger and event list
+                sendEvent(response);
+                return response;
+            }
+
+            // the only way to reach this level is if massGifted and subGift are false
+
+            // new prime sub
+            if (Integer.parseInt(subMonths) < 2 && prime) {
+                // find and replace variable %user %tier
+                response = guiHandler.bot.getStore().getConfiguration().subNewPrimeReply;
+                response = response.replace("%user", subDisplayName).replace("%tier", tier);
+            } 
+
+            // new sub 
+            // subMonths can come from Twitch as either 0 or 1
+            else if (Integer.parseInt(subMonths) < 2) {
+                // find and replace variable %user %tier
+                response = guiHandler.bot.getStore().getConfiguration().subNewNormalReply;
+                response = response.replace("%user", subDisplayName).replace("%tier", tier);
+            } 
+
+            // prime resub
+            else if (prime) {
+                // find and replace variables %user %months
+                response = guiHandler.bot.getStore().getConfiguration().subPrimeReply;
+                response = response.replace("%user", subDisplayName).replace("%months", subMonths);
+            } 
+
+            // resub
+            else {
+                // find and replace variables %user %months %tier
+                response = guiHandler.bot.getStore().getConfiguration().subNormalReply;
+                response = response.replace("%user", subDisplayName).replace("%months", subMonths).replace("%tier", tier);
             }
 
             // bundle and send reply to messenger and event list
             sendEvent(response);
             return response;
         }
+
         private static void sendEvent(final String msg) {
-        String event = msg;
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                guiHandler.bot.getStore().getEventList().addList(event);
-            }
-        });
-    }
+            String event = msg;
+            
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    guiHandler.bot.getStore().getEventList().addList(event);
+                }
+            });
+        }
     }
 }
