@@ -551,6 +551,7 @@ public class CommandParser {
             return;
         }
         if (trailing.toLowerCase().startsWith("!vote")) {
+            if(store.getConfiguration().spoopathonStatus.equals("off")){ return; }
             // parse for params "!vote [gameID] [votes]
             System.out.println("trailing: " + trailing);
             try {
