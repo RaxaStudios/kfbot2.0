@@ -101,10 +101,11 @@ public class LotteryController implements Initializable {
     @FXML
     public void showQueue() {
         userLottoList.clear();
-        LOTTOMAP = entries.getMap();
-        LOTTOMAP.entrySet().forEach((m) -> {
-            System.out.println("Current map item: " + m.getKey() + "  current tickets: " + m.getValue().getTicket());
-        });
+        LOTTOMAP = lotto.getMap();
+        //uncomment for debugging
+        /*LOTTOMAP.entrySet().forEach((m) -> {
+        //System.out.println("Current map item: " + m.getKey() + "  current tickets: " + m.getValue().getTicket());
+        });*/
         LOTTOMAP.entrySet().forEach((m) -> {
             userLottoList.add(" " + (labelLotto + 1) + ". " + m.getKey());
             labelLotto++;
@@ -318,9 +319,10 @@ public class LotteryController implements Initializable {
     public void showSongQueue() {
         userSongList.clear();
         SONGMAP = entries.getMap();
-        SONGMAP.entrySet().forEach((m) -> {
-            System.out.println("Current map item: " + m.getKey() + "  current tickets: " + m.getValue().getTicket());
-        });
+        //uncomment for debugging
+        /*SONGMAP.entrySet().forEach((m) -> {
+            //System.out.println("Current map item: " + m.getKey() + "  current tickets: " + m.getValue().getTicket());
+        });*/
         SONGMAP.entrySet().forEach((m) -> {
             userSongList.add(" " + (labelSong + 1) + ". " + m.getKey() + ": " + m.getValue().getContent());
             labelSong++;
@@ -340,8 +342,8 @@ public class LotteryController implements Initializable {
         store = guiHandler.bot.getStore();
         qStatus.setText("Lottery ready to use");
         songStatusWindow.setText("Song Lotto ready");
-        //showQueue();
-       // showSongQueue();
+        showQueue();
+        showSongQueue();
         setRadios();
         addListener(lottoGroup, "lottoStatus");
         addListener(songLottoGroup, "songLottoStatus");
