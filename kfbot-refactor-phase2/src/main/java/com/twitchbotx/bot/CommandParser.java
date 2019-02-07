@@ -833,7 +833,7 @@ public class CommandParser {
                 gifted = false;
             } else {
                 // sub gift notification does not have this param
-                int beginMonths = msg.indexOf("msg-param-months=") + 17;
+                int beginMonths = msg.indexOf("msg-param-cumulative-months=") + 28;
                 int endMonths = msg.indexOf(";", beginMonths);
                 subMonths = msg.substring(beginMonths, endMonths);
                 massGifted = false;
