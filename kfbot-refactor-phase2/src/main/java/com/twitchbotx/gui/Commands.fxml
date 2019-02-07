@@ -2,17 +2,149 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane id="Commands" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.controllers.CommandsController">
     <children>
-                <Button alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" layoutX="329.0" layoutY="358.0" mnemonicParsing="false" onAction="#editCommands" prefHeight="25.0" prefWidth="155.0" text="Command Editor" textAlignment="CENTER" />
-      <Button layoutX="82.0" layoutY="358.0" mnemonicParsing="false" onAction="#dash" text="Dashboard" />
-      <ScrollPane fx:id="commandList" layoutX="24.0" layoutY="23.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="323.0" prefWidth="197.0" style="-fx-background-color: eae8e8;" />
-      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="47.0" layoutY="2.0" prefHeight="17.0" prefWidth="144.0" text="Current Commands">
+      <TabPane prefHeight="406.0" prefWidth="606.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab text="Current Commands">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <ScrollPane fx:id="commandList" layoutX="22.0" layoutY="18.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="339.0" prefWidth="197.0" style="-fx-background-color: eae8e8;" />
+                        <Label layoutX="357.0" layoutY="9.0" text="Command Info">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        <Pane fx:id="commandInfo" layoutX="252.0" layoutY="42.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="317.0" prefWidth="321.0" style="-fx-background-color: eae8e8;" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab text="Command Editor">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TextField fx:id="commandToEdit" layoutX="276.0" layoutY="19.0" />
+                        <Button fx:id="submitChanges" layoutX="469.0" layoutY="80.0" mnemonicParsing="false" onAction="#submitChanges" prefHeight="25.0" prefWidth="124.0" text="Submit Changes" />
+                        <Button fx:id="deleteCommand" layoutX="466.0" layoutY="19.0" mnemonicParsing="false" onAction="#deleteCommand" prefHeight="25.0" prefWidth="129.0" text="Delete Command" />
+                        <Label layoutX="208.0" layoutY="184.0" text="Create new command">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="newCommandName" layoutX="59.0" layoutY="210.0" prefHeight="25.0" prefWidth="107.0" promptText="!command" />
+                        <TextField fx:id="newCommandAuth" layoutX="59.0" layoutY="250.0" prefHeight="25.0" prefWidth="133.0" promptText="(-s +m -a +username)" />
+                        <Label layoutX="10.0" layoutY="217.0" text="Name:" />
+                        <Label layoutX="13.0" layoutY="254.0" text="Auth:" />
+                        <Label layoutX="3.0" layoutY="291.0" text="Cooldown:" />
+                        <TextField fx:id="newCommandCooldown" alignment="CENTER" layoutX="76.0" layoutY="287.0" prefHeight="25.0" prefWidth="51.0" text="30" />
+                        <Label layoutX="138.0" layoutY="291.0" text="seconds" />
+                        <Label layoutX="184.0" layoutY="50.0" text="What to edit">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <MenuButton fx:id="attributesMenu" layoutX="180.0" layoutY="80.0" mnemonicParsing="false" text="Attributes">
+                           <items>
+                              <MenuItem fx:id="attributeAuth" mnemonicParsing="false" onAction="#setAttribute" text="Auth" />
+                              <MenuItem fx:id="attributeCooldown" mnemonicParsing="false" onAction="#setAttribute" text="Cooldown" />
+                              <MenuItem fx:id="attributeEnabled" mnemonicParsing="false" onAction="#setAttribute" text="Disabled" />
+                              <MenuItem fx:id="attributeInitialDelay" mnemonicParsing="false" onAction="#setAttribute" text="Initial Delay" />
+                              <MenuItem fx:id="attributeInterval" mnemonicParsing="false" onAction="#setAttribute" text="Interval" />
+                              <MenuItem mnemonicParsing="false" onAction="#setAttribute" text="Repeating" />
+                              <MenuItem fx:id="attributeSound" mnemonicParsing="false" onAction="#setAttribute" text="Sound" />
+                              <MenuItem fx:id="attributeMessage" mnemonicParsing="false" onAction="#setAttribute" text="Message" />
+                           </items>
+                        </MenuButton>
+                        <ListView fx:id="commandEditingList" layoutX="14.0" layoutY="31.0" prefHeight="158.0" prefWidth="149.0" />
+                        <Label layoutX="40.0" layoutY="6.0" text="Select a command" />
+                        <Button layoutX="184.0" layoutY="19.0" mnemonicParsing="false" onAction="#chooseCommand" text="Select" />
+                        <Label layoutX="235.0" layoutY="23.0" text="-&gt;" />
+                        <Label fx:id="editValueLabel" layoutX="318.0" layoutY="50.0" text="New value">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="220.0" layoutY="234.0" text="Repeating:" />
+                        <Label layoutX="216.0" layoutY="278.0" text="Initial Delay:" />
+                        <Label layoutX="219.0" layoutY="310.0" text="Interval:" />
+                        <Button layoutX="459.0" layoutY="345.0" mnemonicParsing="false" onAction="#newCommand" text="Add New Command" />
+                        <Label layoutX="412.0" layoutY="222.0" text="Message:" />
+                        <TextField fx:id="newCommandInitDelay" alignment="CENTER" layoutX="295.0" layoutY="274.0" prefHeight="25.0" prefWidth="35.0" text="0" />
+                        <Label layoutX="347.0" layoutY="278.0" text="seconds" />
+                        <RadioButton fx:id="repeatYes" layoutX="293.0" layoutY="225.0" mnemonicParsing="false" text="True">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="repeating" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="repeatNo" layoutX="294.0" layoutY="245.0" mnemonicParsing="false" selected="true" text="False" toggleGroup="$repeating" />
+                        <Label layoutX="347.0" layoutY="310.0" text="seconds" />
+                        <TextField fx:id="newCommandInterval" alignment="CENTER" layoutX="275.0" layoutY="306.0" prefHeight="25.0" prefWidth="57.0" text="1800" />
+                        <Label fx:id="submitStatus" layoutX="468.0" layoutY="153.0" prefHeight="56.0" prefWidth="103.0" wrapText="true" />
+                        <Label fx:id="cmdStatus" alignment="CENTER" contentDisplay="CENTER" layoutX="424.0" layoutY="171.0" prefHeight="64.0" prefWidth="149.0" textAlignment="CENTER" textFill="#f80707" wrapText="true" />
+                        <Label layoutX="5.0" layoutY="342.0" text="Sound file (optional):" />
+                        <TextField fx:id="newCommandSound" layoutX="124.0" layoutY="338.0" prefHeight="25.0" prefWidth="149.0" promptText="filename.mp3" />
+                        <TextArea fx:id="newValueText" layoutX="291.0" layoutY="80.0" maxHeight="75.0" maxWidth="149.0" minHeight="25.0" minWidth="149.0" prefHeight="73.0" prefWidth="149.0" wrapText="true" />
+                        <TextArea fx:id="newCommandMessage" layoutX="412.0" layoutY="250.0" prefHeight="88.0" prefWidth="174.0" wrapText="true" />
+                        <Label fx:id="deleteConfirmText" layoutX="445.0" layoutY="60.0" prefHeight="50.0" prefWidth="149.0" textAlignment="CENTER" textFill="RED" wrapText="true" />
+                        <Button layoutX="520.0" layoutY="197.0" mnemonicParsing="false" onAction="#clearNewCommand" text="Clear New" />
+                     </children></AnchorPane>
+            </content>
+          </Tab>
+            <Tab text="Repeating Editor">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <ScrollPane fx:id="commandRepeatingList" layoutX="17.0" layoutY="63.0" prefHeight="276.0" prefWidth="171.0" />
+                        <Label layoutX="33.0" layoutY="19.0" text="Available Commands">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="414.0" layoutY="9.0" text="Options">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="263.0" layoutY="55.0" text="Name:" />
+                        <Label layoutX="264.0" layoutY="124.0" text="Interval:" />
+                        <Label layoutX="248.0" layoutY="155.0" text="Initial Delay:" />
+                        <Label layoutX="260.0" layoutY="197.0" text="Message:" />
+                        <Button layoutX="228.0" layoutY="232.0" mnemonicParsing="false" onAction="#startCommand" prefHeight="25.0" prefWidth="74.0" text="Start" />
+                        <Button layoutX="227.0" layoutY="288.0" mnemonicParsing="false" onAction="#stopCommand" prefHeight="25.0" prefWidth="74.0" text="Stop" />
+                        <Label fx:id="commandNameText" alignment="CENTER" contentDisplay="CENTER" layoutX="365.0" layoutY="54.0" prefHeight="19.0" prefWidth="160.0" style="-fx-border-color: grey;" textAlignment="CENTER" />
+                        <Label fx:id="commandInterval" alignment="CENTER" contentDisplay="CENTER" layoutX="365.0" layoutY="123.0" prefHeight="19.0" prefWidth="160.0" style="-fx-border-color: grey;" textAlignment="CENTER" />
+                        <Label fx:id="commandInitDelay" alignment="CENTER" contentDisplay="CENTER" layoutX="365.0" layoutY="163.0" prefHeight="19.0" prefWidth="160.0" style="-fx-border-color: grey;" textAlignment="CENTER" />
+                        <Label fx:id="commandMessage" alignment="CENTER" contentDisplay="TOP" layoutX="333.0" layoutY="189.0" prefHeight="151.0" prefWidth="242.0" style="-fx-border-color: grey; -fx-label-padding: 2;" textAlignment="CENTER" wrapText="true" />
+                        <Label layoutX="252.0" layoutY="90.0" text="Repeating:" />
+                        <Label fx:id="commandRepeating" alignment="CENTER" contentDisplay="CENTER" layoutX="365.0" layoutY="89.0" prefHeight="19.0" prefWidth="160.0" style="-fx-border-color: grey;" textAlignment="CENTER" />
+                        <Label fx:id="confirmationLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="189.0" layoutY="320.0" prefHeight="38.0" prefWidth="152.0" textAlignment="CENTER" wrapText="true">
+                           <font>
+                              <Font size="11.0" />
+                           </font>
+                        </Label>
+                     </children></AnchorPane>
+              </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+      <Button layoutX="380.0" layoutY="2.0" mnemonicParsing="false" onAction="#dash" prefHeight="25.0" prefWidth="64.0" text="Dash" />
+      <Label layoutX="458.0" layoutY="3.0" text="Commands Page">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></Label>
