@@ -21,16 +21,13 @@
       <Label layoutX="23.0" layoutY="120.0" text="Progress Color" />
       <Label layoutX="23.0" layoutY="177.0" text="Text Color" />
       <ColorPicker fx:id="tColor" layoutX="130.0" layoutY="173.0" />
-      <Button layoutX="302.0" layoutY="68.0" mnemonicParsing="false" text="Save" />
-      <Button layoutX="302.0" layoutY="116.0" mnemonicParsing="false" text="Save" />
-      <Button layoutX="302.0" layoutY="170.0" mnemonicParsing="false" text="Save" />
+      <Button layoutX="298.0" layoutY="116.0" mnemonicParsing="false" onAction="#setColors" text="Save" />
       <Label layoutX="123.0" layoutY="13.0" text="Tip Goal Feature">
          <font>
             <Font name="System Bold" size="19.0" />
          </font>
       </Label>
-      <ProgressBar fx:id="pBar" layoutX="52.0" layoutY="221.0" prefWidth="200.0" progress="0.0" />
-      <Button layoutX="294.0" layoutY="217.0" mnemonicParsing="false" text="Preview" />
+      <ProgressBar fx:id="pBar" layoutX="23.0" layoutY="220.0" prefWidth="200.0" progress="0.0" />
       <Label layoutX="438.0" layoutY="28.0" text="Bits" />
       <Label layoutX="434.0" layoutY="107.0" text="Subs" />
       <Label layoutX="436.0" layoutY="185.0" text="Tips" />
@@ -38,9 +35,9 @@
       <Label layoutX="354.0" layoutY="333.0" text="Total/Goal Amount" />
       <Button layoutX="492.0" layoutY="296.0" mnemonicParsing="false" text="Submit" />
       <Button layoutX="472.0" layoutY="357.0" mnemonicParsing="false" text="Reset Progress" />
-      <Button layoutX="512.0" layoutY="63.0" mnemonicParsing="false" text="Submit" />
-      <Button layoutX="512.0" layoutY="133.0" mnemonicParsing="false" text="Submit" />
-      <Button layoutX="519.0" layoutY="216.0" mnemonicParsing="false" text="Submit" />
+      <Button layoutX="510.0" layoutY="63.0" mnemonicParsing="false" onAction="#submitBitEnabled" text="Submit" />
+      <Button layoutX="510.0" layoutY="133.0" mnemonicParsing="false" onAction="#submitSubEnabled" text="Submit" />
+      <Button layoutX="510.0" layoutY="225.0" mnemonicParsing="false" onAction="#submitSubEnabled" text="Submit" />
       <RadioButton layoutX="403.0" layoutY="55.0" mnemonicParsing="false" text="Enabled" />
       <RadioButton layoutX="404.0" layoutY="80.0" mnemonicParsing="false" text="Disabled" />
       <RadioButton layoutX="402.0" layoutY="128.0" mnemonicParsing="false" text="Enabled" />
@@ -55,5 +52,6 @@
       <TextField layoutX="360.0" layoutY="296.0" prefHeight="25.0" prefWidth="94.0" />
       <TextField layoutX="357.0" layoutY="357.0" prefHeight="25.0" prefWidth="94.0" />
       <TextField layoutX="169.0" layoutY="357.0" />
+      <Label layoutX="243.0" layoutY="220.0" text="Test Text Value Here" />
    </children>
 </AnchorPane>
