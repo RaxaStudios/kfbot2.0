@@ -1,0 +1,7 @@
+@font-face {
+  src: url(/fonts/comfortaa/Comfortaa-Regular.ttf);
+}
+
+.text {
+  -fx-font-family: "Comfortaa";
+}

@@ -69,6 +69,20 @@
                     <include>**/*.fxml</include>
                 </includes>             
             </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/java/com/twitchbotx/gui</directory>
+                <includes>
+                    <include>**/*.css</include>
+                </includes>             
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/java/com/twitchbotx/gui</directory>
+                <includes>
+                    <include>**/*.ttf</include>
+                </includes>             
+            </resource>
         </resources>
         <plugins>
             <plugin>

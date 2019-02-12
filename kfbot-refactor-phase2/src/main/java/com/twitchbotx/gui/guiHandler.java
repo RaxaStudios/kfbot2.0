@@ -46,7 +46,6 @@ import javafx.stage.Stage;
 import javax.annotation.concurrent.GuardedBy;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
@@ -76,7 +75,7 @@ public class guiHandler extends Application {
     public static String moderationFile = "Moderation.fxml";
     public static String commandsID = "commands";
     public static String commandsFile = "Commands.fxml";
-    
+
     // Command page related
     public static String commandEditorID = "commandEditor";
     public static String commandEditorFile = "CommandEditor.fxml";
@@ -86,7 +85,7 @@ public class guiHandler extends Application {
     // Moderation page related
     public static String regexID = "regex";
     public static String regexFile = "Regex.fxml";
-    
+
     // Feature landing page related
     public static String respEditID = "RespEdit";
     public static String respEditFile = "AlertResponse.fxml";
@@ -102,7 +101,7 @@ public class guiHandler extends Application {
     public static String counterFile = "Counter.fxml";
     public static String pollID = "Poll";
     public static String pollFile = "PollFeature.fxml";
-    
+
     // Response page related
     public static String subEditID = "SubEdit";
     public static String subEditFile = "SubEdit.fxml";
@@ -110,14 +109,13 @@ public class guiHandler extends Application {
     public static String bitEditFile = "BitEdit.fxml";
     public static String raidEditID = "RaidEdit";
     public static String raidEditFile = "RaidEdit.fxml";
-    
-    // Event page related
 
+    // Event page related
     public static String spoopathonID = "spoopathon";
     public static String spoopathonFile = "Spoopathon.fxml";
     public static String marathonID = "marathon";
     public static String marathonFile = "Marathon.fxml";
-    
+
     public static Stage stage = new Stage();
 
     public static String[] spoopGames;
@@ -146,8 +144,8 @@ public class guiHandler extends Application {
             store.setBot(bot);
         } catch (IOException | ParserConfigurationException | SAXException e) {
             e.printStackTrace();
-        } 
-        
+        }
+
         //create songlist based on text content
         try {
             Path location = Paths.get("");
@@ -186,34 +184,38 @@ public class guiHandler extends Application {
         CommandParser.lotto.getMapFromFile();
         // attempt to recover spoopathon points map from spoopUser.map
         CommandParser.spoop.getMapFromFile();
-        
-        
+
         //create and show GUI
         ScreensController container = new ScreensController();
         container.loadScreen(dashboardID, dashboardFile);
         container.setScreen(dashboardID);
+
         // TODO resizing scale options
         Group root = new Group();
         root.getChildren().addAll(container);
-        root.setStyle("-fx-font-family: \"Comfortaa\", cursive;");
-        ScalableContentPane scale = new ScalableContentPane();
-        Scene scene = new Scene(root);
-        scene.getStylesheets().add("https://fonts.googleapis.com/css?family=Comfortaa");
-        scale.setContent(root);
-        Scene testScale = new Scene(scale, 600, 400);
-        testScale.getStylesheets().add("https://fonts.googleapis.com/css?family=Comfortaa");
-        
+        try {
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add("stylesheet.css");
 
+            ScalableContentPane scale = new ScalableContentPane();
+            scale.setContent(root);
+
+            Scene testScale = new Scene(scale, 600, 400);
+            //testScale.getStylesheets().add(stylesheet.getCanonicalPath());
+        
         stage.setScene(scene);
         //stage.setScene(testScale);
         String botName = store.getConfiguration().account;
         stage.setTitle(botName);
         stage.getIcons().add(new Image("http://kf.bot.raxastudios.com/kffcLove.png"));
         stage.show();
-        stage.setOnCloseRequest(e -> { 
+        stage.setOnCloseRequest(e -> {
             // TODO send error report via ftp
             System.exit(0);
         });
+        }catch (Exception ie) {
+            ie.printStackTrace();
+        }
     }
 
     public static String nowDateFormatted() {

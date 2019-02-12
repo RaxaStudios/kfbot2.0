@@ -85,7 +85,8 @@ public class ScreensController extends StackPane {
 
     public void show(Node node) {
         Group group = new Group();
-        node.setStyle("-fx-font-family: \"Comfortaa\";");
+       // node.setStyle("-fx-font-family: \"Comfortaa\";");
+       //node.getStyleClass().add("bold");
         group.getChildren().addAll(node);
         /*Scene visibleScreen = new Scene(group);
         visibleScreen.getStylesheets().add("https://fonts.googleapis.com/css?family=Comfortaa");
@@ -99,7 +100,9 @@ public class ScreensController extends StackPane {
         int w = dm.getWidth();
         int h = dm.getHeight();
         Scene testScale = new Scene(scale, 600, 400);
-        testScale.getStylesheets().add("https://fonts.googleapis.com/css?family=Comfortaa:700");
+        //testScale.getStylesheets().add("https://fonts.googleapis.com/css?family=Comfortaa:700");
+        //testScale.getStylesheets().add("https://fonts.googleapis.com/css?family=Comfortaa");
+        //testScale.getStylesheets().add("stylesheets.css");
         guiHandler.stage.setScene(testScale);
         guiHandler.stage.show();
     }
