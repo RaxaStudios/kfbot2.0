@@ -204,8 +204,8 @@ public class guiHandler extends Application {
         testScale.getStylesheets().add("https://fonts.googleapis.com/css?family=Comfortaa");
         
 
-        //stage.setScene(scene);
-        stage.setScene(testScale);
+        stage.setScene(scene);
+        //stage.setScene(testScale);
         String botName = store.getConfiguration().account;
         stage.setTitle(botName);
         stage.getIcons().add(new Image("http://kf.bot.raxastudios.com/kffcLove.png"));

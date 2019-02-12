@@ -75,15 +75,10 @@ public class CommandsController {
             }
         });
     }
-    
+
     public void initialize() {
         try {
-            try {
-                final ConfigParameters.Elements elements = configuration.parseConfiguration("./kfbot.xml");
-                store = new XmlDatastore(elements);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            store = guiHandler.bot.getStore();
 
             VBox vB = new VBox();
             vB.setAlignment(Pos.CENTER_LEFT);
@@ -113,7 +108,7 @@ public class CommandsController {
             System.out.println("Error at initialize viewer");
             ex.printStackTrace();
         }
-        
+
         // Editor command initialize
         deleteConfirmText.setText("");
         confirmed = false;
@@ -136,9 +131,9 @@ public class CommandsController {
                 commandsEditing.add(commandName1);
             }
         }
-        
+
         commandEditingList.setItems(commandsEditing);
-        
+
         // Repeating command intialize
         try {
             confirmationLabel.setText("");
@@ -174,7 +169,7 @@ public class CommandsController {
             ex.printStackTrace();
         }
     }
-    
+
     /**
      * Command info feature starts here
      */
@@ -182,7 +177,6 @@ public class CommandsController {
     ScrollPane commandList;
     @FXML
     Pane commandInfo;
-    
 
     private void showCommandInfo(String command) {
         VBox vB = new VBox();
@@ -235,7 +229,9 @@ public class CommandsController {
     /**
      * Command Edit features start here
      */
-    /*********************************************************************************************************/
+    /**
+     * ******************************************************************************************************
+     */
     MenuItem cM;
 
     @FXML
@@ -300,7 +296,7 @@ public class CommandsController {
     @FXML
     Label deleteConfirmText;
     private boolean confirmed;
-    
+
     //method to set the command to be edited/deleted
     @FXML
     private void chooseCommand(ActionEvent event) {
@@ -312,7 +308,7 @@ public class CommandsController {
         commandToEdit.setText(commandEditingList.getItems().get(selected));
         confirmed = false;
     }
-    
+
     @FXML
     private void deleteCommand(ActionEvent event) {
         if (confirmed) {
@@ -328,7 +324,7 @@ public class CommandsController {
             confirmed = true;
         }
     }
-    
+
     private void refresh() {
         confirmed = false;
 
@@ -348,7 +344,7 @@ public class CommandsController {
         }
         commandEditingList.setItems(commandsEditing);
     }
-    
+
     @FXML
     private void submitChanges(ActionEvent event) {
         newValueText.selectAll();
@@ -400,7 +396,7 @@ public class CommandsController {
         }
         refresh();
     }
-    
+
     @FXML
     private void newCommand(ActionEvent event) {
         System.out.println("Creating new command");
@@ -448,16 +444,16 @@ public class CommandsController {
         }
         refresh();
     }
-    
+
     @FXML
-    public void clearNewCommand(){
+    public void clearNewCommand() {
         newCommandName.setText("");
         newCommandAuth.setText("");
         newCommandCooldown.setText("");
         newCommandSound.setText("");
         newCommandMessage.setText("");
     }
-    
+
     @FXML
     private void setAttribute(ActionEvent event) {
         MenuItem choice = (MenuItem) event.getSource();
@@ -584,11 +580,13 @@ public class CommandsController {
         }
 
     }
-    
+
     /**
      * Repeating command features start here
      */
-    /*********************************************************************************************************/
+    /**
+     * ******************************************************************************************************
+     */
     final TimerManagement timers = new TimerManagement();
 
     @FXML
@@ -611,7 +609,7 @@ public class CommandsController {
 
     @FXML
     ScrollPane commandRepeatingList;
-    
+
     private void showRepeatCommandInfo(String command) {
         for (int i = 0; i < this.store.getCommands().size(); i++) {
             final ConfigParameters.Command commandConfig = this.store.getCommands().get(i);
@@ -624,7 +622,7 @@ public class CommandsController {
             }
         }
     }
-    
+
     /**
      * Send and submit command name to TimerManagement
      */
@@ -648,7 +646,7 @@ public class CommandsController {
         }
         showRepeatCommandInfo(commandToSchedule);
     }
-    
+
     /**
      * Send command name to TimerManagement to find then stop task
      */
@@ -674,5 +672,5 @@ public class CommandsController {
         }
         showRepeatCommandInfo(commandToStop);
     }
-    
+
 }
