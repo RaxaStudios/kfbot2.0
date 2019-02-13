@@ -1,6 +1,5 @@
 package com.twitchbotx.bot.handlers;
 
-//import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
 import com.twitchbotx.gui.controllers.DashboardController;
 

@@ -1,8 +1,6 @@
 package com.twitchbotx.bot;
 
-//import com.twitchbotx.gui.DashboardController;
-//import com.twitchbotx.gui.guiHandler;
-//import java.io.BufferedReader;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -12,14 +10,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
-//import java.io.PrintStream;
-//import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-//import java.util.Collections;
 import java.util.List;
-//import java.util.Map;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
@@ -34,7 +28,7 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 public final class XmlDatastore implements Datastore {
 
-    // store off the elements
+    // store of the elements
     private final ConfigParameters.Elements elements;
 
     /**

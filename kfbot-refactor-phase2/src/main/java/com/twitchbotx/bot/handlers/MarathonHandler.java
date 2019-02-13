@@ -39,10 +39,9 @@ public class MarathonHandler {
     int minutes = 0;
     int hours = 12;
     int bitPool = 0;
-    //TwitchMessenger messenger;
 
     public MarathonHandler(Datastore store) {
-        //this.messenger = new TwitchMessenger(out, store.getConfiguration().joinedChannel);
+        
     }
 
     public void addPoints(String msg) {

@@ -94,7 +94,7 @@ public class WSClass extends WebSocketClient {
         this.send("NICK " + botName);
 
         // Request our tags
-        // membership for joins/parts
+        // uncomment membership for joins/parts
         //this.send("CAP REQ :twitch.tv/membership");
         this.send("CAP REQ :twitch.tv/commands");
         this.send("CAP REQ :twitch.tv/tags");
@@ -110,7 +110,6 @@ public class WSClass extends WebSocketClient {
 
             // if we sent a ping longer than 3 minutes ago, send another one.
             if (System.currentTimeMillis() > (lastPing + 180000)) {
-                //System.out.println("Sending a PING to Twitch.");
                 lastPing = System.currentTimeMillis();
                 this.send("PING");
             }
@@ -129,9 +128,9 @@ public class WSClass extends WebSocketClient {
     /**
      * Callback that is called when the connection with Twitch is lost.
      *
-     * @param {int} code
-     * @param {String} reason
-     * @param {boolean} remote
+     * @param code
+     * @param reason
+     * @param remote
      */
     @Override
     public void onClose(int code, String reason, boolean remote) {
@@ -143,7 +142,7 @@ public class WSClass extends WebSocketClient {
     /**
      * Callback that is called when we get an error from the socket.
      *
-     * @param {Exception} ex
+     * @param ex
      */
     @Override
     public void onError(Exception ex) {
@@ -154,22 +153,18 @@ public class WSClass extends WebSocketClient {
     /**
      * Callback that is called when we get a message from Twitch.
      *
-     * @param {String} message
+     * @param message
      */
     @Override
     public void onMessage(String message) {
-        //System.out.println("Message: " + message);
         if (message.startsWith("PING")) {
-            //System.out.println("Send PONG");
             this.send("PONG");
         } else if (message.startsWith("PONG")) {
             lastPong = System.currentTimeMillis();
-            //System.out.println("Set lastPong");
         } else if (message.contains("JOIN #" + channelName)){
+            //tool for checking joins/parts, possible future use with points
             String name = "";
             name = message.substring(message.indexOf(":") + 1, (message.indexOf("!",message.indexOf(":"))));
-            //System.out.println("JOIN MESSAGE: " + message);
-            System.out.println(name + "  has joined");
         } else {
             message  = message.replaceAll("\\r\\n|\\r|\\n", "");
             parse(message);
@@ -177,7 +172,6 @@ public class WSClass extends WebSocketClient {
     }
 
     void parse(String msg) {
-        //System.out.println("PARSE INCOMING: " + msg);
         CommandParser parser = new CommandParser(store);
         parser.parse(msg);
     }
@@ -209,7 +203,6 @@ public class WSClass extends WebSocketClient {
                     // Close the connection and destroy the class.
                     this.close();
                     // Create a new connection.
-
                     DashboardController.wIRC = new WSClass(new URI("wss://irc-ws.chat.twitch.tv"), channelName, botName, oAuth, store);
                     // Check if we are reconnected.
                     reconnected = DashboardController.wIRC.connectWSS(true);
@@ -217,7 +210,7 @@ public class WSClass extends WebSocketClient {
                     System.out.println("Error when reconnecting to Twitch [" + ex.getClass().getSimpleName() + "]: " + ex.getMessage());
                 }
             }
-            // Sleep for 5 seconds.
+            // Sleep for 5 seconds
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException ex) {
@@ -231,7 +224,6 @@ public class WSClass extends WebSocketClient {
             message = "/me " + message;
         }
         String channel = store.getConfiguration().joinedChannel;
-        //System.out.println("channel: " + channel + " sending message: " + message);
         this.send("PRIVMSG #"
                 + channel
                 + " "
@@ -240,7 +232,6 @@ public class WSClass extends WebSocketClient {
         return true;
     }
     public void sendNonFormatMessage (String message){
-        //String channel = store.getConfiguration().joinedChannel;
         this.send(message);
     }
     

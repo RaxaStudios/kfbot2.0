@@ -40,7 +40,6 @@ public final class TwitchBotX {
 
             //Start StreamLabs listener
             //Send ready message on new connection
-            System.out.println("Recon? " + reconnect);
             if (!reconnect) {
                 startSL(store);
             }
@@ -48,13 +47,9 @@ public final class TwitchBotX {
             LOGGER.info("Bot is now ready for service.");
 
             //clear out old timers before
-            // TimerManagement.getLHM().clear();
             // start all periodic timers for broadcasting events
             TimerManagement.LHM.clear();
             startTimers(store);
-
-            // start doing a blocking read on the socket
-            //beginReadingMessages();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error caught at bot start up: {0}");
             e.printStackTrace();

@@ -19,7 +19,6 @@ public class EventHandler {
 
     // pre checked for if enabled = "on"
     public EventHandler(Datastore store) {
-        //this.messenger = new TwitchMessenger(out, store.getConfiguration().joinedChannel);
         this.store = store;
     }
 

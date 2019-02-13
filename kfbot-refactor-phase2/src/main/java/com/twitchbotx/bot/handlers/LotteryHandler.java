@@ -170,7 +170,6 @@ public class LotteryHandler {
                         }
                     }
                     m.getValue().addTicket(ticketValue);
-                    //System.out.println(m.getKey() + " tickets: " + m.getValue().getTicket());
                 });
             } catch (NullPointerException | IllegalArgumentException ne) {
                 sendMessage("Lottery is empty!");
@@ -197,7 +196,6 @@ public class LotteryHandler {
                 auth = "+a";
                 keyword = trailing.substring(trailing.indexOf(" "), trailing.length());
             }
-            //System.out.println("auth found: " + auth + " keyword: " + keyword);
             if (auth.equals("+s")) {
                 subOnly = true;
                 sendMessage("A sub-only lottery has started! Subs can type " + keyword + " to enter!");
@@ -255,7 +253,6 @@ public class LotteryHandler {
             try {
                 Path location = Paths.get("");
                 Path lResolved = location.resolve("Lottery.map");
-                //System.out.println(lResolved.toAbsolutePath());
                 FileInputStream fin = new FileInputStream(lResolved.toString());
                 ObjectInputStream ois = new ObjectInputStream(fin);
                 LinkedHashMap<String, Entrant<Integer, String>> m1 = (LinkedHashMap<String, Entrant<Integer, String>>) ois.readObject();
@@ -265,7 +262,6 @@ public class LotteryHandler {
                 setMap(m1);
                 System.out.println("Successfully set regular lottery from file");
                 sendEvent("Successfully set regular lottery from file");
-                //printMap();
                 return m1;
             } catch (IOException ie) {
                 sendEvent("Map lottery file not found");
@@ -333,7 +329,6 @@ public class LotteryHandler {
             try {
                 Path location = Paths.get("");
                 Path lResolved = location.resolve("songLottery.map");
-                //System.out.println(lResolved.toAbsolutePath());
                 FileInputStream fin = new FileInputStream(lResolved.toString());
                 ObjectInputStream ois = new ObjectInputStream(fin);
                 LinkedHashMap<String, Entrant<Integer, String>> m1 = (LinkedHashMap<String, Entrant<Integer, String>>) ois.readObject();
@@ -346,7 +341,6 @@ public class LotteryHandler {
                 setMap(m1);
                 System.out.println("Successfully set song lottery from file");
                 sendEvent("Successfully set song lottery from file");
-                //printMap();
                 return m1;
             } catch (IOException ie) {
                 sendEvent("Map lottery file not found");
@@ -400,11 +394,8 @@ public class LotteryHandler {
             }
 
             //add song to currAdded
-            //possibly check against prevAdded so songs can't be requested twitch without reset
             if (currPool.contains(user)) {
                 sendMessage(displayName + " already entered in lottery");
-                //System.out.println(MAP.get(user));
-                //+ MAP.get(user).getContent());
                 return false;
             } else if (currAdded.contains(songListName)) {
                 sendMessage("@" + displayName + ", that song is already in the lottery, please choose a new song!");
@@ -417,8 +408,6 @@ public class LotteryHandler {
                 if (prevWinner.contains(user)) {
                     sendMessage(displayName + ", limit is 1 win per stream");
                     return false;
-                    /*sendMessage(displayName + " re-added with song: " + songListName);
-                ticketValue = 1;*/
                 } else {
                     sendMessage(displayName + " added with song: " + songListName);
                     currPool.add(user);
@@ -429,18 +418,13 @@ public class LotteryHandler {
 
             MAP.put(user, new Entrant(songListName));
             MAP.get(user).addTicket(ticketValue);
-            MAP.entrySet().forEach((m) -> {
-                // System.out.println("Current map item: " + m.getKey() + "  current tickets: " + m.getValue().getTicket());
-            });
             writeMap(MAP);
             return true;
         }
 
         public synchronized void leaveSong(String user) {
-            //System.out.println("MAP stuff: " + MAP.get(user).content);
             currAdded.remove(MAP.get(user).content);
             MAP.remove(user);
-            //prevWinner.add(user);
             currPool.remove(user);
 
             writeMap(MAP);
@@ -480,7 +464,6 @@ public class LotteryHandler {
                         }
                     }
                     m.getValue().addTicket(ticketValue);
-                    //System.out.println(m.getKey() + " index: " + m.getValue().getIndex() + " content: " + m.getValue().getContent() + " ticket: " + m.getValue().getTicket());
                 });
                 writeMap(MAP);
             } catch (NullPointerException | IllegalArgumentException ne) {

@@ -76,11 +76,11 @@ public class ModerationHandler implements ModerationListener{
             if (!filterCheck(msg).equals("no filter")) {
                 System.out.println(reason);
                 sendMessage(".timeout " + username + " " + timeout + " " + reason);
-                //sendEvent("timeout " + username + " " + timeout + " " + reason);
+                sendEvent("timeout " + username + " " + timeout + " " + reason);
                 return;
             } else if (userCheck(username)) {
                 sendMessage(".timeout " + username + " 600 Username caught by filter");
-                //sendEvent(".timeout " + username + " 600 Username caught by filter");
+                sendEvent(".timeout " + username + " 600 Username caught by filter");
                 return;
             } else {
                 regexCheck(username, msg, msgId);
@@ -103,7 +103,6 @@ public class ModerationHandler implements ModerationListener{
         boolean delete = false;
         for (int i = 0; i < store.getRegexes().size(); i++) {
             final ConfigParameters.FilterRegex filter = store.getRegexes().get(i);
-            //System.out.println("name: " + filter.name + " filter enabled: " + filter.enabled);
             if (filter.enabled) {
                 String content = filter.content;
                 reason = filter.reason;
@@ -116,10 +115,10 @@ public class ModerationHandler implements ModerationListener{
                 if (matcher.find()) {
                     if (delete) {
                         sendMessage(".delete " + msgId);
-                        //sendEvent(".delete user " + user + " message. Reason:" + reason);
+                        sendEvent(".delete user " + user + " message. Reason:" + reason);
                     } else {
                         sendMessage(".timeout " + user + " " + timeout + " " + reason);
-                       // sendEvent(".timeout " + user + " " + timeout + " " + reason);
+                        sendEvent(".timeout " + user + " " + timeout + " " + reason);
                     }
                     return;
                 }

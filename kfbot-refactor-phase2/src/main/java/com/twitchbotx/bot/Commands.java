@@ -18,7 +18,8 @@ public final class Commands {
 
     private String[] reservedCommands = {
         
-        //UPDATE COMMAND LIST FOR NON EDITABLE COMMANDS
+        //UPDATE COMMAND LIST FOR NON EDITABLE COMMANDS 
+        // TODO
             "!uptime",
             "!followage",
             "!highlight",
