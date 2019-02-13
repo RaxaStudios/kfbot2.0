@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.controllers.ScreenEditController">
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.controllers.ScreenEditController">
    <children>
       <Button layoutX="41.0" layoutY="349.0" mnemonicParsing="false" onAction="#dash" text="Dashboard" />
       <Label fx:id="submitStatus" alignment="CENTER" contentDisplay="CENTER" layoutX="245.0" layoutY="275.0" prefHeight="62.0" prefWidth="191.0" textAlignment="CENTER" wrapText="true" />

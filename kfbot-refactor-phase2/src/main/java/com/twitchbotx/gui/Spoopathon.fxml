@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="408.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.controllers.SpoopathonController">
+<AnchorPane id="AnchorPane" prefHeight="408.0" prefWidth="600.0" styleClass="mainFxmlClass" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.controllers.SpoopathonController">
    <children>
       <TabPane layoutX="5.0" layoutY="38.0" prefHeight="353.0" prefWidth="589.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>

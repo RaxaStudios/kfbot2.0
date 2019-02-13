@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="Commands" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.controllers.CommandsController">
+<AnchorPane id="Commands" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.controllers.CommandsController">
     <children>
       <TabPane prefHeight="406.0" prefWidth="606.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
@@ -25,9 +25,9 @@
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
                         <ScrollPane fx:id="commandList" layoutX="22.0" layoutY="18.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="339.0" prefWidth="197.0" style="-fx-background-color: eae8e8;" />
-                        <Label layoutX="363.0" layoutY="18.0" text="Command Info">
+                        <Label fx:id="cmdInfoLabel" layoutX="363.0" layoutY="18.0" text="Command Info">
                            <font>
-                              <Font name="System Bold" size="14.0" />
+                              <Font size="14.0" />
                            </font>
                         </Label>
                         <Pane fx:id="commandInfo" layoutX="271.0" layoutY="38.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="317.0" prefWidth="271.0" style="-fx-background-color: eae8e8;" />
@@ -89,10 +89,10 @@
                         <Label layoutX="347.0" layoutY="278.0" text="seconds" />
                         <RadioButton fx:id="repeatYes" layoutX="293.0" layoutY="225.0" mnemonicParsing="false" text="True">
                            <toggleGroup>
-                              <ToggleGroup fx:id="repeating" />
+                              <ToggleGroup fx:id="repeatingGroup" />
                            </toggleGroup>
                         </RadioButton>
-                        <RadioButton fx:id="repeatNo" layoutX="294.0" layoutY="245.0" mnemonicParsing="false" selected="true" text="False" toggleGroup="$repeating" />
+                        <RadioButton fx:id="repeatNo" layoutX="294.0" layoutY="245.0" mnemonicParsing="false" selected="true" text="False" toggleGroup="$repeatingGroup" />
                         <Label layoutX="347.0" layoutY="310.0" text="seconds" />
                         <TextField fx:id="newCommandInterval" alignment="CENTER" layoutX="275.0" layoutY="306.0" prefHeight="25.0" prefWidth="57.0" text="1800" />
                         <Label fx:id="submitStatus" layoutX="468.0" layoutY="153.0" prefHeight="56.0" prefWidth="103.0" wrapText="true" />

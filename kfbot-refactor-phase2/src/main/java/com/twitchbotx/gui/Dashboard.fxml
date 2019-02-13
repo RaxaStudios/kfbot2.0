@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="Dashboard" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.controllers.DashboardController">
+<AnchorPane id="Dashboard" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.controllers.DashboardController">
    <children>
     <Button layoutX="34.0" layoutY="309.0" mnemonicParsing="false" onAction="#startBot" prefHeight="25.0" prefWidth="126.0" text="Start Bot" />
       <Button layoutX="34.0" layoutY="350.0" mnemonicParsing="false" onAction="#restartBot" prefHeight="25.0" prefWidth="126.0" text="Restart Bot" />

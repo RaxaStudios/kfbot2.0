@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.controllers.BitEditController">
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.twitchbotx.gui.controllers.BitEditController">
     <children>
       <TextArea fx:id="message" layoutX="247.0" layoutY="179.0" prefHeight="168.0" prefWidth="331.0" wrapText="true" />
       <Label alignment="TOP_CENTER" contentDisplay="TOP" layoutX="5.0" layoutY="47.0" prefHeight="302.0" prefWidth="235.0" style="-fx-border-color: grey;" text="Bit Events" textAlignment="CENTER" />
