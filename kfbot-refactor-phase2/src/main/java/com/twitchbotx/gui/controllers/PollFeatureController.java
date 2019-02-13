@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -52,6 +53,7 @@ public class PollFeatureController implements Initializable {
     // TODO timer option
     // @FXML
     // TextField time;
+    
     @FXML
     TextField option1;
 
@@ -63,6 +65,10 @@ public class PollFeatureController implements Initializable {
 
     @FXML
     TextField option4;
+
+    public PollFeatureController() {
+        //dummy constructor
+    }
 
     /**
      * Initializes the controller class.
@@ -100,12 +106,17 @@ public class PollFeatureController implements Initializable {
     @FXML
     public void showStats() {
         try {
-            System.out.println("show");
-            optionMap = pHandler.getMap();
-            optionList.clear();
-            optionMap.entrySet().forEach((m) -> {
-                optionList.add(m.getKey() + ": " + m.getValue());
-                System.out.println("adding: " + m.getKey() + ": " + m.getValue());
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    System.out.println("show");
+                    optionMap = pHandler.getMap();
+                    optionList.clear();
+                    optionMap.entrySet().forEach((m) -> {
+                        optionList.add(m.getKey() + ": " + m.getValue());
+                        System.out.println("adding: " + m.getKey() + ": " + m.getValue());
+                    });
+                }
             });
             pollList.setItems(optionList);
         } catch (Exception e) {
