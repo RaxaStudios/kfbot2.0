@@ -149,7 +149,7 @@ public class CommandParser {
             }
         }
         if (pHandler.getRunning()) {
-            if (pHandler.getMap().containsKey(trailing)) {
+            if (pHandler.containsKey(trailing)) {
                 pHandler.addVote(trailing, username);
             } else if (Character.isDigit(trailing.charAt(0))) {
                 pHandler.addNumericVote(trailing, username);

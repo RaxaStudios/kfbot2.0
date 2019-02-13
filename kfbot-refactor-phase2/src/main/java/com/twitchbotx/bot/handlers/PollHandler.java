@@ -20,6 +20,7 @@ import javafx.application.Platform;
  */
 public class PollHandler {
 
+    private boolean contains;
     private LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
     private List<String> usernames = new ArrayList<>();
     private String winner = "";
@@ -120,6 +121,7 @@ public class PollHandler {
     public synchronized boolean addVote(String option, String username) {
         if (usernames.contains(username)) {
             if (!username.equals("")) {
+                sendEvent("Duplicate vote from: " + username + ", choice: " + option);
                 return false;
             }
         }
@@ -144,13 +146,23 @@ public class PollHandler {
         return true;
     }
 
+    public boolean containsKey(String msg) {
+        contains = false;
+        map.entrySet().forEach((m) -> {
+            if (m.getKey().equalsIgnoreCase(msg)) {
+                contains = true;
+            }
+        });
+        return contains;
+    }
+
     public void addNumericVote(String option, String username) {
         Set<String> keys = map.keySet();
         int choice = Integer.parseInt(option);
         int i = 1;
         for (String o : keys) {
             System.out.println("o=" + o);
-            System.out.println("i=" + i +" c=" + choice);
+            System.out.println("i=" + i + " c=" + choice);
             if (i == choice) {
                 System.out.println("equals o=" + o);
                 option = o;
