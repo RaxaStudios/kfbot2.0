@@ -2,7 +2,6 @@ package com.twitchbotx.bot.handlers;
 
 import com.twitchbotx.bot.ConfigParameters;
 import com.twitchbotx.bot.Datastore;
-import com.twitchbotx.bot.client.TwitchMessenger;
 import com.twitchbotx.gui.guiHandler;
 import java.sql.Connection;
 import java.sql.Statement;
@@ -203,10 +202,10 @@ public final class CountHandler {
         /**
          * Deals with sub messages and routes a response to chat accordingly
          *
-         * @param massGifted boolean
-         * @param subGift boolean
+         * @param massGift boolean
+         * @param singleGift boolean
          * @param subDisplayName display-name will be gifter or subscriber
-         * @param giftRecip name of recipient of a sub gift
+         * @param giftRecipient name of recipient of a sub gift
          * @param giftAmount number of gifted subs
          * @param subPoints tier 1 = 1, tier 2 = 2, tier 3 = 6 int
          * @param prime is this a prime sub?

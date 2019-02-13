@@ -288,7 +288,7 @@ public final class ConfigParameters {
         // A command name
         public String name;
 
-        // No clue what this is used for
+        // Cooldown until next usage
         public String cdUntil;
 
         // Time in seconds for cooldown
@@ -297,16 +297,16 @@ public final class ConfigParameters {
         // Flag for whenever this command is enabled/disabled
         public boolean disabled;
 
-        // No clue what this is used for
+        // Repeating command usage, delay before starting to send message
         public String initialDelay;
 
-        // No clue what this is used for
+        // Repeating command usage, interval between sends
         public String interval;
 
-        // No clue what this is used for
+        // Boolean repeating
         public String repeating;
 
-        // The sound to play when command is used?
+        // The sound to play when command is used
         public String sound;
 
         // The text to display when this command is hit

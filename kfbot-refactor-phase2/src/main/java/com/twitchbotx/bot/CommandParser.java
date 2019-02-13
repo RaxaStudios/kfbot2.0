@@ -130,8 +130,8 @@ public class CommandParser {
                 System.out.println(cmd + " COMMAND");
             }
         }
-        System.out.println("TRAIL: " + trailing);
-        //
+        
+// comment out until needed/wanted back in
 //        final boolean detected = pyramidDetector.pyramidDetection(username, trailing);
 //        if(detected) {
 //            twitchMessenger.sendMessage(store.getConfiguration().pyramidResponse);
@@ -189,20 +189,8 @@ public class CommandParser {
         if (trailing.equalsIgnoreCase("!error2") && (username.equalsIgnoreCase("Raxa"))) {
             try {
                 throw new IllegalArgumentException("Error testing illegally");
-                /*CommonUtility.ERRORLOGGER.severe("SEVERE MESSAGE TEST");
-                CommonUtility.writeError("Example of a caught exception :"
-                        + "\n"
-                        + "Exception in thread \"pool-2-thread-1\" java.lang.IllegalStateException: Not on FX application thread; currentThread = pool-2-thread-1\n"
-                        + "    at com.sun.javafx.tk.Toolkit.checkFxUserThread(Toolkit.java:236)\n"
-                        + "    at com.sun.javafx.tk.quantum.QuantumToolkit.checkFxUserThread(QuantumToolkit.java:423)\n"
-                        + "    at javafx.scene.Parent$2.onProposedChange(Parent.java:367)\n"
-                        + "    at com.sun.javafx.collections.VetoableListDecorator.setAll(VetoableListDecorator.java:113)\n"
-                        + "    at com.sun.javafx.collections.VetoableListDecorator.setAll(VetoableListDecorator.java:108)\n"
-                        + "    at com.sun.javafx.scene.control.skin.LabeledSkinBase.updateChildren(LabeledSkinBase.java:575)");*/
             } catch (Exception e) {
-                //Thread.dumpStack();
                 try {
-
                     e.printStackTrace(s);
                 } catch (Exception pe) {
                     pe.printStackTrace();
@@ -221,7 +209,6 @@ public class CommandParser {
         }
 
         if (trailing.startsWith("!uptime")) {
-            //LOGGER.log(Level.INFO, "{0} {1} {2}", new Object[]{username, mod, sub});
             if (commandOptionsHandler.checkAuthorization("!uptime", username, mod, sub)) {
                 sendMessage(twitchStatusHandler.uptime(trailing), true);
             }
@@ -449,12 +436,9 @@ public class CommandParser {
                     int nameEnd = trailing.indexOf(" ", nameBegin + 1);
                     String user = trailing.substring(nameBegin + 1, nameEnd);
                     int amt = Integer.parseInt(trailing.substring(nameEnd + 1, trailing.length()));
-                    //System.out.println("user:" + user);
                     user = user.replace("@", "");
                     String userLower = user.toLowerCase();
                     spoop.addVotes(user, userLower, amt, true);
-                    // double send with spoop.addVotes thing
-                    //sendMessage("Added " + amt + " votes to " + user);
                 } catch (IndexOutOfBoundsException e) {
                     e.printStackTrace();
                     sendEvent("Syntax: !addVotes [username] [points]");
@@ -499,7 +483,6 @@ public class CommandParser {
                     int endOld = trailing.indexOf(" ", beginOld + 1);
                     String oldName = trailing.substring(beginOld, endOld);
                     String newName = trailing.substring(endOld + 1, trailing.length());
-                    //System.out.println("Old found:" + oldName + " new: " + newName);
                     spoop.changeName(oldName, newName);
                     sendMessage("Changed " + oldName + " to " + newName, true);
                 } catch (Exception e) {
@@ -508,17 +491,8 @@ public class CommandParser {
                 }
             }
         }
-        /*
-        !addVotes sending twice to chat for adding points/votes FIXED
-        sub system adding 1 point instead of 5 like it should FIXED
-        sub system not adding to certain users, possibly capitalization issue FIXED
-        !votes not sending anything if user doesn't have votes FIXED
-        sub gifted points aren't adding to user correctly possible capitalization issue
-        bits not working with spoopathon system
-        double check bit/raid replies work
-         */
 
- /*
+        /*
         *
         * accepts !votes or !votes [username] to cast check
          */
@@ -590,12 +564,6 @@ public class CommandParser {
                 sendMessage("Number of votes must be a whole and valid number", true);
             }
         }
-
-//        if (trailing.startsWith("!commands")) {
-//            if (commandOptionsHandler.checkAuthorization("!commands", username, mod, sub)) {
-//                commandOptionsHandler.commands(username, mod, sub);
-//            }
-//        }
         if (trailing.startsWith("!command-add")) {
             if (commandOptionsHandler.checkAuthorization("!command-add", username, mod, sub)) {
                 sendMessage(commandOptionsHandler.addCommand(trailing), true);
@@ -723,10 +691,10 @@ public class CommandParser {
             }
             return;
         }
+        // special case command due to action discrepency
         if (username.equalsIgnoreCase("buttgasm") && trailing.startsWith("!gotem")) {
             sendMessage(commandOptionsHandler.parseForUserCommands(trailing, username, mod, sub), false);
         }
-        //System.out.println("trailing: " + trailing);
         sendMessage(commandOptionsHandler.parseForUserCommands(trailing, username, mod, sub), true);
     }
 
@@ -752,7 +720,6 @@ public class CommandParser {
                 }
             }
         }
-        // todo enable this system
         sendEditorMessage(editorCommandHandler.parseForCommand(user, level, msg, channel));
     }
 
@@ -764,10 +731,6 @@ public class CommandParser {
      * Deal with raid message
      *
      * @param msg raw incoming IRC see example
-     *
-     * example:
-     * @badges=<badges>;color=<color>;display-name=<display-name>;emotes=<emotes>;id=<id-of-msg>;login=<user>;mod=<mod>;msg-id=<type-of-msg>;msg-param-displayName=<msg-param-displayName>;msg-param-login=<msg-param-login>;msg-param-viewerCount=<msg-param-viewerCount>;room-id=<room-id>;subscriber=<subscriber>;system-msg=<system-msg>;tmi-sent-ts=<timestamp>;turbo=<turbo>;user-id=<user-id>;user-type=<user-type>
-     * :tmi.twitch.tv USERNOTICE #<channel> :<message>
      */
     public void handleRaid(String msg) {
         // TODO replicate the sub response system for raids and bits
@@ -799,10 +762,6 @@ public class CommandParser {
     public void handleUserNotice(String msg) {
         // TODO add ability for different responses for different months
         try {
-            //temporary spam prevention measure for overflow of secondary sharing of sub tenure
-            if (msg.contains("msg-param-stream-months") || msg.contains("msg-param=cumulative-months") || msg.contains("msg-param-should-share-streak")) {
-                return;
-            }
 
             String giftRecipient = "";
 
@@ -811,14 +770,11 @@ public class CommandParser {
             boolean gifted = false;
             boolean prime = false;
 
-            //System.out.println("USERNOTICE FOUND msg=" + msg);
-            /*
+        /*
         ** catch "msg-param-mass-gift-count"  before looking for sub length
         ** set temp variable if "display-name" = name of mass gifter for count # of times, don't respond
         ** new sub = 1 month
-        ** example msg: 
-        **@badges=subscriber/0,premium/1;color=#FF69B4;display-name=MutantLittle;emotes=;id=570922ab-358d-4d65-a312-89e26e7e0d9d;login=mutantlittle;mod=0;msg-id=sub;msg-param-months=1;msg-param-sub-plan-name=The\sFruit\sBasket\s:D;msg-param-sub-plan=Prime;room-id=59712498;subscriber=0;system-msg=MutantLittle\sjust\ssubscribed\swith\sTwitch\sPrime!;tmi-sent-ts=1524967138517;turbo=0;user-id=92690807;user-type= :tmi.twitch.tv USERNOTICE #kungfufruitcup
-             */
+        */
             int beginDisplayName = msg.indexOf("display-name=") + 13;
             int endDisplayName = msg.indexOf(";", beginDisplayName);
             String subDisplayName = msg.substring(beginDisplayName, endDisplayName);
@@ -837,7 +793,6 @@ public class CommandParser {
                 int endMonths = msg.indexOf(";", beginMonths);
                 subMonths = msg.substring(beginMonths, endMonths);
                 massGifted = false;
-                //System.out.println(subMonths);
                 if (msg.contains("msg-id=subgift")) {
                     int beginRecip = msg.indexOf("recipient-display-name=") + 23;
                     int endRecip = msg.indexOf(";", beginRecip);
@@ -851,12 +806,6 @@ public class CommandParser {
                     if (tempGiftAmount < 0) {
                         tempName = "";
                     }
-                    /* if (store.getConfiguration().subReply.equals("on")) {
-                        sendMessage(CountHandler.SubHandler.handleSubMessage(massGifted, gifted, subDisplayName, giftRecipient, tempGiftAmount, tempGiftAmount, prime, subMonths), true);
-                    }
-                    if (store.getConfiguration().marathonStatus.equals("on")) {
-                        mHandler.addSub(1, massGifted, gifted, tempGiftAmount);
-                    }*/
                 } else {
                     giftRecipient = "";
                     gifted = false;
@@ -868,13 +817,13 @@ public class CommandParser {
                 // send to event list
                 sendEvent(giftRecipient + " has been gifted a sub by " + subDisplayName);
 
-                // exit and return if this is true- prevents spammed replies
+                // exit and return if this is true- prevents spammed replies 
+                // (mass sub gifts, ie 100 sub bomb)
             } else {
 
                 int beginTier = msg.indexOf("msg-param-sub-plan=") + 19;
                 int endTier = msg.indexOf(";", beginTier);
                 String subTier = msg.substring(beginTier, endTier);
-                //System.out.println(subTier);
                 prime = false;
                 int subPoints = 0;
                 if (subTier.equals("Prime")) {
@@ -892,7 +841,6 @@ public class CommandParser {
                     subPoints = 1;
                 }
                 //send to sub method in CountHandler.java get String and send to chat
-                // if disabled do not send this message or send to parser
                 if (store.getConfiguration().subReply.equals("on")) {
                     sendMessage(CountHandler.SubHandler.handleSubMessage(massGifted, gifted, subDisplayName, giftRecipient, tempGiftAmount, subPoints, prime, subMonths), true);
                 }
@@ -903,7 +851,6 @@ public class CommandParser {
                     }
                 }
                 // send to spoopathon system if on
-                //System.out.println("sending to spoopathon. name:" + subDisplayName + " subpoints:" + subPoints + " massGift:" + massGifted + " gifted:" + gifted);
                 if (store.getConfiguration().spoopathonStatus.equals("on")) {
                     // drop to lowercase for uniformity when checking for people
                     String subLower = subDisplayName.toLowerCase();
@@ -924,17 +871,12 @@ public class CommandParser {
     }
 
     public void handleBits(String msg) {
-        /*
-        ** example msg:
-        **@badges=subscriber/0,bits/100;bits=100;color=;display-name=King_of_Death_;emotes=9:68-69,71-72;id=0e5c1c5d-cc9a-4d36-be6b-2224c285b674;mod=0;room-id=59712498;subscriber=1;tmi-sent-ts=1524965816604;turbo=0;user-id=107746834;user-type= :king_of_death_!king_of_death_@king_of_death_.tmi.twitch.tv PRIVMSG #kungfufruitcup :cheer100 I'm gonna go stream some ME2, I will be back later to lurk <3 <3
-         */
         try {
             //TODO replicate sub response system 
             // add ability to have different or min amount for message
             int beginAmt = msg.indexOf("bits=") + 5;
             int endAmt = msg.indexOf(";", beginAmt);
             String amt = msg.substring(beginAmt, endAmt);
-            //System.out.println(amt);
 
             int beginName = msg.indexOf("display-name=") + 13;
             int endName = msg.indexOf(";", beginName);
@@ -996,29 +938,20 @@ public class CommandParser {
             }
 
             // Find the VIP indication, treat at sub level
-            /* if(msg.contains("@badges=vip/1,")){
+            if(msg.contains("@badges=vip/1,")){
                 isSub = true;
-            }*/
+            }
             // Find the subscriber indication
             final int subPosition = msg.indexOf("subscriber=") + 11;
             if ("1".equals(msg.substring(subPosition, subPosition + 1))) {
                 isSub = true;
             }
 
-            // Find the username
-            // User-id search for V5 switch
-            /*if (msg.contains("user-id=")){
-                int usernameStart = msg.indexOf("user-id=", msg.indexOf(";"));
-                System.out.println(usernameStart);
-            username = msg.substring(msg.indexOf("user-id=") + 8, msg.indexOf(";", msg.indexOf("user-id=")));
-            System.out.println(username + " USERNAME");
-            }*/
             if (msg.contains("user-type=")) {
                 int usernameStart = msg.indexOf(":", msg.indexOf("user-type="));
                 int usernameEnd = msg.indexOf("!", usernameStart);
                 if (usernameStart != -1 && usernameEnd != -1) {
                     username = msg.substring(usernameStart + 1, usernameEnd).toLowerCase();
-                    //System.out.println(username + " USERNAME");
                 }
             }
 
@@ -1054,7 +987,6 @@ public class CommandParser {
                 final String hasPrivMsg = msg.substring(0, channelPosition);
                 final int privMsgIndex = hasPrivMsg.indexOf("PRIVMSG");
                 if (privMsgIndex == -1 || sendRaw.contains("bits=")) {
-                    //check for "USERNOTICE" alternate message
                     if (hasPrivMsg.contains("USERNOTICE")) {
                         // split into raid versus sub
                         if (sendRaw.contains("sub-plan")) {
@@ -1064,7 +996,7 @@ public class CommandParser {
                             //incoming raid
                             handleRaid(sendRaw);
                         } else if (sendRaw.contains("msg-id=giftpaidupgrade")) {
-                            //incoming subtember promo
+                            //incoming subtember 2018 promo
                             //ignore until needed
                             //handlePromo(sendRaw);
                         } else if (sendRaw.contains("bits=")) {
@@ -1095,20 +1027,20 @@ public class CommandParser {
                 final int msgIdBegin = sendRaw.indexOf("id=") + 3;
                 final int msgIdEnd = sendRaw.indexOf(";", msgIdBegin);
                 String msgId = sendRaw.substring(msgIdBegin, msgIdEnd);
+                
                 // Determine where message is from
-                // filter system access via bot channel's chat
                 final int channelName = chanFind.indexOf("#", chanFind.indexOf("PRIVMSG"));
                 final int chanIndex = chanFind.indexOf(" ", channelName);
                 String channel = chanFind.substring(channelName + 1, chanIndex);
                 String botName = store.getConfiguration().account;
-                //System.out.println(channel + " " + botName);
 
+                // filter system access via bot channel's chat
                 if (channel.equalsIgnoreCase(botName)) {
                     handleEditorCommand(username, msg, channel);
                 } else {
 
                     // Handle the message
-                    //System.out.println("un: " + username + " msg: " + msg);
+                    // Don't worry about this >.>
                     if (guiHandler.bot.rogue) {
                         Random rng = new Random();
                         if (rng.nextInt(100) < 40) {
@@ -1133,8 +1065,6 @@ public class CommandParser {
     }
 
     //Method to add events to the GUI event list
-    //Stored in the store, created in DashboardController
-    //to address thread safety and concurrency
     private void sendEvent(final String msg) {
         String event = msg;
         Platform.runLater(new Runnable() {

@@ -85,7 +85,6 @@ public class sqlHandler {
 
     public boolean addGame(String msg) {
         Statement add = connect();
-        System.out.println("addGame msg= " + msg);
         String gameToAdd = msg.substring(msg.indexOf(" ") + 1);
         String sqlStatementAI;
         int value = 0;
@@ -95,7 +94,6 @@ public class sqlHandler {
             while (rs.next()) {
                 value = rs.getInt("gameID");
             }
-            System.out.println("value sql autoadd:" + value);
             sqlStatementAI = "ALTER TABLE bot AUTO_INCREMENT=" + value;
             add.executeUpdate(sqlStatementAI);
             //execute insertion of value
@@ -113,7 +111,6 @@ public class sqlHandler {
 
     public boolean deleteGame(String msg) {
         Statement delete = connect();
-        System.out.println("deleteGame msg= " + msg);
         String gameToDelete = msg.substring(msg.indexOf(" ") + 1);
         sqlStatement = "DELETE FROM bot WHERE Game=\'" + gameToDelete + "\'";
         //sqlStatement = "DELETE FROM bot where gameID=\'0\'";
@@ -232,7 +229,7 @@ public class sqlHandler {
      */
     public boolean addPoints(String msg) {
         String enabled = this.store.getConfiguration().spoopathonStatus;
-        System.out.println(enabled);
+        
         if (enabled.equals("on")) {
             Statement addPoints = connect();
             String game = msg.substring(msg.indexOf(" ") + 1, msg.indexOf(" ", msg.indexOf(" ") + 2));
@@ -283,7 +280,6 @@ public class sqlHandler {
                         Calendar calendar = Calendar.getInstance();
                         java.util.Date now = calendar.getTime();
                         java.util.Date cdTime = new java.util.Date(0L);
-                        System.out.println("CDUNTIL: " + command.cdUntil);
                         if (!command.cdUntil.isEmpty()) {
                             cdTime = new java.util.Date(Long.parseLong(command.cdUntil));
                         }
@@ -374,7 +370,6 @@ public class sqlHandler {
                         sendMessage(points + " added to " + tGame);
                         closeConnection();
                     } catch (IllegalArgumentException il) {
-                        //messenger.sendMessage("Syntax: !s-addPoints [gameID] [points]");
                         il.printStackTrace();
                     } catch (SQLException sql) {
                         LOGGER.severe(sql.toString());
@@ -420,15 +415,11 @@ public class sqlHandler {
         return true;
     }
     
-    public boolean setCountText(String txt){
-        System.out.println("execute print A");
-        Statement setText = connectCounter();
-        
+    public boolean setCountText(String txt){        
+        Statement setText = connectCounter();        
         sqlStatement = "UPDATE botCount SET text=\'" + txt + "\' WHERE 1";
-        System.out.println("execute print");
         try {
-            setText.executeUpdate(sqlStatement);
-            System.out.println("execute print 2");
+            setText.executeUpdate(sqlStatement);  
         } catch (SQLException e) {
             e.printStackTrace();
             LOGGER.severe(e.toString());

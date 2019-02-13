@@ -9,18 +9,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
-/*
-** Roughly 15 minute intervals between command sendMessage, 
-** OR based on number of messages between sendMessage
-**
-** RE-ADD online check timer foro online-only timer functionality 
-** as well as for future discord stream is live function
- */
+
 /**
  * This class is responsible for timer management.
  */
@@ -154,13 +147,10 @@ public final class TimerManagement {
                     }
                 } else {
                     this.shutdown();
-                    
-                   // System.out.println("Still alive");
                 }
                 
             };
             f = ses.scheduleWithFixedDelay(runnable, initialDelay, commandInterval, TimeUnit.SECONDS);
-            //f.cancel(true);
         }
 
         private boolean getDead() {

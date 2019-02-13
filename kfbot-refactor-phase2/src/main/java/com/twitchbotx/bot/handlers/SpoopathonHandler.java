@@ -350,7 +350,6 @@ public class SpoopathonHandler {
         try {
             Path location = Paths.get("");
             Path lResolved = location.resolve("spoopUser.map");
-            //System.out.println(lResolved.toAbsolutePath());
             FileInputStream fin = new FileInputStream(lResolved.toString());
             ObjectInputStream ois = new ObjectInputStream(fin);
             LinkedHashMap<String, Integer> m1 = (LinkedHashMap<String, Integer>) ois.readObject();

@@ -1,7 +1,5 @@
 package com.twitchbotx.bot.handlers;
 
-//import java.io.FileInputStream;
-//import java.io.InputStream;
 import com.twitchbotx.bot.CommandParser;
 import java.util.Calendar;
 import java.util.Date;
@@ -54,7 +52,6 @@ public final class CommandOptionHandler {
                     endOfCmd = msg.length();
                 }
                 String cmd = msg.substring(0, endOfCmd);
-                //System.out.println(command.name + " equals? " + cmd + " - " + cmd.equals(command.name));
                 if (cmd.contentEquals(command.name)) {
                     if (!checkAuthorization(cmd, username, mod, sub)) {
                         return "";
@@ -84,15 +81,13 @@ public final class CommandOptionHandler {
                     if (!username.contentEquals(store.getConfiguration().joinedChannel)) {
                         Calendar calendar = Calendar.getInstance();
                         Date now = calendar.getTime();
-                        //System.out.println("cooldown test set cdUntil:" + command.cdUntil);
+                        
                         //check for blank cdUntil
-
                         Long cooldown;
                         try {
                             cooldown = Long.parseLong(command.cdUntil);
                         } catch (NumberFormatException nfe) {
                             cooldown = (Long) new Date(now.getTime()).getTime();
-                            //System.out.println(cooldown);
                             nfe.printStackTrace();
                         }
 
@@ -110,7 +105,6 @@ public final class CommandOptionHandler {
                             ne.printStackTrace();
                         }
                         cdTime = new Date(now.getTime() + cooldownInSec * 1000L);
-                        // System.out.println("NAME: " + command.name + " CDTIME: " + cdTime + " CDGET: " + cdTime.getTime());
                         store.updateCooldownTimer(command.name, cdTime.getTime());
 
                     }
@@ -118,10 +112,8 @@ public final class CommandOptionHandler {
                         playSound(command.sound);
                     }
                     if (sendTxt.isEmpty()) {
-                        //System.out.println("empty returning text");
                         return "";
                     } else {
-                        //System.out.println("returning sendTxt: " + sendTxt);     
                         return sendTxt;
                     }
                 }
@@ -207,7 +199,6 @@ public final class CommandOptionHandler {
             }
 
             final boolean edited = store.editCommand(cmd, txt);
-            //System.out.println("EDITED?: " + edited);
             if (edited) {
                 return "Command [" + cmd + "] changed to " + txt;
             }
@@ -252,6 +243,7 @@ public final class CommandOptionHandler {
      * Appends a sounds file to command node
      *
      * @param msg The message from the user
+     * @return string with confirmation
      */
     public String commandSound(String msg) {
         try {
@@ -306,7 +298,6 @@ public final class CommandOptionHandler {
     public boolean checkAuthorization(String userCommand, String username, boolean mod, boolean sub) {
         String auth = "";
         int authLvl = 0;
-        //LOGGER.info("COMMAND: " + userCommand + " USERNAME: " + username + " MOD: " + mod + " SUB: " + sub);
         if (username.contentEquals(store.getConfiguration().joinedChannel)) {
             return true;
         }
