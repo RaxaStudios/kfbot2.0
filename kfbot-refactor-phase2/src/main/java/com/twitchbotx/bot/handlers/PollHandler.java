@@ -12,6 +12,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import javafx.application.Platform;
 
 /**
@@ -28,12 +32,14 @@ public class PollHandler {
     private boolean tie = false;
     private StringBuilder winners = new StringBuilder();
     public static boolean running = false;
+    private final ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
+    private Future f;
 
     public PollHandler() {
 
     }
 
-    public boolean startPoll(List<String> options) {
+    public boolean startPoll(List<String> options, int interval) {
         running = true;
         usernames.clear();
         map.clear();
@@ -56,9 +62,50 @@ public class PollHandler {
         } catch (Exception e) {
             sendEvent("Poll opened, bot not connected to chat");
             e.printStackTrace();
+            return false;
         }
-
+        if (interval > 0) {
+            startReminder(map, interval);
+        }
         return true;
+    }
+
+    public void startReminder(LinkedHashMap<String, Integer> currMap, int interval) {
+        System.out.println("Starting reminders");
+        StringBuilder sr = new StringBuilder();
+        sr.append("A poll is running in chat! Type one of the follow options (without the brackets) [");
+        currMap.entrySet().forEach((m) -> {
+            sr.append(m.getKey() + "], [");
+            System.out.println("Starting reminders m value:" + m.getKey());
+        });
+        sr.delete(sr.lastIndexOf(", "), sr.length());
+        sr.append(" to vote!");
+        System.out.println("Pre-start running: " + getRunning());
+        Runnable runnable = () -> {
+            System.out.println("Running value: " + getRunning());
+            if (getRunning()) {
+                System.out.println("running, sending " + sr.toString());
+                DashboardController.wIRC.sendMessage(sr.toString(), true);
+            } else {
+                System.out.println("running false");
+                this.shutdown();
+            }
+        };
+        f = ses.scheduleWithFixedDelay(runnable, interval, interval, TimeUnit.SECONDS);
+    }
+
+    public void shutdown() {
+        ses.shutdown();
+        f.cancel(true);
+        try {
+            if (!ses.awaitTermination(800, TimeUnit.MILLISECONDS)) {
+                ses.shutdownNow();
+                Thread.currentThread().join();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            ses.shutdownNow();
+        }
     }
 
     public boolean endPoll() {
@@ -114,7 +161,7 @@ public class PollHandler {
         return this.map;
     }
 
-    public synchronized boolean getRunning() {
+    public boolean getRunning() {
         return running;
     }
 

@@ -23,9 +23,9 @@
       <Label layoutX="453.0" layoutY="229.0" text="Results" />
       <Label layoutX="273.0" layoutY="266.0" text="Winning option:" />
       <Label fx:id="winningText" alignment="CENTER" contentDisplay="CENTER" layoutX="372.0" layoutY="261.0" prefHeight="27.0" prefWidth="200.0" style="-fx-border-color: grey;" />
-      <Button layoutX="19.0" layoutY="297.0" mnemonicParsing="false" onAction="#start" text="Start Poll" />
-      <Button layoutX="191.0" layoutY="297.0" mnemonicParsing="false" onAction="#end" text="End Poll" />
-      <Button layoutX="121.0" layoutY="237.0" mnemonicParsing="false" onAction="#reset" text="Reset Options" />
+      <Button layoutX="19.0" layoutY="306.0" mnemonicParsing="false" onAction="#start" text="Start Poll" />
+      <Button layoutX="231.0" layoutY="306.0" mnemonicParsing="false" onAction="#end" text="End Poll" />
+      <Button layoutX="112.0" layoutY="306.0" mnemonicParsing="false" onAction="#reset" text="Reset Options" />
       <TextField fx:id="option1" layoutX="94.0" layoutY="79.0" />
       <TextField fx:id="option2" layoutX="94.0" layoutY="116.0" />
       <TextField fx:id="option3" layoutX="94.0" layoutY="155.0" promptText="(leave blank if unused)" />
@@ -35,5 +35,9 @@
       <Button layoutX="333.0" layoutY="217.0" mnemonicParsing="false" onAction="#showStats" text="Refresh" />
       <Button layoutX="491.0" layoutY="306.0" mnemonicParsing="false" onAction="#drawWinner" text="Get Winner" />
       <ListView fx:id="pollList" layoutX="367.0" layoutY="82.0" prefHeight="119.0" prefWidth="186.0" />
+      <Label layoutX="94.0" layoutY="229.0" text="Reminder interval" />
+      <TextField fx:id="intervalText" alignment="CENTER" layoutX="94.0" layoutY="254.0" prefHeight="25.0" prefWidth="77.0" text="600" />
+      <Label layoutX="189.0" layoutY="258.0" text="seconds" />
+      <Label fx:id="intervalError" alignment="CENTER" contentDisplay="CENTER" layoutX="23.0" layoutY="238.0" prefHeight="51.0" prefWidth="59.0" textAlignment="CENTER" wrapText="true" />
    </children>
 </AnchorPane>

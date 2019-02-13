@@ -49,11 +49,13 @@ public class PollFeatureController implements Initializable {
 
     @FXML
     Label winningText;
+    
+    @FXML
+    Label intervalError;
 
     // TODO timer option
     // @FXML
     // TextField time;
-    
     @FXML
     TextField option1;
 
@@ -66,6 +68,9 @@ public class PollFeatureController implements Initializable {
     @FXML
     TextField option4;
 
+    @FXML
+    TextField intervalText;
+
     public PollFeatureController() {
         //dummy constructor
     }
@@ -76,6 +81,7 @@ public class PollFeatureController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+        intervalError.setText("");
         showStats();
         int i = 1;
         for (String s : optionList) {
@@ -138,6 +144,7 @@ public class PollFeatureController implements Initializable {
     @FXML
     private void start() {
         String txt;
+        int interval;
         winningText.setText("");
         winningNumber.setText("");
         options.clear();
@@ -169,8 +176,16 @@ public class PollFeatureController implements Initializable {
             options.add(txt);
             System.out.println("Added: " + txt);
         }
-        pHandler.startPoll(options);
-        showStats();
+        intervalText.selectAll();
+        intervalText.copy();
+        try {
+            interval = Integer.parseInt(intervalText.getText());
+            pHandler.startPoll(options, interval);
+            showStats();
+        } catch (Exception e) {
+            e.printStackTrace();
+            intervalError.setText("Interval not valid");
+        }
     }
 
     @FXML
