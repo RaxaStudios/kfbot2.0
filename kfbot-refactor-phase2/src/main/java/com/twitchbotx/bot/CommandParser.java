@@ -736,16 +736,10 @@ public class CommandParser {
         // TODO replicate the sub response system for raids and bits
         // parse raw message
         try {
-            String raider;
-            int viewers;
-
-            int beginRaider = msg.indexOf("msg-param-displayName=") + 22;
-            int endRaider = msg.indexOf(";", beginRaider);
-            raider = msg.substring(beginRaider, endRaider);
-            int beginViewers = msg.indexOf("msg-param-viewerCount=") + 22;
-            int endViewers = msg.indexOf(";", beginViewers);
-            viewers = Integer.parseInt(msg.substring(beginViewers, endViewers));
+            String raider = messageTagValue(msg, "msg-param-displayName");
+            int viewers = Integer.parseInt(messageTagValue(msg, "msg-param-viewerCount"));
             /// send to eventhandler for message to chat
+            
             if (store.getConfiguration().raidReply.equals("on")) {
                 eHandler.handleRaid(raider, viewers);
             }
@@ -762,9 +756,7 @@ public class CommandParser {
     public void handleUserNotice(String msg) {
         // TODO add ability for different responses for different months
         try {
-
             String giftRecipient = "";
-
             String subMonths = "0";
             boolean massGifted = false;
             boolean gifted = false;
@@ -775,28 +767,18 @@ public class CommandParser {
         ** set temp variable if "display-name" = name of mass gifter for count # of times, don't respond
         ** new sub = 1 month
         */
-            int beginDisplayName = msg.indexOf("display-name=") + 13;
-            int endDisplayName = msg.indexOf(";", beginDisplayName);
-            String subDisplayName = msg.substring(beginDisplayName, endDisplayName);
+            String subDisplayName = messageTagValue(msg, "display-name");
             // check for gifted batch sub
             if (msg.contains("msg-id=submysterygift")) {
-                int beginGiftAmount = msg.indexOf("gift-count=") + 11;
-                int endGiftAmount = msg.indexOf(";", beginGiftAmount);
                 // set these variables on a new sub batch
-                tempGiftAmount = Integer.parseInt(msg.substring(beginGiftAmount, endGiftAmount));
+                tempGiftAmount = Integer.parseInt(messageTagValue(msg, "gift-count"));
                 tempName = subDisplayName;
                 massGifted = true;
-                gifted = false;
             } else {
                 // sub gift notification does not have this param
-                int beginMonths = msg.indexOf("msg-param-cumulative-months=") + 28;
-                int endMonths = msg.indexOf(";", beginMonths);
-                subMonths = msg.substring(beginMonths, endMonths);
-                massGifted = false;
+                subMonths = messageTagValue(msg, "msg-param-cumulative-months");
                 if (msg.contains("msg-id=subgift")) {
-                    int beginRecip = msg.indexOf("recipient-display-name=") + 23;
-                    int endRecip = msg.indexOf(";", beginRecip);
-                    giftRecipient = msg.substring(beginRecip, endRecip);
+                    giftRecipient = messageTagValue(msg, "recipient-display-name");
                     gifted = true;
                     if (tempName.equals(subDisplayName)) {
                         tempGiftAmount--;
@@ -806,9 +788,6 @@ public class CommandParser {
                     if (tempGiftAmount < 0) {
                         tempName = "";
                     }
-                } else {
-                    giftRecipient = "";
-                    gifted = false;
                 }
             }
 
@@ -820,18 +799,13 @@ public class CommandParser {
                 // exit and return if this is true- prevents spammed replies 
                 // (mass sub gifts, ie 100 sub bomb)
             } else {
-
-                int beginTier = msg.indexOf("msg-param-sub-plan=") + 19;
-                int endTier = msg.indexOf(";", beginTier);
-                String subTier = msg.substring(beginTier, endTier);
-                prime = false;
+                String subTier = messageTagValue(msg, "msg-param-sub-plan");
                 int subPoints = 0;
                 if (subTier.equals("Prime")) {
                     subPoints = 1;
                     prime = true;
                 } else if (Integer.parseInt(subTier) == 1000) {
                     subPoints = 1;
-                    prime = false;
                 } else if (Integer.parseInt(subTier) == 2000) {
                     subPoints = 2;
                 } else if (Integer.parseInt(subTier) == 3000) {
@@ -874,16 +848,13 @@ public class CommandParser {
         try {
             //TODO replicate sub response system 
             // add ability to have different or min amount for message
-            int beginAmt = msg.indexOf("bits=") + 5;
-            int endAmt = msg.indexOf(";", beginAmt);
-            String amt = msg.substring(beginAmt, endAmt);
+            String amt = messageTagValue(msg, "bits");
+            String user = messageTagValue(msg, "display-name");
 
-            int beginName = msg.indexOf("display-name=") + 13;
-            int endName = msg.indexOf(";", beginName);
-            String user = msg.substring(beginName, endName);
             if (store.getConfiguration().marathonStatus.equals("on")) {
                 mHandler.addBits(Integer.parseInt(amt));
             }
+
             // send to spoopathon system if on
             if (store.getConfiguration().spoopathonStatus.equals("on")) {
                 String lowerUser = user.toLowerCase();
@@ -1073,5 +1044,15 @@ public class CommandParser {
                 store.getEventList().addList(event);
             }
         });
+    }
+
+    // Extract value from IRC tags
+    private String messageTagValue(String message, String tag) {
+        // Add one to account for the =
+        int startIndex = message.indexOf(tag) + tag.length() + 1;
+        int endIndex = message.indexOf(";", startIndex);
+        String tagValue = message.substring(startIndex, endIndex);
+
+        return tagValue;
     }
 }
