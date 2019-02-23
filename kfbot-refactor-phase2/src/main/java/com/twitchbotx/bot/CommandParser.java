@@ -852,7 +852,7 @@ public class CommandParser {
             String user = messageTagValue(msg, "display-name");
 
             if (store.getConfiguration().marathonStatus.equals("on")) {
-                mHandler.addBits(Integer.parseInt(amt));
+                //mHandler.addBits(Integer.parseInt(amt));
             }
 
             // send to spoopathon system if on

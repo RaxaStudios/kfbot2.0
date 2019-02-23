@@ -297,7 +297,7 @@ public class MarathonController implements Initializable {
         int minuteValue = 500;
         int dollarValue = 0;
         int dollarMinute = 0;
-        int subValue = 0;
+        double subValue = 0;
         //set minute value from sql query
         String minValue = "SELECT minValue, dollarValue, dollarMinute, subValue FROM kfTimer";
         try {
@@ -306,7 +306,7 @@ public class MarathonController implements Initializable {
                 minuteValue = aM.getInt("minValue");
                 dollarValue = aM.getInt("dollarValue");
                 dollarMinute = aM.getInt("dollarMinute");
-                subValue = aM.getInt("subValue");
+                subValue = aM.getDouble("subValue");
             }
         } catch (Exception e) {
             e.printStackTrace();

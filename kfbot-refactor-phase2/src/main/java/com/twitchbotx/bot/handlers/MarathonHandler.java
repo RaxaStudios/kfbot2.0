@@ -92,6 +92,7 @@ public class MarathonHandler {
                 pointMins = 0;
             }
         }
+        int pointSeconds = amt;
         //find change in minutes
         int deltaMins = pointMins - preMins;
         System.out.println(pointHours + " " + pointMins);
@@ -102,11 +103,12 @@ public class MarathonHandler {
         if (pointHours > (maxHour - 1)) {
             pointHours = maxHour;
             pointMins = 0;
+            pointSeconds = 0;
             deltaMins = 999;
         }
 
         //begin update sql point value
-        String addP = "Update kfTimer SET points = \'" + sendAmt + "\', hours=\'" + pointHours + "\', minutes=\'" + pointMins + "\' WHERE indexID=\'0\'";
+        String addP = "Update kfTimer SET points = \'" + sendAmt + "\', hours=\'" + pointHours + "\', minutes=\'" + pointMins + "\', seconds=\'" + pointSeconds + "\' WHERE indexID=\'0\'";
         try {
             Class.forName("com.mysql.jdbc.Driver");
             con = DriverManager.getConnection(SQLURL, USER, PASS);
@@ -138,7 +140,7 @@ public class MarathonHandler {
         //hard coded for 4/27 marathon 1 sub point = 5 minutes = (200points/1minute)*5 = 1000 points
 
         //get value of sub from sql, 1 sub point = subPointValue in minutes @ 60 points = 1 minute
-        int subPointValue = 0;
+        double subPointValue = 0;
         //set minute value from sql query
         String subValue = "SELECT subValue FROM kfTimer";
         try {
@@ -159,7 +161,7 @@ public class MarathonHandler {
         }
 
         int pointsToAdd = 0;
-        int minutesToAdd = 0;
+        double minutesToAdd = 0;
         // adjust for  sub gifts/mass gifts
         if (massGift) {
             minutesToAdd = subPoints * subPointValue * giftAmount;
@@ -167,10 +169,10 @@ public class MarathonHandler {
             minutesToAdd = subPoints * subPointValue;
         }
         // 1 sub point * minute value
-        pointsToAdd = minutesToAdd * 60; //convert minutes to seconds, 1 point = 1 sec
+        pointsToAdd = (int) minutesToAdd * 60; //convert minutes to seconds, 1 point = 1 sec
         addPoints("!addPoints " + pointsToAdd);
 
-    }
+    } 
 
     //dollar addition system -> addPoints
     public void addDollars(int dollars) {
@@ -340,21 +342,23 @@ public class MarathonHandler {
 
     public void addMinutes(String minutes) {
         //convert to points and !addPoints
-        int minutesToAdd = Integer.parseInt(minutes);
-        int points = minutesToAdd * 60;
-        System.out.println("adding " + points + " points/seconds");
-        addPoints("!addPoints " + points);
+        double minutesToAdd = Double.parseDouble(minutes);
+        double points = minutesToAdd * 60;
+        int p = (int) points;
+        System.out.println("adding " + p + " points/seconds" + " points=" + points);
+        addPoints("!addPoints " + p);
     }
 
     //set value of base time(aka marathon lowest end time, normally 12 hours)
     public void setBaseTime(String msg) {
         String amt = msg.substring(msg.indexOf(" ") + 1);
+        String hr = msg.substring(msg.indexOf(" "), msg.indexOf(":", msg.indexOf(" ")));
         try {
             Class.forName("com.mysql.jdbc.Driver");
             con = DriverManager.getConnection(SQLURL, USER, PASS);
             stmt = con.createStatement();
             String setM = "";
-            setM = "UPDATE kfTimer SET baseTime=\'" + amt + "\' WHERE indexID=\'0\'";
+            setM = "UPDATE kfTimer SET baseTime=\'" + amt + "\', baseHour\'" + hr + "\' WHERE indexID=\'0\'";
             stmt.executeUpdate(setM);
             con.close();
             addPoints("!addPoints 0");
