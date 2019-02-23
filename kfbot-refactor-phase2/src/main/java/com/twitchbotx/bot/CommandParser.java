@@ -1,6 +1,5 @@
 package com.twitchbotx.bot;
 
-
 import com.twitchbotx.bot.handlers.*;
 import com.twitchbotx.gui.controllers.ConfigurationController;
 import com.twitchbotx.gui.controllers.DashboardController;
@@ -130,7 +129,7 @@ public class CommandParser {
                 System.out.println(cmd + " COMMAND");
             }
         }
-        
+
 // comment out until needed/wanted back in
 //        final boolean detected = pyramidDetector.pyramidDetection(username, trailing);
 //        if(detected) {
@@ -525,7 +524,9 @@ public class CommandParser {
             return;
         }
         if (trailing.toLowerCase().startsWith("!vote")) {
-            if(store.getConfiguration().spoopathonStatus.equals("off")){ return; }
+            if (store.getConfiguration().spoopathonStatus.equals("off")) {
+                return;
+            }
             // parse for params "!vote [gameID] [votes]
             System.out.println("trailing: " + trailing);
             try {
@@ -736,10 +737,10 @@ public class CommandParser {
         // TODO replicate the sub response system for raids and bits
         // parse raw message
         try {
-            String raider = messageTagValue(msg, "msg-param-displayName");
-            int viewers = Integer.parseInt(messageTagValue(msg, "msg-param-viewerCount"));
+            String raider = messageTagValue(msg, "msg-param-displayName=");
+            int viewers = Integer.parseInt(messageTagValue(msg, "msg-param-viewerCount="));
             /// send to eventhandler for message to chat
-            
+
             if (store.getConfiguration().raidReply.equals("on")) {
                 eHandler.handleRaid(raider, viewers);
             }
@@ -762,33 +763,33 @@ public class CommandParser {
             boolean gifted = false;
             boolean prime = false;
 
-        /*
+            /*
         ** catch "msg-param-mass-gift-count"  before looking for sub length
         ** set temp variable if "display-name" = name of mass gifter for count # of times, don't respond
         ** new sub = 1 month
-        */
-            String subDisplayName = messageTagValue(msg, "display-name");
+             */
+            String subDisplayName = messageTagValue(msg, "display-name=");
             // check for gifted batch sub
             if (msg.contains("msg-id=submysterygift")) {
                 // set these variables on a new sub batch
-                tempGiftAmount = Integer.parseInt(messageTagValue(msg, "gift-count"));
+                tempGiftAmount = Integer.parseInt(messageTagValue(msg, "gift-count="));
                 tempName = subDisplayName;
                 massGifted = true;
+            } else if (msg.contains("msg-id=subgift")) {
+                giftRecipient = messageTagValue(msg, "recipient-display-name=");
+                gifted = true;
+                if (tempName.equals(subDisplayName)) {
+                    tempGiftAmount--;
+                } else {
+                    tempGiftAmount = 1;
+                }
+                if (tempGiftAmount < 0) {
+                    tempName = "";
+                }
             } else {
                 // sub gift notification does not have this param
-                subMonths = messageTagValue(msg, "msg-param-cumulative-months");
-                if (msg.contains("msg-id=subgift")) {
-                    giftRecipient = messageTagValue(msg, "recipient-display-name");
-                    gifted = true;
-                    if (tempName.equals(subDisplayName)) {
-                        tempGiftAmount--;
-                    } else {
-                        tempGiftAmount = 1;
-                    }
-                    if (tempGiftAmount < 0) {
-                        tempName = "";
-                    }
-                }
+                subMonths = messageTagValue(msg, "msg-param-cumulative-months=");
+
             }
 
             if (gifted && tempName.equals(subDisplayName)) {
@@ -799,7 +800,7 @@ public class CommandParser {
                 // exit and return if this is true- prevents spammed replies 
                 // (mass sub gifts, ie 100 sub bomb)
             } else {
-                String subTier = messageTagValue(msg, "msg-param-sub-plan");
+                String subTier = messageTagValue(msg, "msg-param-sub-plan=");
                 int subPoints = 0;
                 if (subTier.equals("Prime")) {
                     subPoints = 1;
@@ -848,8 +849,8 @@ public class CommandParser {
         try {
             //TODO replicate sub response system 
             // add ability to have different or min amount for message
-            String amt = messageTagValue(msg, "bits");
-            String user = messageTagValue(msg, "display-name");
+            String amt = messageTagValue(msg, "bits=");
+            String user = messageTagValue(msg, "display-name=");
 
             if (store.getConfiguration().marathonStatus.equals("on")) {
                 //mHandler.addBits(Integer.parseInt(amt));
@@ -909,7 +910,7 @@ public class CommandParser {
             }
 
             // Find the VIP indication, treat at sub level
-            if(msg.contains("@badges=vip/1,")){
+            if (msg.contains("@badges=vip/1,")) {
                 isSub = true;
             }
             // Find the subscriber indication
@@ -998,7 +999,7 @@ public class CommandParser {
                 final int msgIdBegin = sendRaw.indexOf("id=") + 3;
                 final int msgIdEnd = sendRaw.indexOf(";", msgIdBegin);
                 String msgId = sendRaw.substring(msgIdBegin, msgIdEnd);
-                
+
                 // Determine where message is from
                 final int channelName = chanFind.indexOf("#", chanFind.indexOf("PRIVMSG"));
                 final int chanIndex = chanFind.indexOf(" ", channelName);
@@ -1048,8 +1049,7 @@ public class CommandParser {
 
     // Extract value from IRC tags
     private String messageTagValue(String message, String tag) {
-        // Add one to account for the =
-        int startIndex = message.indexOf(tag) + tag.length() + 1;
+        int startIndex = message.indexOf(tag) + tag.length();
         int endIndex = message.indexOf(";", startIndex);
         String tagValue = message.substring(startIndex, endIndex);
 
