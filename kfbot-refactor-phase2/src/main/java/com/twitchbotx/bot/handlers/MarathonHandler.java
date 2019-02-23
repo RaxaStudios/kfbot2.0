@@ -165,7 +165,7 @@ public class MarathonHandler {
         // adjust for  sub gifts/mass gifts
         if (massGift) {
             minutesToAdd = subPoints * subPointValue * giftAmount;
-       } else {
+        } else {
             minutesToAdd = subPoints * subPointValue;
         }
         // 1 sub point * minute value
