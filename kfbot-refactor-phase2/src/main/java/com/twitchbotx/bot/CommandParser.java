@@ -776,6 +776,7 @@ public class CommandParser {
                 tempName = subDisplayName;
                 massGifted = true;
             } else if (msg.contains("msg-id=subgift")) {
+                subMonths = messageTagValue(msg, "msg-param-months=");
                 giftRecipient = messageTagValue(msg, "recipient-display-name=");
                 gifted = true;
                 if (tempName.equals(subDisplayName)) {
