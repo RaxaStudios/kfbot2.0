@@ -146,7 +146,7 @@ public class DashboardController implements Initializable{
 
     @FXML
     private void restartBot(ActionEvent event) {
-      DashboardController.wIRC.close();
+      wIRC.close();
     }
 
     public Scene getScene() throws IOException {

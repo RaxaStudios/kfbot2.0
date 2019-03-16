@@ -237,7 +237,6 @@ public final class XmlDatastore implements Datastore {
             filter.seconds = e.getAttribute("seconds");
             filters.add(filter);
         }
-
         return filters;
     }
 

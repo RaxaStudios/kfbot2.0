@@ -149,6 +149,15 @@ public class LotteryController implements Initializable {
     }
 
     @FXML
+    public void sendLottoReminder() {
+        if (subRadioButton.isSelected()) {
+            sendMessage("A sub-only lottery is running! Subs can type " + keywordText.getText() + " to enter!");
+        } else {
+            sendMessage("A lottery is running! Type " + keywordText.getText() + " to enter!");
+        }
+    }
+
+    @FXML
     public void closeQueue() {
         lotto.lottoClose();
         addUserTextField.setText("Lottery closed");
@@ -187,12 +196,21 @@ public class LotteryController implements Initializable {
             boolean isEmpty = lotto.getCurr().isEmpty();
             if (!isEmpty) {
                 winner = lotto.drawLotto();
-                winnerText.setAlignment(Pos.CENTER);
-                winnerText.setText(winner);
-                Calendar cal = Calendar.getInstance();
-                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-                sendEvent(sdf.format(cal.getTime()) + " lottery winner: " + winner);
-                showQueue();
+                System.out.println("winner set to " + winner);
+                if (lotto.getCurr().isEmpty()) {
+                    winnerText.setAlignment(Pos.CENTER);
+                    sendMessage("Lottery is empty");
+                    winnerText.setText("Lottery is empty");
+                    showQueue();
+                    
+                } else if(!winner.equals("empty")) {
+                    winnerText.setAlignment(Pos.CENTER);
+                    winnerText.setText(winner);
+                    Calendar cal = Calendar.getInstance();
+                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                    sendEvent(sdf.format(cal.getTime()) + " lottery winner: " + winner);
+                    showQueue();
+                }
             } else {
                 winnerText.setAlignment(Pos.CENTER);
                 sendMessage("Lottery is empty");
@@ -258,6 +276,11 @@ public class LotteryController implements Initializable {
     }
 
     @FXML
+    public void sendSongReminder() {
+        sendMessage("A song lottery is running! Type !song [song number] (without the brackets) to enter");
+    }
+
+    @FXML
     public void closeSongLotto() {
         entries.songClose();
         songStatusWindow.setText("Lottery has been closed");
@@ -289,6 +312,9 @@ public class LotteryController implements Initializable {
     @FXML
     public void drawSongWinner() {
         String drawnWinner = entries.drawSong();
+        if (drawnWinner.equals("notPresent")) {
+            drawnWinner = entries.drawSong();
+        }
         ///System.out.println(winner);
         int begIndex = drawnWinner.indexOf("song:") + 6;
         int endIndex = drawnWinner.length();
@@ -336,18 +362,18 @@ public class LotteryController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        try{
-        LOTTOMAP = lotto.getMap();
-        SONGMAP = entries.getMap();
-        store = guiHandler.bot.getStore();
-        qStatus.setText("Lottery ready to use");
-        songStatusWindow.setText("Song Lotto ready");
-        showQueue();
-        showSongQueue();
-        setRadios();
-        addListener(lottoGroup, "lottoStatus");
-        addListener(songLottoGroup, "songLottoStatus");
-        } catch(Exception e){
+        try {
+            LOTTOMAP = lotto.getMap();
+            SONGMAP = entries.getMap();
+            store = guiHandler.bot.getStore();
+            qStatus.setText("Lottery ready to use");
+            songStatusWindow.setText("Song Lotto ready");
+            showQueue();
+            showSongQueue();
+            setRadios();
+            addListener(lottoGroup, "lottoStatus");
+            addListener(songLottoGroup, "songLottoStatus");
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

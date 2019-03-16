@@ -141,6 +141,8 @@ public class LotteryHandler {
             sendMessage(user + " has been removed from the lottery");
         }
 
+        private String tempName = "";
+
         public synchronized String drawLotto() {
             int r = 0;
             size = MAP.size();
@@ -158,19 +160,33 @@ public class LotteryHandler {
                 Collections.shuffle(sA);
                 r = RNG.nextInt(sA.size());
                 winner = sA.get(r);
-                sendMessage("Winner: " + winner + " kffcCheer");
-                prevWinner.add(winner);
-                MAP.remove(winner);
-                currPool.remove(winner);
-                MAP.entrySet().forEach((m) -> {
-                    int ticketValue = 2;
-                    for (String c : prevWinner) {
-                        if (c.equals(m.getKey())) {
-                            ticketValue = 1;
+                // check for user in chat, choose again if not found per request
+                if (tempName.equals(winner)) {
+                    return "empty";
+                }
+
+                if (!userPresent(winner)) {
+                    System.out.println("trying to remove " + winner);
+                    MAP.remove(winner);
+                    currPool.remove(winner);
+                    tempName = winner;
+                    drawLotto();
+                    return "empty";
+                } else {
+                    sendMessage("Winner: " + winner + " kffcCheer");
+                    prevWinner.add(winner);
+                    MAP.remove(winner);
+                    currPool.remove(winner);
+                    MAP.entrySet().forEach((m) -> {
+                        int ticketValue = 2;
+                        for (String c : prevWinner) {
+                            if (c.equals(m.getKey())) {
+                                ticketValue = 1;
+                            }
                         }
-                    }
-                    m.getValue().addTicket(ticketValue);
-                });
+                        m.getValue().addTicket(ticketValue);
+                    });
+                }
             } catch (NullPointerException | IllegalArgumentException ne) {
                 sendMessage("Lottery is empty!");
             }
@@ -449,6 +465,13 @@ public class LotteryHandler {
                 Collections.shuffle(sA);
                 r = RNG.nextInt(sA.size());
                 winner = sA.get(r);
+                // check for user in chat, choose again if not found per request
+                if (!userPresent(winner)) {
+                    System.out.println("trying to remove " + winner);
+                    MAP.remove(winner);
+                    currPool.remove(winner);
+                    drawSong();
+                }
                 winnerSong = MAP.get(winner).getContent();
                 sendMessage("Winner: " + winner + " kffcCheer Song choice: " + MAP.get(winner).getContent());
                 prevWinner.add(winner);
@@ -554,7 +577,7 @@ public class LotteryHandler {
         }
     }
 
-    private void sendEvent(final String msg) {
+    private static void sendEvent(final String msg) {
         String event = msg;
         Platform.runLater(new Runnable() {
             @Override
@@ -576,4 +599,22 @@ public class LotteryHandler {
         DashboardController.wIRC.sendMessage(msg, true);
     }
 
+    /**
+     * Method to check for user still in chat at time of drawing
+     *
+     * @param username
+     *
+     * @return boolean in chat
+     */
+    private static boolean userPresent(String user) {
+        if (TwitchStatusHandler.userPresent(user)) {
+
+            return true;
+        } else {
+            sendEvent(user + " was not found, redrawing");
+            System.out.println(user + " was not found, redrawing");
+            return false;
+        }
+
+    }
 }

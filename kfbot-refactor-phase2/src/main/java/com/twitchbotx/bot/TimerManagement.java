@@ -117,7 +117,7 @@ public final class TimerManagement {
 
     public static class Task {
 
-        private final TwitchStatusHandler tH = new TwitchStatusHandler(guiHandler.bot.getStore());
+        private final TwitchStatusHandler tH = new TwitchStatusHandler();
         private volatile boolean dead;
         private final ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
         private Future f;
