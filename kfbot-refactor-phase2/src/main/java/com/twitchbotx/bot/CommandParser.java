@@ -74,7 +74,7 @@ public class CommandParser {
         // all the handlers for different messages
         this.commandOptionsHandler = new CommandOptionHandler(store);
         this.pyramidDetector = new PyramidDetector(store);
-        twitchStatusHandler = new TwitchStatusHandler(store);
+        twitchStatusHandler = new TwitchStatusHandler();
         this.countHandler = new CountHandler(store);
         filterHandler = new FilterHandler(store);
         moderationHandler = new ModerationHandler(store);
@@ -351,7 +351,9 @@ public class CommandParser {
 
         if (trailing.startsWith("!song-draw")) {
             if (commandOptionsHandler.checkAuthorization("!song-draw", username, mod, sub)) {
-                songs.drawSong();
+                if(songs.drawSong().equals("notPresent")){
+                    songs.drawSong();
+                }
             }
             return;
         }
@@ -1056,4 +1058,15 @@ public class CommandParser {
 
         return tagValue;
     }
+    
+    public static class testUnit {
+        public testUnit(){
+            
+        }
+        public boolean testString(String test){
+            System.out.println("Testing :" + test);
+            return test.equals("test");
+        }
+    }
+    
 }

@@ -410,7 +410,7 @@ public final class ConfigParameters {
         @Override
         public String toString() {
             return "FilterRegex{"
-                    + "name-'" + name + '\''
+                    + "name='" + name + '\''
                     + "enabled='" + enabled + '\''
                     + ", content='" + content + '\''
                     + ", reason='" + reason + '\''

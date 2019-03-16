@@ -1,6 +1,7 @@
 package com.twitchbotx.bot.handlers;
 
 import com.twitchbotx.bot.Datastore;
+import com.twitchbotx.gui.guiHandler;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -19,10 +20,10 @@ public final class TwitchStatusHandler {
 
     private static final Logger LOGGER = Logger.getLogger(TwitchStatusHandler.class.getSimpleName());
 
-    private final Datastore store;
-    
-    public TwitchStatusHandler(final Datastore store) {
-        this.store = store;
+    private static Datastore store;
+
+    public TwitchStatusHandler() {
+        store = guiHandler.bot.getStore();
     }
 
     /**
@@ -101,12 +102,10 @@ public final class TwitchStatusHandler {
                 response.append(inputLine);
             }
 
-            
             int bi = response.toString().indexOf("\"created_at\":") + 14;
             int ei = response.toString().indexOf("\"", bi);
             String s = response.toString().substring(bi, ei);
-            
-            
+
             DateTimeFormatter full = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss'Z'");
             DateTimeFormatter format = DateTimeFormatter.ofPattern("MMM dd, uuuu");
             ZoneId z = ZoneId.of("UTC-1");
@@ -122,14 +121,14 @@ public final class TwitchStatusHandler {
             diff = diff - (diffMinutes * 60 * 1000);
             long diffSeconds = diff / 1000;
             diff = diff - (diffSeconds * 1000);
-           if(diffDay < 0 || diffHours < 0 || diffMinutes < 0){
+            if (diffDay < 0 || diffHours < 0 || diffMinutes < 0) {
                 diffDay = 0;
                 diffHours = 0;
                 diffMinutes = 0;
                 diffSeconds = 0;
             }
             String beginFormatted = begin.format(format);
-            String gap = diffDay +" days " + diffHours + " hours " + diffMinutes +" minutes " + diffSeconds + " seconds"; 
+            String gap = diffDay + " days " + diffHours + " hours " + diffMinutes + " minutes " + diffSeconds + " seconds";
             brin.close();
             return user + " has been following for " + gap + ". Starting on " + beginFormatted + ".";
 
@@ -145,12 +144,12 @@ public final class TwitchStatusHandler {
 
     /**
      * Find last played game for use with %game% variable, namely !follow
-     * 
+     *
      * @param Username sent name from the param of !follow
-     * 
+     *
      * @return String value of game
      */
-    public String getLastGame(String username){
+    public String getLastGame(String username) {
         String game = "";
         try {
             String gameURL = store.getConfiguration().channelInfo;
@@ -167,20 +166,20 @@ public final class TwitchStatusHandler {
                 response.append(inputLine);
             }
             brin.close();
-            
+
             System.out.println("GAME RESPONSE: " + response);
-            
+
             int bi = response.indexOf("\"game\"") + 8;
             int ei = response.indexOf("\",", bi);
             game = response.substring(bi, ei);
             System.out.println("Game found: " + game);
-            
-        } catch(Exception ie){
+
+        } catch (Exception ie) {
             ie.printStackTrace();
         }
         return game;
     }
-    
+
     //TODO implement highlight system and commands to google doc system
     // mod and viewer editions
     /*   public void highlight() {
@@ -210,4 +209,38 @@ public final class TwitchStatusHandler {
         }
     }
      */
+    /**
+     * run a check on twitch viewerlist url:
+     * https://tmi.twitch.tv/group/user/channel/chatters
+     *
+     * @param user
+     * @return if found in viewerlist
+     */
+    public static boolean userPresent(String user) {
+        try {
+            String channel = store.getConfiguration().joinedChannel;
+            String nameURL = "https://tmi.twitch.tv/group/user/" + channel + "/chatters";
+            URL url = new URL(nameURL);
+            URLConnection con = (URLConnection) url.openConnection();
+            BufferedReader brin = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            StringBuilder response = new StringBuilder();
+            String inputLine;
+            while ((inputLine = brin.readLine()) != null) {
+                response.append(inputLine);
+            }
+            brin.close();
+
+            //System.out.println("NAME RESPONSE: " + response);
+            if (response.toString().contains("\"" + user.toLowerCase() + "\"")) {
+                System.out.println("found user:" + user);
+                return true;
+            } else {
+                System.out.println("did not find user:" + user);
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

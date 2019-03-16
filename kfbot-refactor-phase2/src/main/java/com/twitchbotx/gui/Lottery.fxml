@@ -56,6 +56,7 @@
                               <ListView fx:id="userLottoListView" prefHeight="280.0" prefWidth="232.0" />
                            </content>
                         </ScrollPane>
+                        <Button layoutX="442.0" layoutY="318.0" mnemonicParsing="false" onAction="#sendLottoReminder" prefHeight="25.0" prefWidth="129.0" text="Send Reminder" />
                      </children>
                   </AnchorPane>
             </content>
@@ -79,7 +80,7 @@
                         </Label>
                         <Label fx:id="songStatusWindow" alignment="CENTER" contentDisplay="CENTER" layoutX="29.0" layoutY="59.0" prefHeight="89.0" prefWidth="190.0" style="-fx-border-color: grey; -fx-background-color: white;" wrapText="true" />
                         <Label fx:id="songWinnerName" alignment="CENTER" contentDisplay="CENTER" layoutX="82.0" layoutY="279.0" prefHeight="27.0" prefWidth="151.0" style="-fx-background-color: white; -fx-border-color: grey;" />
-                        <Button layoutX="241.0" layoutY="59.0" mnemonicParsing="false" onAction="#openSongLotto" text="Open Lottery" />
+                        <Button layoutX="241.0" layoutY="79.0" mnemonicParsing="false" onAction="#openSongLotto" text="Open Lottery" />
                         <Button layoutX="348.0" layoutY="334.0" mnemonicParsing="false" onAction="#clearSongQueue" text="Clear Queue" />
                         <Label layoutX="421.0" layoutY="13.0" text="Current Queue">
                            <font>
@@ -102,6 +103,7 @@
                               <ListView fx:id="userSongListView" prefHeight="260.0" prefWidth="219.0" />
                            </content>
                         </ScrollPane>
+                        <Button layoutX="241.0" layoutY="21.0" mnemonicParsing="false" onAction="#sendSongReminder" prefHeight="45.0" prefWidth="86.0" text="Send Reminder" textAlignment="CENTER" wrapText="true" />
                      </children>
                   </AnchorPane>
             </content>
